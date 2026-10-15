@@ -39,15 +39,18 @@
 
 ## IV. HƯỚNG DẪN KHỞI CHẠY
 
-### 1. Chạy ứng dụng bằng một lệnh duy nhất
-Tại thư mục gốc của dự án, mở terminal và gõ:
-```bash
-mvn spring-boot:run
-```
-Sau khi màn hình hiện thông báo `Started NewsApplication`, mở trình duyệt web và truy cập:
-👉 **[http://localhost:8080](http://localhost:8080)**
+### 1. Khởi động ứng dụng (chọn 1 trong các cách sau)
+- **Cách 1 (Khuyên dùng - Tiện lợi nhất):** Nhấp đúp vào file [`run.bat`](file:///E:/Ch%C3%B3Khu%C3%AA/run.bat) hoặc gõ trong terminal:
+  ```powershell
+  .\mvn spring-boot:run
+  ```
+- **Cách 2 (Chạy trực tiếp file JAR đã đóng gói):**
+  ```powershell
+  java -jar target/news-reader-1.0.0.jar
+  ```
 
-*(Lưu ý: Nếu cổng 8080 trên máy của bạn đang bị ứng dụng khác chiếm dụng, có thể chạy với cổng khác bằng lệnh: `mvn spring-boot:run -Dspring-boot.run.arguments=--server.port=8081` và truy cập [http://localhost:8081](http://localhost:8081))*.
+Sau khi màn hình hiện thông báo `Started NewsApplication`, mở trình duyệt web và truy cập:
+👉 **[http://localhost:8080](http://localhost:8080)** (hoặc **[http://localhost:8081](http://localhost:8081)** nếu máy bạn đang có phần mềm chiếm cổng 8080 - hệ thống có cơ chế tự động chuyển cổng thông minh, không lo xung đột).
 
 ### 2. Chạy kiểm thử tự động (Unit Test & Integration Test)
 Dự án có **31 bài kiểm thử tự động** bao phủ toàn bộ 6 mẫu thiết kế và các chức năng:
