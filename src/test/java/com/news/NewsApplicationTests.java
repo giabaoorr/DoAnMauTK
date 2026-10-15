@@ -88,4 +88,26 @@ class NewsApplicationTests {
         assertThat(newsService.getUnreadCounter()).isNotNull();
         assertThat(newsService.getNewsLogger().getLogHistory()).isNotEmpty();
     }
+
+    @Test
+    @DisplayName("GĐ5 - Truy cập trang /bookmarks và thực hiện toggle bookmark")
+    void testBookmarksEndpoint() throws Exception {
+        mockMvc.perform(get("/bookmarks"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("bookmarks"))
+                .andExpect(model().attributeExists("articles"))
+                .andExpect(model().attributeExists("bookmarkCount"));
+
+        List<Article> articles = newsService.getAllArticles();
+        assertThat(articles).isNotEmpty();
+        String articleId = articles.get(0).getId();
+
+        // Toggle bookmark
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/bookmarks/toggle")
+                        .param("articleId", articleId)
+                        .param("returnUrl", "/"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/"))
+                .andExpect(flash().attributeExists("message"));
+    }
 }

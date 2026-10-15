@@ -27,18 +27,52 @@ public class NewsService {
     private final List<Article> articles = new CopyOnWriteArrayList<>();
     private final List<FeedSource> feedSources = new ArrayList<>();
     private boolean fallbackMode = false;
+    private final BookmarkService bookmarkService;
 
     // [Observer] Khởi tạo Subject và các Observers bằng Java thuần
     private final com.news.observer.NewsFeed newsFeed = new com.news.observer.NewsFeed();
     private final com.news.observer.UnreadCounter unreadCounter = new com.news.observer.UnreadCounter();
     private final com.news.observer.NewsLogger newsLogger = new com.news.observer.NewsLogger();
 
-    public NewsService() {
+    public NewsService(BookmarkService bookmarkService) {
+        this.bookmarkService = bookmarkService;
         initDefaultFeedSources();
 
         // [Observer] Đăng ký (attach) các Observer vào Subject
         newsFeed.attach(unreadCounter);
         newsFeed.attach(newsLogger);
+    }
+
+    /**
+     * [Decorator] Bọc Article bằng các Concrete Decorator tùy theo ngữ cảnh và trạng thái:
+     * - BookmarkedArticle: nếu bài viết đã được lưu
+     * - FeaturedArticle: nếu bài viết thuộc nhóm tin tiêu điểm / từ khóa nổi bật
+     * - SummarizedArticle: tạo đoạn trích dẫn súc tích và tính toán thời gian đọc
+     */
+    public Article applyDecorators(Article article) {
+        if (article == null) return null;
+        Article decorated = article;
+
+        // 1. [Decorator] Bọc BookmarkedArticle nếu người dùng đã lưu
+        if (bookmarkService != null && bookmarkService.isBookmarked(article.getId())) {
+            decorated = new com.news.decorator.BookmarkedArticle(decorated);
+        }
+
+        // 2. [Decorator] Bọc FeaturedArticle nếu là tin bài tiêu điểm nổi bật
+        if (isHighlightArticle(article)) {
+            decorated = new com.news.decorator.FeaturedArticle(decorated);
+        }
+
+        // 3. [Decorator] Bọc SummarizedArticle để tối ưu phần mô tả tóm tắt
+        decorated = new com.news.decorator.SummarizedArticle(decorated, 160);
+
+        return decorated;
+    }
+
+    private boolean isHighlightArticle(Article a) {
+        if (a == null || a.getTitle() == null) return false;
+        String t = a.getTitle().toLowerCase();
+        return t.contains("kỷ lục") || t.contains("đột phá") || t.contains("khởi công") || t.contains("ai");
     }
 
     private void initDefaultFeedSources() {
@@ -152,24 +186,33 @@ public class NewsService {
     }
 
     public List<Article> getAllArticles() {
-        return Collections.unmodifiableList(new ArrayList<>(articles));
+        return articles.stream()
+                .map(this::applyDecorators)
+                .collect(Collectors.toList());
     }
 
     /**
-     * [Strategy] Lấy danh sách bài viết sau khi xử lý qua các chiến lược sắp xếp và lọc.
+     * [Strategy & Decorator] Lấy danh sách bài viết sau khi xử lý qua các chiến lược sắp xếp và lọc,
+     * đồng thời áp dụng Decorator pattern cho từng bài viết.
      */
     public List<Article> getProcessedArticles(String category, String source, String sort) {
         // [Strategy] Khởi tạo Context và nạp các chiến lược theo lựa chọn
         com.news.strategy.ArticleProcessorContext context =
                 com.news.strategy.ArticleProcessorContext.fromUserPreferences(category, source, sort);
-        return context.process(new ArrayList<>(this.articles));
+        List<Article> processed = context.process(new ArrayList<>(this.articles));
+
+        // [Decorator] Áp dụng các decorator cho bài viết kết quả
+        return processed.stream()
+                .map(this::applyDecorators)
+                .collect(Collectors.toList());
     }
 
     public Optional<Article> getArticleById(String id) {
         if (id == null) return Optional.empty();
         return articles.stream()
                 .filter(a -> id.equals(a.getId()))
-                .findFirst();
+                .findFirst()
+                .map(this::applyDecorators);
     }
 
     public List<String> getAllCategories() {

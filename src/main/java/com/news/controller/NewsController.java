@@ -18,9 +18,11 @@ import java.util.Optional;
 public class NewsController {
 
     private final NewsService newsService;
+    private final com.news.service.BookmarkService bookmarkService;
 
-    public NewsController(NewsService newsService) {
+    public NewsController(NewsService newsService, com.news.service.BookmarkService bookmarkService) {
         this.newsService = newsService;
+        this.bookmarkService = bookmarkService;
     }
 
     /**
@@ -45,6 +47,7 @@ public class NewsController {
         model.addAttribute("selectedSource", source != null ? source : "");
         model.addAttribute("selectedSort", sort != null ? sort : "newest");
         model.addAttribute("fallbackMode", newsService.isFallbackMode());
+        model.addAttribute("bookmarkCount", bookmarkService.getBookmarkCount());
         return "index";
     }
 
@@ -56,10 +59,53 @@ public class NewsController {
         Optional<Article> articleOpt = newsService.getArticleById(id);
         if (articleOpt.isEmpty()) {
             model.addAttribute("errorMessage", "Không tìm thấy bài viết yêu cầu!");
+            model.addAttribute("bookmarkCount", bookmarkService.getBookmarkCount());
             return "error/404";
         }
         model.addAttribute("article", articleOpt.get());
+        model.addAttribute("bookmarkCount", bookmarkService.getBookmarkCount());
         return "detail";
+    }
+
+    /**
+     * [Decorator] Trang hiển thị danh sách bài viết đã đánh dấu (BookmarkedArticle).
+     */
+    @GetMapping("/bookmarks")
+    public String bookmarks(Model model) {
+        List<Article> bookmarkedArticles = bookmarkService.getBookmarkedArticles();
+        model.addAttribute("articles", bookmarkedArticles);
+        model.addAttribute("bookmarkCount", bookmarkedArticles.size());
+        return "bookmarks";
+    }
+
+    /**
+     * [Decorator & JSON File Storage] Thao tác Đánh dấu / Bỏ đánh dấu bài viết.
+     */
+    @org.springframework.web.bind.annotation.PostMapping("/bookmarks/toggle")
+    public String toggleBookmark(
+            @org.springframework.web.bind.annotation.RequestParam("articleId") String articleId,
+            @org.springframework.web.bind.annotation.RequestParam(name = "returnUrl", defaultValue = "/") String returnUrl,
+            org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+
+        // Tìm bài viết trong NewsService hoặc từ BookmarkService
+        Optional<Article> articleOpt = newsService.getArticleById(articleId);
+        if (articleOpt.isEmpty()) {
+            // Có thể đang ở trang bookmarks mà tin chưa được tải trong bộ nhớ chính
+            articleOpt = bookmarkService.getBookmarkedArticles().stream()
+                    .filter(a -> articleId.equals(a.getId()))
+                    .findFirst();
+        }
+
+        if (articleOpt.isPresent()) {
+            boolean isBookmarked = bookmarkService.toggleBookmark(articleOpt.get());
+            if (isBookmarked) {
+                redirectAttributes.addFlashAttribute("message", "Đã lưu bài viết vào danh sách đánh dấu!");
+            } else {
+                redirectAttributes.addFlashAttribute("message", "Đã gỡ bài viết khỏi danh sách đánh dấu!");
+            }
+        }
+
+        return "redirect:" + (returnUrl.startsWith("/") ? returnUrl : "/");
     }
 
     /**
