@@ -61,4 +61,22 @@ public class NewsController {
         model.addAttribute("article", articleOpt.get());
         return "detail";
     }
+
+    /**
+     * [Observer] Làm mới dữ liệu tin tức.
+     * Khi nhấn nút, Service làm mới tin và Subject (NewsFeed) sẽ thông báo cho các Observer.
+     */
+    @org.springframework.web.bind.annotation.PostMapping("/refresh")
+    public String refresh(org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        int total = newsService.refreshArticles();
+        int newCount = newsService.getUnreadCounter().getLastNewCount();
+        if (newCount > 0) {
+            redirectAttributes.addFlashAttribute("refreshMessage",
+                    "Đã làm mới thành công! [Observer] UnreadCounter ghi nhận " + newCount + " tin tức mới (Tổng cộng: " + total + " bài viết).");
+        } else {
+            redirectAttributes.addFlashAttribute("refreshMessage",
+                    "Đã đồng bộ tin tức mới nhất từ các nguồn RSS (Tổng cộng: " + total + " bài viết).");
+        }
+        return "redirect:/";
+    }
 }

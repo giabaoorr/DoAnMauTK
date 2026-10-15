@@ -28,8 +28,17 @@ public class NewsService {
     private final List<FeedSource> feedSources = new ArrayList<>();
     private boolean fallbackMode = false;
 
+    // [Observer] Khởi tạo Subject và các Observers bằng Java thuần
+    private final com.news.observer.NewsFeed newsFeed = new com.news.observer.NewsFeed();
+    private final com.news.observer.UnreadCounter unreadCounter = new com.news.observer.UnreadCounter();
+    private final com.news.observer.NewsLogger newsLogger = new com.news.observer.NewsLogger();
+
     public NewsService() {
         initDefaultFeedSources();
+
+        // [Observer] Đăng ký (attach) các Observer vào Subject
+        newsFeed.attach(unreadCounter);
+        newsFeed.attach(newsLogger);
     }
 
     private void initDefaultFeedSources() {
@@ -87,16 +96,33 @@ public class NewsService {
             }
         }
 
+        Set<String> oldUrls = articles.stream().map(Article::getUrl).filter(Objects::nonNull).collect(Collectors.toSet());
+
         if (successFeedCount > 0 && !articleMap.isEmpty()) {
             this.fallbackMode = false;
+
+            // Tìm danh sách các bài viết mới chưa có trước đó
+            List<Article> newArticles = new ArrayList<>();
+            for (Article a : articleMap.values()) {
+                if (a.getUrl() != null && !oldUrls.contains(a.getUrl())) {
+                    newArticles.add(a);
+                }
+            }
+
             this.articles.clear();
             this.articles.addAll(articleMap.values());
             logger.info("Hoàn tất tải tin tức trực tuyến: {} bài viết tổng cộng từ {} nguồn RSS", articles.size(), successFeedCount);
+
+            // [Observer] Subject phát thông báo cho UnreadCounter và NewsLogger
+            newsFeed.notifyObservers(newArticles, articles.size());
+
             return articles.size();
         } else {
             // [Chế độ dự phòng] Nếu không có mạng hoặc tất cả nguồn RSS bị lỗi
             logger.warn("Không thể kết nối Internet hoặc các nguồn RSS lỗi. Kích hoạt chế độ dự phòng (fallback) từ sample JSON...");
-            return loadFallbackArticles();
+            int count = loadFallbackArticles();
+            newsFeed.notifyObservers(articles, articles.size());
+            return count;
         }
     }
 
@@ -166,5 +192,17 @@ public class NewsService {
 
     public boolean isFallbackMode() {
         return fallbackMode;
+    }
+
+    public com.news.observer.NewsFeed getNewsFeed() {
+        return newsFeed;
+    }
+
+    public com.news.observer.UnreadCounter getUnreadCounter() {
+        return unreadCounter;
+    }
+
+    public com.news.observer.NewsLogger getNewsLogger() {
+        return newsLogger;
     }
 }

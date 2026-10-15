@@ -75,4 +75,17 @@ class NewsApplicationTests {
                 .andExpect(view().name("error/404"))
                 .andExpect(model().attributeExists("errorMessage"));
     }
+
+    @Test
+    @DisplayName("GĐ4 - Gửi POST /refresh kích hoạt làm mới và chuyển hướng về trang chủ")
+    void testRefreshEndpoint() throws Exception {
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/refresh"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/"))
+                .andExpect(flash().attributeExists("refreshMessage"));
+
+        // Xác nhận Observer UnreadCounter và NewsLogger đã ghi nhận
+        assertThat(newsService.getUnreadCounter()).isNotNull();
+        assertThat(newsService.getNewsLogger().getLogHistory()).isNotEmpty();
+    }
 }
