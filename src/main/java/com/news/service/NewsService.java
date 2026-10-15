@@ -98,11 +98,32 @@ public class NewsService {
 
     /**
      * Tải lại toàn bộ bài viết từ các nguồn RSS thật.
+     * Sử dụng Singleton CacheManager để lưu trữ và quản lý dữ liệu trong bộ nhớ.
      * Nếu lỗi mạng hoặc không có kết nối, tự động kích hoạt chế độ dự phòng đọc từ JSON mẫu.
      *
      * @return Số lượng tin bài mới tải được
      */
     public synchronized int refreshArticles() {
+        return refreshArticles(false);
+    }
+
+    /**
+     * @param useCacheNếu true thì ưu tiên lấy từ CacheManager trước; nếu false thì xóa cache tải mới
+     */
+    public synchronized int refreshArticles(boolean useCache) {
+        // [Singleton] Sử dụng CacheManager
+        com.news.cache.CacheManager cacheManager = com.news.cache.CacheManager.getInstance();
+
+        if (useCache) {
+            List<Article> cached = cacheManager.get("ALL_ARTICLES");
+            if (cached != null && !cached.isEmpty()) {
+                logger.info("[Singleton:CacheManager] Tải {} bài viết trực tiếp từ Cache.", cached.size());
+                this.articles.clear();
+                this.articles.addAll(cached);
+                return articles.size();
+            }
+        }
+
         logger.info("Bắt đầu nạp tin tức từ các nguồn RSS...");
         Map<String, Article> articleMap = new LinkedHashMap<>();
         int successFeedCount = 0;
@@ -112,8 +133,20 @@ public class NewsService {
 
         for (FeedSource feed : feedSources) {
             try {
-                // [Factory Method & Adapter] Parse URL và chuyển đổi về Article qua Adapter
-                List<Article> feedArticles = rssParser.parseUrl(feed.getUrl(), feed.getName(), feed.getCategory());
+                List<Article> feedArticles = null;
+                if (useCache) {
+                    feedArticles = cacheManager.get(feed.getUrl());
+                }
+
+                if (feedArticles == null) {
+                    // [Factory Method & Adapter] Parse URL và chuyển đổi về Article qua Adapter
+                    feedArticles = rssParser.parseUrl(feed.getUrl(), feed.getName(), feed.getCategory());
+                    if (feedArticles != null && !feedArticles.isEmpty()) {
+                        // [Singleton] Lưu từng nguồn vào cache
+                        cacheManager.put(feed.getUrl(), feedArticles);
+                    }
+                }
+
                 if (feedArticles != null && !feedArticles.isEmpty()) {
                     for (Article a : feedArticles) {
                         if (a.getUrl() != null && !a.getUrl().isEmpty()) {
@@ -145,6 +178,10 @@ public class NewsService {
 
             this.articles.clear();
             this.articles.addAll(articleMap.values());
+
+            // [Singleton] Lưu danh sách hợp nhất vào CacheManager
+            cacheManager.put("ALL_ARTICLES", new ArrayList<>(this.articles));
+
             logger.info("Hoàn tất tải tin tức trực tuyến: {} bài viết tổng cộng từ {} nguồn RSS", articles.size(), successFeedCount);
 
             // [Observer] Subject phát thông báo cho UnreadCounter và NewsLogger
@@ -155,6 +192,7 @@ public class NewsService {
             // [Chế độ dự phòng] Nếu không có mạng hoặc tất cả nguồn RSS bị lỗi
             logger.warn("Không thể kết nối Internet hoặc các nguồn RSS lỗi. Kích hoạt chế độ dự phòng (fallback) từ sample JSON...");
             int count = loadFallbackArticles();
+            cacheManager.put("ALL_ARTICLES", new ArrayList<>(this.articles));
             newsFeed.notifyObservers(articles, articles.size());
             return count;
         }
