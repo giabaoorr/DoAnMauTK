@@ -57,6 +57,10 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>com.news.NewsApplication</mainClass>
+                    <jvmArguments>-Dfile.encoding=UTF-8 -XX:+EnableDynamicAgentLoading</jvmArguments>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
