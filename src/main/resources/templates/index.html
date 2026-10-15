@@ -64,6 +64,11 @@
         <span th:text="${refreshMessage}">Đã cập nhật tin tức mới!</span>
     </div>
 
+    <!-- Thông báo chế độ dự phòng nếu offline / nguồn RSS lỗi -->
+    <div th:if="${fallbackMode}" class="alert-banner" style="background-color: #fef3c7; border-color: #fde68a; color: #92400e;">
+        <span>⚠️ <strong>Chế độ dự phòng đang hoạt động:</strong> Ứng dụng đang đọc dữ liệu mẫu cục bộ từ <code>src/main/resources/sample/</code> do không có mạng hoặc nguồn RSS không phản hồi.</span>
+    </div>
+
     <!-- Thanh thống kê -->
     <div class="stats-bar">
         <span>Tổng cộng: <strong th:text="${articles.size()}">0</strong> bài viết</span>

@@ -33,6 +33,7 @@ public class NewsController {
         model.addAttribute("categories", newsService.getAllCategories());
         model.addAttribute("sources", newsService.getAllSources());
         model.addAttribute("totalArticles", articles.size());
+        model.addAttribute("fallbackMode", newsService.isFallbackMode());
         return "index";
     }
 
