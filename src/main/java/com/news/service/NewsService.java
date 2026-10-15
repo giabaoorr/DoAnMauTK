@@ -287,9 +287,9 @@ public class NewsService {
                 .map(this::applyDecorators)
                 .collect(Collectors.toList());
 
-        if (onlyFeatured != null && onlyFeatured) {
+        if (Boolean.TRUE.equals(onlyFeatured)) {
             return decorated.stream()
-                    .filter(Article::isFeatured)
+                    .filter(a -> a != null && a.isFeatured())
                     .collect(Collectors.toList());
         }
 
@@ -310,7 +310,7 @@ public class NewsService {
         boolean hasCategory = (category != null && !category.trim().isEmpty());
 
         List<Article> categoryPool = articles.stream()
-                .filter(a -> !hasCategory || category.equalsIgnoreCase(a.getCategory()))
+                .filter(a -> a != null && (!hasCategory || (category != null && category.equalsIgnoreCase(a.getCategory()))))
                 .collect(Collectors.toList());
 
         // 1. Tìm các bài viết có từ khóa tiêu điểm hoặc ghim nổi bật trong chuyên mục
@@ -322,10 +322,15 @@ public class NewsService {
 
         // 2. Nếu chưa đủ limit bài, chọn các bài mới nhất trong chuyên mục và bọc bằng FeaturedArticle Decorator
         if (featured.size() < limit && !categoryPool.isEmpty()) {
-            Set<String> existingIds = featured.stream().map(Article::getId).collect(Collectors.toSet());
+            Set<String> existingIds = featured.stream()
+                    .filter(Objects::nonNull)
+                    .map(a -> a.getId())
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toSet());
             for (Article a : categoryPool) {
+                if (a == null) continue;
                 if (featured.size() >= limit) break;
-                if (!existingIds.contains(a.getId())) {
+                if (a.getId() != null && !existingIds.contains(a.getId())) {
                     Article baseDecorated = applyDecorators(a);
                     Article manuallyFeatured = (baseDecorated instanceof com.news.decorator.FeaturedArticle)
                             ? baseDecorated

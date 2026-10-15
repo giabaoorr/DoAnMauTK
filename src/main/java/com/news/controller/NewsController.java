@@ -42,11 +42,15 @@ public class NewsController {
 
         // [Decorator: FeaturedArticle] Lấy 3 bài tiêu điểm nổi bật phù hợp cho chủ đề đang xem
         List<Article> featuredArticles = newsService.getFeaturedArticlesForCategory(category, 3);
-        Set<String> featuredIds = featuredArticles.stream().map(Article::getId).collect(java.util.stream.Collectors.toSet());
+        Set<String> featuredIds = featuredArticles.stream()
+                .filter(java.util.Objects::nonNull)
+                .map(a -> a.getId())
+                .filter(java.util.Objects::nonNull)
+                .collect(java.util.stream.Collectors.toSet());
 
         // Danh sách bài viết còn lại cho Grid (không lặp lại bài viết đã nằm ở vị trí Tiêu điểm hàng đầu)
         List<Article> gridArticles = processedArticles.stream()
-                .filter(a -> !featuredIds.contains(a.getId()))
+                .filter(a -> a != null && a.getId() != null && !featuredIds.contains(a.getId()))
                 .collect(java.util.stream.Collectors.toList());
 
         model.addAttribute("featuredArticles", featuredArticles);
