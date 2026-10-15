@@ -287,33 +287,52 @@ public class NewsService {
     }
 
     /**
-     * [Decorator: FeaturedArticle] Lấy danh sách các bài viết tiêu điểm nổi bật nhất.
-     * Đảm bảo luôn trả về danh sách các bài viết được trang trí bởi FeaturedArticle.
+     * [Decorator: FeaturedArticle] Lấy danh sách các bài viết tiêu điểm nổi bật theo từng chuyên mục.
+     * Áp dụng tính năng Tin Tiêu Điểm & Nổi Bật cho mọi chủ đề: Thời sự, Công nghệ, Kinh doanh, Thể thao, Giải trí...
+     *
+     * @param category Tên chuyên mục (hoặc null/rỗng nếu ở Trang chủ)
+     * @param limit Số lượng bài tiêu điểm cần lấy (mặc định 3: 1 hero lớn + 2 tin phụ)
+     * @return Danh sách bài viết được bọc bởi FeaturedArticle Decorator
      */
-    public List<Article> getFeaturedArticles(int limit) {
-        if (limit <= 0) limit = 4;
-        List<Article> allDecorated = articles.stream()
-                .map(this::applyDecorators)
+    public List<Article> getFeaturedArticlesForCategory(String category, int limit) {
+        if (limit <= 0) limit = 3;
+
+        boolean hasCategory = (category != null && !category.trim().isEmpty());
+
+        List<Article> categoryPool = articles.stream()
+                .filter(a -> !hasCategory || category.equalsIgnoreCase(a.getCategory()))
                 .collect(Collectors.toList());
 
-        List<Article> featured = allDecorated.stream()
-                .filter(Article::isFeatured)
+        // 1. Tìm các bài viết có từ khóa tiêu điểm hoặc ghim nổi bật trong chuyên mục
+        List<Article> featured = categoryPool.stream()
+                .filter(this::isHighlightArticle)
+                .map(this::applyDecorators)
                 .limit(limit)
                 .collect(Collectors.toList());
 
-        // Nếu số bài viết có từ khóa nổi bật ít hơn limit, bổ sung các bài viết mới nhất và bọc bằng FeaturedArticle
-        if (featured.size() < limit && !allDecorated.isEmpty()) {
+        // 2. Nếu chưa đủ limit bài, chọn các bài mới nhất trong chuyên mục và bọc bằng FeaturedArticle Decorator
+        if (featured.size() < limit && !categoryPool.isEmpty()) {
             Set<String> existingIds = featured.stream().map(Article::getId).collect(Collectors.toSet());
-            for (Article a : allDecorated) {
+            for (Article a : categoryPool) {
                 if (featured.size() >= limit) break;
                 if (!existingIds.contains(a.getId())) {
-                    Article manuallyFeatured = new com.news.decorator.FeaturedArticle(a);
+                    Article baseDecorated = applyDecorators(a);
+                    Article manuallyFeatured = (baseDecorated instanceof com.news.decorator.FeaturedArticle)
+                            ? baseDecorated
+                            : new com.news.decorator.FeaturedArticle(baseDecorated);
                     featured.add(manuallyFeatured);
                     existingIds.add(a.getId());
                 }
             }
         }
         return featured;
+    }
+
+    /**
+     * [Decorator: FeaturedArticle] Lấy danh sách các bài viết tiêu điểm nổi bật toàn trang.
+     */
+    public List<Article> getFeaturedArticles(int limit) {
+        return getFeaturedArticlesForCategory(null, limit);
     }
 
     public Optional<Article> getArticleById(String id) {

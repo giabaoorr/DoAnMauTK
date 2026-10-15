@@ -92,16 +92,7 @@
                     <input type="hidden" name="articleId" th:value="${article.id}">
                     <input type="hidden" name="returnUrl" th:value="@{'/article/' + ${article.id}}">
                     <button type="submit" class="btn btn-outline" th:classappend="${article.bookmarked} ? 'btn-active-bookmark' : ''">
-                        <span th:text="${article.bookmarked} ? '★ Đã lưu bài này' : '☆ Lưu bài viết'">☆ Lưu bài viết</span>
-                    </button>
-                </form>
-
-                <!-- Nút Ghim Nổi Bật -->
-                <form th:action="@{/featured/toggle}" method="post" style="display:inline;">
-                    <input type="hidden" name="articleId" th:value="${article.id}">
-                    <input type="hidden" name="returnUrl" th:value="@{'/article/' + ${article.id}}">
-                    <button type="submit" class="btn btn-outline" th:classappend="${article.featured} ? 'btn-active-featured' : ''">
-                        <span th:text="${article.featured} ? '★ Đã ghim nổi bật' : '⭐ Ghim nổi bật'">⭐ Ghim nổi bật</span>
+                        <span th:text="${article.bookmarked} ? '★ Đã lưu' : '☆ Lưu bài viết'">☆ Lưu bài viết</span>
                     </button>
                 </form>
 

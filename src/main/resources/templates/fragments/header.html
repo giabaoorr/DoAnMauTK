@@ -14,20 +14,17 @@
         <div class="header-search-wrap">
             <span class="search-icon">🔍</span>
             <input type="text" id="liveSearchInput" class="header-search-input"
-                   placeholder="Tìm nhanh bài viết, từ khóa..."
+                   placeholder="Tìm kiếm bài viết, từ khóa..."
                    aria-label="Tìm kiếm bài viết">
             <button type="button" id="clearSearchBtn" class="search-clear-btn" style="display:none;" title="Xóa tìm kiếm">✕</button>
         </div>
 
         <nav class="header-actions">
             <a th:href="@{/}" class="nav-link" th:classappend="${activePage == 'home'} ? 'active' : ''">
-                <span>📰 Trang chủ</span>
-            </a>
-            <a th:href="@{/(featured='true')}" class="nav-link nav-link-featured" th:classappend="${activePage == 'featured'} ? 'active' : ''" title="Xem danh sách bài viết nổi bật (FeaturedArticle Decorator)">
-                <span>⭐ Nổi bật</span>
+                <span>Trang chủ</span>
             </a>
             <a th:href="@{/bookmarks}" class="nav-link" th:classappend="${activePage == 'bookmarks'} ? 'active' : ''" title="Bài viết đã lưu (BookmarkedArticle Decorator)">
-                <span>🔖 Đã lưu</span>
+                <span>Đã lưu</span>
                 <span th:if="${bookmarkCount != null and bookmarkCount > 0}"
                       class="nav-counter"
                       th:text="${bookmarkCount}">0</span>

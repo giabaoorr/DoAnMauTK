@@ -19,14 +19,14 @@
     <!-- Tiêu đề trang -->
     <div class="page-heading">
         <div class="page-heading-left">
-            <h1 class="page-title">⭐ Danh Sách Tin Đã Đánh Dấu</h1>
+            <h1 class="page-title">Danh sách bài viết đã lưu</h1>
             <p class="page-desc">
-                Dữ liệu được lưu trữ bền vững tại file <code>data/bookmarks.json</code>. Các bài viết được trang trí bởi <strong>[Decorator] BookmarkedArticle</strong>.
+                Dữ liệu được lưu trữ bền vững tại file <code>data/bookmarks.json</code>. Các bài viết được bọc bởi <strong>[Decorator] BookmarkedArticle</strong>.
             </p>
         </div>
         <div class="page-heading-right">
-            <span class="badge badge-bookmarked bookmark-total-badge">
-                <span th:text="${bookmarkCount}">0</span> bài đã lưu
+            <span class="bookmark-total-badge">
+                <span th:text="${bookmarkCount}">0</span> bài viết đã lưu
             </span>
             <a th:href="@{/}" class="btn btn-outline btn-sm">&larr; Về trang chủ</a>
         </div>
@@ -35,30 +35,15 @@
     <!-- Thông báo nếu có -->
     <div th:if="${message != null}" class="alert-banner alert-success">
         <div class="alert-content">
-            <span class="alert-icon">✨</span>
             <span th:text="${message}">Thao tác thành công!</span>
         </div>
         <button type="button" class="alert-close" onclick="this.parentElement.remove()">✕</button>
     </div>
 
-    <!-- Danh sách bài viết đã lưu -->
+    <!-- Danh sách bài viết đã lưu (Clean Editorial Grid) -->
     <div class="article-grid" th:if="${not #lists.isEmpty(articles)}">
-        <article class="article-card"
-                 th:each="article : ${articles}"
-                 th:classappend="${article.featured} ? 'featured-card' : ''">
-
-            <!-- Dải băng góc cho bài viết Nổi Bật nếu có -->
-            <div th:if="${article.featured}" class="featured-ribbon">
-                <span>★ NỔI BẬT</span>
-            </div>
-
+        <article class="article-card" th:each="article : ${articles}">
             <div class="card-image-wrap">
-                <div class="card-badges">
-                    <span class="badge badge-source" th:text="${article.source}">Nguồn</span>
-                    <span class="badge badge-category" th:text="${article.category}">Chuyên mục</span>
-                    <span th:if="${article.featured}" class="badge badge-featured">★ NỔI BẬT</span>
-                    <span class="badge badge-bookmarked">✓ ĐÃ LƯU</span>
-                </div>
                 <img th:if="${article.imageUrl != null and !article.imageUrl.empty}"
                      th:src="${article.imageUrl}"
                      th:alt="${article.title}"
@@ -70,14 +55,15 @@
                      th:alt="${article.title}"
                      class="card-image">
 
-                <span class="card-reading-time" th:text="'⏱️ ' + ${article.estimatedReadingTime}">⏱️ 2 phút</span>
+                <span class="card-reading-time" th:text="${article.estimatedReadingTime}">2 phút đọc</span>
             </div>
 
             <div class="card-content">
-                <div class="card-meta">
-                    <span class="meta-date" th:text="'🕒 ' + ${article.formattedDate}">15/10/2026</span>
-                    <span class="meta-dot">•</span>
-                    <span class="meta-source" th:text="${article.source}">VnExpress</span>
+                <div class="card-kicker">
+                    <span class="card-kicker-cat" th:text="${article.category}">Chuyên mục</span>
+                    <span class="card-kicker-dot">•</span>
+                    <span class="card-kicker-src" th:text="${article.source}">VnExpress</span>
+                    <span class="card-bookmarked-tag">ĐÃ LƯU</span>
                 </div>
 
                 <h2 class="card-title">
@@ -87,16 +73,18 @@
                 <p class="card-desc" th:text="${article.description}">Mô tả tóm tắt...</p>
 
                 <div class="card-footer">
-                    <a th:href="@{'/article/' + ${article.id}}" class="btn btn-read-more btn-sm">
-                        Đọc tiếp &rarr;
-                    </a>
+                    <span class="card-date" th:text="${article.formattedDate}">15/10/2026</span>
 
                     <div class="card-actions-group">
+                        <a th:href="@{'/article/' + ${article.id}}" class="btn-read-link">
+                            Đọc tiếp &rarr;
+                        </a>
+
                         <!-- Nút bỏ lưu -->
                         <form th:action="@{/bookmarks/toggle}" method="post" style="display:inline;">
                             <input type="hidden" name="articleId" th:value="${article.id}">
                             <input type="hidden" name="returnUrl" th:value="@{/bookmarks}">
-                            <button type="submit" class="btn-card-action active-bookmark" title="Gỡ bài viết này khỏi danh sách đã lưu">
+                            <button type="submit" class="btn-card-action active-bookmark" title="Gỡ bài viết khỏi danh sách đã lưu">
                                 <span>✕ Bỏ lưu</span>
                             </button>
                         </form>
@@ -105,7 +93,7 @@
                         <button type="button" class="btn-card-action btn-share"
                                 th:data-url="@{'/article/' + ${article.id}}"
                                 onclick="copyArticleLink(this.getAttribute('data-url'), event)"
-                                title="Sao chép liên kết bài viết">
+                                title="Sao chép liên kết">
                             <span>🔗</span>
                         </button>
                     </div>
@@ -116,7 +104,6 @@
 
     <!-- Khi danh sách trống -->
     <div th:if="${#lists.isEmpty(articles)}" class="empty-state">
-        <div class="empty-icon">🔖</div>
         <h3>Bạn chưa đánh dấu bài viết nào</h3>
         <p>Hãy dạo quanh trang chủ và nhấn nút <strong>"☆ Lưu"</strong> ở bài viết bạn quan tâm để xem lại sau nhé.</p>
         <a th:href="@{/}" class="btn btn-primary">Khám phá tin tức ngay</a>

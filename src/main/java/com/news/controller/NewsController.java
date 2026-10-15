@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Controller xử lý các request giao diện web Thymeleaf.
@@ -27,24 +28,29 @@ public class NewsController {
 
     /**
      * Trang chủ hiển thị danh sách tin tức với bộ lọc và sắp xếp (Strategy Pattern),
-     * kèm khu vực hiển thị bài viết nổi bật (FeaturedArticle Decorator).
+     * kết hợp bài viết tiêu điểm nổi bật (FeaturedArticle Decorator) theo từng chủ đề.
      */
     @GetMapping("/")
     public String index(
             @org.springframework.web.bind.annotation.RequestParam(name = "category", required = false) String category,
             @org.springframework.web.bind.annotation.RequestParam(name = "source", required = false) String source,
             @org.springframework.web.bind.annotation.RequestParam(name = "sort", required = false, defaultValue = "newest") String sort,
-            @org.springframework.web.bind.annotation.RequestParam(name = "featured", required = false) Boolean featured,
             Model model) {
 
         // [Strategy] Lấy danh sách bài viết đã qua lọc và sắp xếp
-        List<Article> processedArticles = newsService.getProcessedArticles(category, source, sort, featured);
+        List<Article> processedArticles = newsService.getProcessedArticles(category, source, sort);
 
-        // [Decorator: FeaturedArticle] Lấy danh sách các bài viết tiêu điểm nổi bật
-        List<Article> featuredArticles = newsService.getFeaturedArticles(4);
+        // [Decorator: FeaturedArticle] Lấy 3 bài tiêu điểm nổi bật phù hợp cho chủ đề đang xem
+        List<Article> featuredArticles = newsService.getFeaturedArticlesForCategory(category, 3);
+        Set<String> featuredIds = featuredArticles.stream().map(Article::getId).collect(java.util.stream.Collectors.toSet());
 
-        model.addAttribute("articles", processedArticles);
+        // Danh sách bài viết còn lại cho Grid (không lặp lại bài viết đã nằm ở vị trí Tiêu điểm hàng đầu)
+        List<Article> gridArticles = processedArticles.stream()
+                .filter(a -> !featuredIds.contains(a.getId()))
+                .collect(java.util.stream.Collectors.toList());
+
         model.addAttribute("featuredArticles", featuredArticles);
+        model.addAttribute("articles", gridArticles.isEmpty() ? processedArticles : gridArticles);
         model.addAttribute("categories", newsService.getAllCategories());
         model.addAttribute("sources", newsService.getAllSources());
         model.addAttribute("totalArticles", newsService.getAllArticles().size());
@@ -52,7 +58,6 @@ public class NewsController {
         model.addAttribute("selectedCategory", category != null ? category : "");
         model.addAttribute("selectedSource", source != null ? source : "");
         model.addAttribute("selectedSort", sort != null ? sort : "newest");
-        model.addAttribute("selectedFeatured", Boolean.TRUE.equals(featured));
         model.addAttribute("fallbackMode", newsService.isFallbackMode());
         model.addAttribute("bookmarkCount", bookmarkService.getBookmarkCount());
         return "index";
