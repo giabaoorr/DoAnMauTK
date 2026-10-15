@@ -78,15 +78,16 @@ img {
 }
 
 /* ==========================================================================
-   Header & Navbar (Tối giản, chuyên nghiệp)
+   Header & Navbar (Đồng bộ màu sắc báo chí - Clean Editorial Navigation)
    ========================================================================== */
 .site-header {
-    background: #0f172a;
-    color: #ffffff;
+    background: #ffffff;
+    color: var(--text-main);
     position: sticky;
     top: 0;
     z-index: 1000;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
 }
 
 .header-content {
@@ -105,7 +106,7 @@ img {
 }
 
 .logo-badge {
-    background: #2563eb;
+    background: var(--primary);
     color: #ffffff;
     font-weight: 800;
     font-size: 0.95rem;
@@ -122,18 +123,18 @@ img {
 .site-title-main {
     font-size: 1.15rem;
     font-weight: 800;
-    color: #ffffff;
+    color: var(--text-main);
     letter-spacing: -0.2px;
     line-height: 1.2;
 }
 
 .site-subtitle {
     font-size: 0.72rem;
-    color: #94a3b8;
+    color: var(--text-light);
     font-weight: 500;
 }
 
-/* Thanh tìm kiếm nhanh trên Header */
+/* Thanh tìm kiếm nhanh trên Header (Đồng bộ Light Palette) */
 .header-search-wrap {
     position: relative;
     flex: 1;
@@ -147,16 +148,16 @@ img {
     left: 12px;
     font-size: 0.85rem;
     pointer-events: none;
-    opacity: 0.6;
+    color: var(--text-light);
 }
 
 .header-search-input {
     width: 100%;
     padding: 7px 32px 7px 34px;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: #f1f5f9;
+    border: 1px solid var(--border);
     border-radius: var(--radius-pill);
-    color: #ffffff;
+    color: var(--text-main);
     font-size: 0.85rem;
     font-family: inherit;
     outline: none;
@@ -164,13 +165,13 @@ img {
 }
 
 .header-search-input::placeholder {
-    color: #94a3b8;
+    color: var(--text-light);
 }
 
 .header-search-input:focus {
-    background: rgba(255, 255, 255, 0.14);
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+    background: #ffffff;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.12);
 }
 
 .search-clear-btn {
@@ -178,17 +179,17 @@ img {
     right: 10px;
     background: transparent;
     border: none;
-    color: #94a3b8;
+    color: var(--text-light);
     cursor: pointer;
     font-size: 0.85rem;
     padding: 2px 4px;
 }
 
 .search-clear-btn:hover {
-    color: #ffffff;
+    color: var(--text-main);
 }
 
-/* Các nút điều hướng */
+/* Các nút điều hướng trên Header */
 .header-actions {
     display: flex;
     align-items: center;
@@ -197,7 +198,7 @@ img {
 }
 
 .nav-link {
-    color: #cbd5e1;
+    color: var(--text-muted);
     font-weight: 600;
     font-size: 0.88rem;
     padding: 7px 14px;
@@ -208,13 +209,19 @@ img {
     transition: var(--transition);
 }
 
-.nav-link:hover, .nav-link.active {
-    background-color: rgba(255, 255, 255, 0.12);
-    color: #ffffff;
+.nav-link:hover {
+    background-color: var(--primary-light);
+    color: var(--primary);
+}
+
+.nav-link.active {
+    background-color: var(--primary-light);
+    color: var(--primary);
+    font-weight: 700;
 }
 
 .nav-counter {
-    background: #2563eb;
+    background: var(--primary);
     color: #ffffff;
     font-size: 0.72rem;
     font-weight: 700;
@@ -226,18 +233,25 @@ img {
     display: inline-flex;
     align-items: center;
     gap: 5px;
+    background: var(--primary);
+    color: #ffffff;
+}
+
+.btn-refresh:hover {
+    background: var(--primary-hover);
 }
 
 /* ==========================================================================
-   Thanh Danh Mục Chuyên Mục Báo Chí (Clean Editorial Navigation)
+   Thanh Danh Mục Chuyên Mục Báo Chí (Đồng bộ sắc xanh thương hiệu)
    ========================================================================== */
 .category-chips-bar {
-    background: var(--bg-card);
+    background: #ffffff;
     border-bottom: 1px solid var(--border);
     padding: 8px 0;
     position: sticky;
     top: 61px;
     z-index: 990;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.02);
 }
 
 .chips-container {
@@ -257,9 +271,10 @@ img {
     font-size: 0.88rem;
     font-weight: 600;
     padding: 6px 14px;
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-pill);
     background: transparent;
     color: var(--text-muted);
+    border: 1px solid transparent;
     white-space: nowrap;
     transition: var(--transition);
     display: inline-flex;
@@ -268,13 +283,15 @@ img {
 }
 
 .chip-item:hover {
-    background: var(--bg-card-subtle);
-    color: var(--text-main);
+    background: var(--primary-light);
+    color: var(--primary);
 }
 
 .chip-item.active {
-    background: #0f172a;
+    background: var(--primary);
     color: #ffffff;
+    border-color: var(--primary);
+    box-shadow: 0 2px 4px rgba(29, 78, 216, 0.2);
 }
 
 .chip-bookmark {
@@ -283,19 +300,24 @@ img {
 }
 
 .chip-counter {
-    background: var(--border);
-    color: var(--text-main);
+    background: var(--primary-light);
+    color: var(--primary);
     font-size: 0.72rem;
     font-weight: 700;
     padding: 1px 7px;
     border-radius: var(--radius-pill);
 }
 
+.chip-item.active .chip-counter {
+    background: rgba(255, 255, 255, 0.25);
+    color: #ffffff;
+}
+
 /* ==========================================================================
-   Toolbar Bộ Lọc & Sắp Xếp (Strategy Pattern)
+   Toolbar Bộ Lọc & Sắp Xếp (Strategy Pattern - Nền nhẹ phân tầng)
    ========================================================================== */
 .toolbar-section {
-    background: var(--bg-card);
+    background: #f8fafc;
     border-bottom: 1px solid var(--border);
     padding: 12px 0;
     margin-bottom: 24px;
