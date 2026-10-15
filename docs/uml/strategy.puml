@@ -1,0 +1,68 @@
+@startuml
+title Mẫu Thiết Kế Strategy - com.news.strategy
+
+interface SortStrategy <<Strategy>> {
+    + sort(List<Article>): List<Article>
+}
+
+class NewestSortStrategy <<ConcreteStrategy>> implements SortStrategy {
+    + sort(List<Article>): List<Article>
+}
+
+class OldestSortStrategy <<ConcreteStrategy>> implements SortStrategy {
+    + sort(List<Article>): List<Article>
+}
+
+class TitleSortStrategy <<ConcreteStrategy>> implements SortStrategy {
+    - collator: Collator
+    + sort(List<Article>): List<Article>
+}
+
+interface FilterStrategy <<Strategy>> {
+    + filter(List<Article>): List<Article>
+    + matches(Article): boolean
+}
+
+class CategoryFilterStrategy <<ConcreteStrategy>> implements FilterStrategy {
+    - targetCategory: String
+    + filter(List<Article>): List<Article>
+    + matches(Article): boolean
+}
+
+class SourceFilterStrategy <<ConcreteStrategy>> implements FilterStrategy {
+    - targetSource: String
+    + filter(List<Article>): List<Article>
+    + matches(Article): boolean
+}
+
+class CompositeFilterStrategy <<ConcreteStrategy>> implements FilterStrategy {
+    - strategies: List<FilterStrategy>
+    + addStrategy(FilterStrategy): CompositeFilterStrategy
+    + filter(List<Article>): List<Article>
+}
+
+class AllPassFilterStrategy <<ConcreteStrategy>> implements FilterStrategy {
+    + filter(List<Article>): List<Article>
+    + matches(Article): boolean
+}
+
+class ArticleProcessorContext <<Context>> {
+    - sortStrategy: SortStrategy
+    - filterStrategy: FilterStrategy
+    + process(List<Article>): List<Article>
+    + setSortStrategy(SortStrategy): void
+    + setFilterStrategy(FilterStrategy): void
+    + {static} fromUserPreferences(String, String, String): ArticleProcessorContext
+}
+
+ArticleProcessorContext o-right- SortStrategy
+ArticleProcessorContext o-left- FilterStrategy
+
+note bottom of ArticleProcessorContext
+  // [Strategy]
+  Context cho phép hoán đổi thuật toán
+  sắp xếp và lọc tại thời điểm chạy (runtime)
+  khi người dùng thao tác trên thanh công cụ web.
+end note
+
+@enduml

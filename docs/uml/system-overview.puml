@@ -1,0 +1,140 @@
+@startuml
+title Sơ Đồ Kiến Trúc Tổng Thể Ứng Dụng Đọc Báo (NewsReader) - 6 Mẫu Thiết Kế
+
+package "com.news.model" {
+    class Article {
+        - id: String
+        - title: String
+        - description: String
+        - content: String
+        - url: String
+        - imageUrl: String
+        - publishedDate: LocalDateTime
+        - source: String
+        - category: String
+        - bookmarked: boolean
+        - featured: boolean
+        + getFormattedDate(): String
+        + getBadge(): String
+    }
+}
+
+package "com.news.factory" {
+    interface NewsParser {
+        + parse(InputStream, String, String): List<Article>
+        + parseUrl(String, String, String): List<Article>
+    }
+    abstract class NewsParserFactory {
+        + {abstract} createParser(): NewsParser
+        + {static} getFactory(SourceType): NewsParserFactory
+        + {static} createParser(SourceType): NewsParser
+    }
+    class RssParserFactory extends NewsParserFactory
+    class JsonParserFactory extends NewsParserFactory
+    class RssNewsParser implements NewsParser
+    class JsonNewsParser implements NewsParser
+}
+
+package "com.news.adapter" {
+    interface ArticleAdapter<T> {
+        + adapt(T): Article
+    }
+    class RssEntryAdapter implements ArticleAdapter
+    class JsonArticleAdapter implements ArticleAdapter
+}
+
+package "com.news.strategy" {
+    interface SortStrategy {
+        + sort(List<Article>): List<Article>
+    }
+    interface FilterStrategy {
+        + filter(List<Article>): List<Article>
+        + matches(Article): boolean
+    }
+    class NewestSortStrategy implements SortStrategy
+    class OldestSortStrategy implements SortStrategy
+    class TitleSortStrategy implements SortStrategy
+
+    class CategoryFilterStrategy implements FilterStrategy
+    class SourceFilterStrategy implements FilterStrategy
+    class CompositeFilterStrategy implements FilterStrategy
+    class AllPassFilterStrategy implements FilterStrategy
+
+    class ArticleProcessorContext {
+        - sortStrategy: SortStrategy
+        - filterStrategy: FilterStrategy
+        + process(List<Article>): List<Article>
+        + setSortStrategy(SortStrategy): void
+        + setFilterStrategy(FilterStrategy): void
+    }
+}
+
+package "com.news.observer" {
+    interface NewsObserver {
+        + onNewsUpdated(NewsUpdateEvent): void
+    }
+    interface NewsSubject {
+        + attach(NewsObserver): void
+        + detach(NewsObserver): void
+        + notifyObservers(List<Article>, int): void
+    }
+    class NewsFeed implements NewsSubject
+    class UnreadCounter implements NewsObserver
+    class NewsLogger implements NewsObserver
+    class NewsUpdateEvent
+}
+
+package "com.news.decorator" {
+    abstract class ArticleDecorator extends Article {
+        # decoratedArticle: Article
+    }
+    class FeaturedArticle extends ArticleDecorator
+    class BookmarkedArticle extends ArticleDecorator
+    class SummarizedArticle extends ArticleDecorator
+}
+
+package "com.news.cache" {
+    class CacheManager {
+        - {static} volatile instance: CacheManager
+        - cache: Map<String, CacheEntry>
+        - CacheManager()
+        + {static} getInstance(): CacheManager
+        + put(String, List<Article>): void
+        + get(String): List<Article>
+        + invalidate(String): void
+        + clear(): void
+    }
+    class CacheEntry
+}
+
+package "com.news.service" {
+    class NewsService {
+        - articles: List<Article>
+        - newsFeed: NewsFeed
+        - unreadCounter: UnreadCounter
+        - newsLogger: NewsLogger
+        - bookmarkService: BookmarkService
+        + refreshArticles(): int
+        + getProcessedArticles(String, String, String): List<Article>
+        + applyDecorators(Article): Article
+    }
+    class BookmarkService {
+        - bookmarkedMap: Map<String, Article>
+        + toggleBookmark(Article): boolean
+        + saveBookmarksToFile(): void
+        + loadBookmarksFromFile(): void
+    }
+}
+
+NewsService --> NewsParserFactory : Factory Method
+NewsService --> ArticleProcessorContext : Strategy
+NewsService --> NewsFeed : Subject
+NewsService --> CacheManager : Singleton
+NewsService --> BookmarkService : Decorator & Persistence
+RssNewsParser --> RssEntryAdapter : Adapter
+JsonNewsParser --> JsonArticleAdapter : Adapter
+ArticleProcessorContext o-- SortStrategy
+ArticleProcessorContext o-- FilterStrategy
+NewsFeed o-- NewsObserver
+
+@enduml

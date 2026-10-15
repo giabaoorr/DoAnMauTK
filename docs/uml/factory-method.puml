@@ -1,0 +1,51 @@
+@startuml
+title Mẫu Thiết Kế Factory Method - com.news.factory
+
+interface NewsParser <<Product>> {
+    + parse(InputStream, String, String): List<Article>
+    + parseUrl(String, String, String): List<Article>
+}
+
+class RssNewsParser <<ConcreteProduct>> implements NewsParser {
+    - TIMEOUT_MS: int
+    + parse(InputStream, String, String): List<Article>
+    + parseUrl(String, String, String): List<Article>
+}
+
+class JsonNewsParser <<ConcreteProduct>> implements NewsParser {
+    - objectMapper: ObjectMapper
+    + parse(InputStream, String, String): List<Article>
+    + parseUrl(String, String, String): List<Article>
+}
+
+abstract class NewsParserFactory <<Creator>> {
+    + {abstract} createParser(): NewsParser
+    + {static} getFactory(SourceType): NewsParserFactory
+    + {static} createParser(SourceType): NewsParser
+}
+
+class RssParserFactory <<ConcreteCreator>> extends NewsParserFactory {
+    + createParser(): NewsParser
+}
+
+class JsonParserFactory <<ConcreteCreator>> extends NewsParserFactory {
+    + createParser(): NewsParser
+}
+
+enum SourceType {
+    RSS
+    JSON
+}
+
+RssParserFactory .down.> RssNewsParser : <<instantiates>>
+JsonParserFactory .down.> JsonNewsParser : <<instantiates>>
+NewsParserFactory .right.> SourceType
+
+note right of NewsParserFactory::createParser
+  // [Factory Method]
+  Phương thức trừu tượng để
+  các lớp con quyết định
+  loại parser cần tạo.
+end note
+
+@enduml

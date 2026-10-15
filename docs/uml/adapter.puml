@@ -1,0 +1,58 @@
+@startuml
+title Mẫu Thiết Kế Adapter - com.news.adapter
+
+class Article <<Target>> {
+    - id: String
+    - title: String
+    - description: String
+    - content: String
+    - url: String
+    - imageUrl: String
+    - publishedDate: LocalDateTime
+    - source: String
+    - category: String
+}
+
+interface ArticleAdapter<T> <<Target Interface>> {
+    + adapt(T): Article
+}
+
+class SyndEntry <<Adaptee (Rome RSS)>> {
+    + getTitle(): String
+    + getLink(): String
+    + getDescription(): SyndContent
+    + getPublishedDate(): Date
+    + getEnclosures(): List<SyndEnclosure>
+}
+
+class JsonNode <<Adaptee (Jackson JSON)>> {
+    + get(String): JsonNode
+    + asText(): String
+    + hasNonNull(String): boolean
+}
+
+class RssEntryAdapter <<Concrete Adapter>> implements ArticleAdapter {
+    - defaultSource: String
+    - defaultCategory: String
+    + adapt(SyndEntry): Article
+    - extractImageUrl(SyndEntry, String): String
+    - cleanHtml(String): String
+}
+
+class JsonArticleAdapter <<Concrete Adapter>> implements ArticleAdapter {
+    + adapt(JsonNode): Article
+}
+
+RssEntryAdapter .left.> SyndEntry : <<adapts>>
+JsonArticleAdapter .left.> JsonNode : <<adapts>>
+RssEntryAdapter -down-> Article : <<creates>>
+JsonArticleAdapter -down-> Article : <<creates>>
+
+note bottom of RssEntryAdapter
+  // [Adapter]
+  Chuyển đổi dữ liệu thô từ SyndEntry
+  của Rome RSS (HTML trong description,
+  enclosure, Date) về lớp Article chuẩn hóa.
+end note
+
+@enduml

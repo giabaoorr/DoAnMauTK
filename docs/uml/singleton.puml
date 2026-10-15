@@ -1,0 +1,46 @@
+@startuml
+title Mẫu Thiết Kế Singleton - com.news.cache
+
+class CacheManager <<Singleton>> {
+    - {static} volatile instance: CacheManager
+    - cache: Map<String, CacheEntry>
+    - hitCount: AtomicLong
+    - missCount: AtomicLong
+    - defaultTtl: Duration
+
+    - CacheManager()
+    + {static} getInstance(): CacheManager
+    + put(String, List<Article>): void
+    + put(String, List<Article>, Duration): void
+    + get(String): List<Article>
+    + contains(String): boolean
+    + invalidate(String): void
+    + clear(): void
+    + size(): int
+    + getHitRate(): double
+}
+
+class CacheEntry {
+    - articles: List<Article>
+    - createdAt: Instant
+    - ttl: Duration
+    + isExpired(): boolean
+    + getArticles(): List<Article>
+}
+
+CacheManager *-- CacheEntry : lưu trữ
+
+note right of CacheManager::getInstance
+  // [Singleton]
+  Double-Checked Locking:
+  synchronized (CacheManager.class)
+  Đảm bảo Thread-safe và hiệu năng cao
+end note
+
+note right of CacheManager::CacheManager
+  // Private constructor
+  Ngăn cấm việc gọi new CacheManager()
+  từ bên ngoài lớp.
+end note
+
+@enduml

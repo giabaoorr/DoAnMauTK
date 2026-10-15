@@ -1,0 +1,58 @@
+@startuml
+title Mẫu Thiết Kế Observer - com.news.observer
+
+interface NewsSubject <<Subject>> {
+    + attach(NewsObserver): void
+    + detach(NewsObserver): void
+    + notifyObservers(List<Article>, int): void
+}
+
+interface NewsObserver <<Observer>> {
+    + onNewsUpdated(NewsUpdateEvent): void
+}
+
+class NewsFeed <<ConcreteSubject>> implements NewsSubject {
+    - observers: List<NewsObserver>
+    + attach(NewsObserver): void
+    + detach(NewsObserver): void
+    + notifyObservers(List<Article>, int): void
+}
+
+class UnreadCounter <<ConcreteObserver>> implements NewsObserver {
+    - lastNewCount: AtomicInteger
+    - totalUnread: AtomicInteger
+    - lastUpdateTime: LocalDateTime
+    + onNewsUpdated(NewsUpdateEvent): void
+    + getLastNewCount(): int
+    + getTotalUnread(): int
+}
+
+class NewsLogger <<ConcreteObserver>> implements NewsObserver {
+    - logHistory: List<String>
+    + onNewsUpdated(NewsUpdateEvent): void
+    + getLogHistory(): List<String>
+    + getLastLog(): String
+}
+
+class NewsUpdateEvent {
+    - newArticles: List<Article>
+    - totalCount: int
+    - timestamp: LocalDateTime
+    + getNewArticlesCount(): int
+    + getTotalCount(): int
+    + getTimestamp(): LocalDateTime
+}
+
+NewsFeed o-right-> NewsObserver : observers
+NewsObserver .down.> NewsUpdateEvent : <<consumes>>
+NewsFeed .down.> NewsUpdateEvent : <<creates>>
+
+note bottom of NewsFeed
+  // [Observer]
+  Khi người dùng nhấn "Làm mới",
+  NewsFeed tự động phát thông báo
+  đến UnreadCounter (đếm tin mới)
+  và NewsLogger (ghi nhật ký hệ thống).
+end note
+
+@enduml

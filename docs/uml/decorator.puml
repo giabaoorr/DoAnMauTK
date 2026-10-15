@@ -1,0 +1,57 @@
+@startuml
+title Mẫu Thiết Kế Decorator - com.news.decorator
+
+class Article <<Component>> {
+    - id: String
+    - title: String
+    - description: String
+    - content: String
+    - bookmarked: boolean
+    - featured: boolean
+    + isBookmarked(): boolean
+    + isFeatured(): boolean
+    + getBadge(): String
+    + getTitle(): String
+    + getDescription(): String
+}
+
+abstract class ArticleDecorator <<Decorator>> extends Article {
+    # decoratedArticle: Article
+    + ArticleDecorator(Article)
+    + getTitle(): String
+    + getDescription(): String
+    + isBookmarked(): boolean
+    + isFeatured(): boolean
+    + getBadge(): String
+}
+
+class FeaturedArticle <<ConcreteDecorator>> extends ArticleDecorator {
+    + isFeatured(): boolean
+    + getBadge(): String
+    + getTitle(): String
+}
+
+class BookmarkedArticle <<ConcreteDecorator>> extends ArticleDecorator {
+    + isBookmarked(): boolean
+    + getBadge(): String
+}
+
+class SummarizedArticle <<ConcreteDecorator>> extends ArticleDecorator {
+    - maxDescriptionLength: int
+    + getDescription(): String
+    + getEstimatedReadingTime(): String
+    + getSummary(): String
+}
+
+ArticleDecorator o-up-> Article : decoratedArticle
+
+note bottom of ArticleDecorator
+  // [Decorator]
+  Bọc đối tượng Article để bổ sung tính năng động:
+  - FeaturedArticle: nhãn "NỔI BẬT", biểu tượng ngôi sao
+  - BookmarkedArticle: nhãn "ĐÃ LƯU", đánh dấu lưu tin
+  - SummarizedArticle: tóm tắt súc tích và tính thời gian đọc
+  Có thể xếp chồng (stack) nhiều Decorator cùng lúc.
+end note
+
+@enduml
