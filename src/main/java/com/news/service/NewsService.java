@@ -129,6 +129,16 @@ public class NewsService {
         return Collections.unmodifiableList(new ArrayList<>(articles));
     }
 
+    /**
+     * [Strategy] Lấy danh sách bài viết sau khi xử lý qua các chiến lược sắp xếp và lọc.
+     */
+    public List<Article> getProcessedArticles(String category, String source, String sort) {
+        // [Strategy] Khởi tạo Context và nạp các chiến lược theo lựa chọn
+        com.news.strategy.ArticleProcessorContext context =
+                com.news.strategy.ArticleProcessorContext.fromUserPreferences(category, source, sort);
+        return context.process(new ArrayList<>(this.articles));
+    }
+
     public Optional<Article> getArticleById(String id) {
         if (id == null) return Optional.empty();
         return articles.stream()

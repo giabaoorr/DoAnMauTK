@@ -23,7 +23,7 @@
                     <option th:each="cat : ${categories}"
                             th:value="${cat}"
                             th:text="${cat}"
-                            th:selected="${param.category != null and param.category[0] == cat}">
+                            th:selected="${selectedCategory == cat}">
                     </option>
                 </select>
             </div>
@@ -36,7 +36,7 @@
                     <option th:each="src : ${sources}"
                             th:value="${src}"
                             th:text="${src}"
-                            th:selected="${param.source != null and param.source[0] == src}">
+                            th:selected="${selectedSource == src}">
                     </option>
                 </select>
             </div>
@@ -45,9 +45,9 @@
             <div class="filter-group">
                 <label for="sort" class="filter-label">⚡ Sắp xếp:</label>
                 <select id="sort" name="sort" class="filter-select">
-                    <option value="newest" th:selected="${param.sort == null or param.sort[0] == 'newest'}">Mới nhất</option>
-                    <option value="oldest" th:selected="${param.sort != null and param.sort[0] == 'oldest'}">Cũ nhất</option>
-                    <option value="title" th:selected="${param.sort != null and param.sort[0] == 'title'}">Theo tiêu đề (A-Z)</option>
+                    <option value="newest" th:selected="${selectedSort == 'newest'}">Mới nhất</option>
+                    <option value="oldest" th:selected="${selectedSort == 'oldest'}">Cũ nhất</option>
+                    <option value="title" th:selected="${selectedSort == 'title'}">Theo tiêu đề (A-Z)</option>
                 </select>
             </div>
 
@@ -71,12 +71,17 @@
 
     <!-- Thanh thống kê -->
     <div class="stats-bar">
-        <span>Tổng cộng: <strong th:text="${articles.size()}">0</strong> bài viết</span>
-        <span th:if="${param.category != null or param.source != null}" style="color: var(--primary);">
-            Đang lọc:
-            <span th:if="${param.category != null and param.category[0] != ''}" th:text="'[' + ${param.category[0]} + '] '"></span>
-            <span th:if="${param.source != null and param.source[0] != ''}" th:text="'(' + ${param.source[0]} + ')'"></span>
-        </span>
+        <div>
+            <span>Tổng cộng: <strong th:text="${totalArticles}">0</strong> bài viết</span>
+            <span th:if="${totalArticles != filteredCount}" style="color: var(--primary); font-weight: 600;">
+                (Đang hiển thị <span th:text="${filteredCount}">0</span> bài)
+            </span>
+        </div>
+        <div th:if="${(selectedCategory != null and !selectedCategory.empty) or (selectedSource != null and !selectedSource.empty)}" style="color: var(--text-muted);">
+            Bộ lọc đang dùng:
+            <span th:if="${selectedCategory != null and !selectedCategory.empty}" class="badge badge-category" th:text="${selectedCategory}"></span>
+            <span th:if="${selectedSource != null and !selectedSource.empty}" class="badge badge-source" th:text="${selectedSource}"></span>
+        </div>
     </div>
 
     <!-- Danh sách bài viết dạng Card -->

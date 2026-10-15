@@ -24,15 +24,26 @@ public class NewsController {
     }
 
     /**
-     * Trang chủ hiển thị danh sách tin tức.
+     * Trang chủ hiển thị danh sách tin tức với bộ lọc và sắp xếp (Strategy Pattern).
      */
     @GetMapping("/")
-    public String index(Model model) {
-        List<Article> articles = newsService.getAllArticles();
-        model.addAttribute("articles", articles);
+    public String index(
+            @org.springframework.web.bind.annotation.RequestParam(name = "category", required = false) String category,
+            @org.springframework.web.bind.annotation.RequestParam(name = "source", required = false) String source,
+            @org.springframework.web.bind.annotation.RequestParam(name = "sort", required = false, defaultValue = "newest") String sort,
+            Model model) {
+
+        // [Strategy] Lấy danh sách bài viết đã qua lọc và sắp xếp
+        List<Article> processedArticles = newsService.getProcessedArticles(category, source, sort);
+
+        model.addAttribute("articles", processedArticles);
         model.addAttribute("categories", newsService.getAllCategories());
         model.addAttribute("sources", newsService.getAllSources());
-        model.addAttribute("totalArticles", articles.size());
+        model.addAttribute("totalArticles", newsService.getAllArticles().size());
+        model.addAttribute("filteredCount", processedArticles.size());
+        model.addAttribute("selectedCategory", category != null ? category : "");
+        model.addAttribute("selectedSource", source != null ? source : "");
+        model.addAttribute("selectedSort", sort != null ? sort : "newest");
         model.addAttribute("fallbackMode", newsService.isFallbackMode());
         return "index";
     }
