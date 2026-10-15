@@ -167,6 +167,23 @@ public class Article {
         return null;
     }
 
+    public String getEstimatedReadingTime() {
+        String text = (content != null && !content.isEmpty()) ? content : description;
+        if (text == null || text.isEmpty()) {
+            return "1 phút đọc";
+        }
+        int words = text.trim().split("\\s+").length;
+        int minutes = Math.max(1, (int) Math.ceil(words / 180.0));
+        return minutes + " phút đọc";
+    }
+
+    public String getHighlightReason() {
+        if (this.featured) {
+            return "Tin tiêu điểm trong ngày";
+        }
+        return null;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

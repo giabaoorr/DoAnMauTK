@@ -3,19 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trang Chủ - Đọc Báo Đa Nguồn</title>
+    <title>Trang Chủ - Đọc Báo Đa Nguồn (Design Patterns)</title>
+    <!-- Google Fonts: Plus Jakarta Sans hiện đại, chuẩn tạp chí -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
 
-<!-- Header -->
-<div th:replace="~{fragments/header :: header('home')}"></div>
+<!-- Header chung -->
+<div th:replace="~{fragments/header :: header(${selectedFeatured} ? 'featured' : 'home')}"></div>
+
+<!-- Thanh Danh Mục Phổ Biến (Quick Category Chips / 1-Chạm) -->
+<nav class="category-chips-bar" aria-label="Danh mục tin tức">
+    <div class="container chips-container">
+        <a th:href="@{/}" class="chip-item"
+           th:classappend="${(selectedCategory == null or selectedCategory.empty) and !selectedFeatured} ? 'active' : ''">
+            <span>🌐 Tất cả tin</span>
+        </a>
+        <a th:href="@{/(featured='true')}" class="chip-item chip-featured"
+           th:classappend="${selectedFeatured} ? 'active' : ''"
+           title="Lọc riêng các bài viết nổi bật (Decorator: FeaturedArticle)">
+            <span>⭐ Tin nổi bật</span>
+        </a>
+        <a th:each="cat : ${categories}"
+           th:href="@{/(category=${cat})}"
+           class="chip-item"
+           th:classappend="${selectedCategory == cat} ? 'active' : ''">
+            <span th:text="${cat == 'Thời sự' ? '🏛️ ' + cat : (cat == 'Kinh doanh' ? '💼 ' + cat : (cat == 'Công nghệ' ? '💻 ' + cat : (cat == 'Thể thao' ? '⚽ ' + cat : (cat == 'Giải trí' ? '🎬 ' + cat : '🏷️ ' + cat))))}">Chuyên mục</span>
+        </a>
+        <a th:href="@{/bookmarks}" class="chip-item chip-bookmark">
+            <span>🔖 Đã lưu</span>
+            <span th:if="${bookmarkCount != null and bookmarkCount > 0}"
+                  class="chip-counter"
+                  th:text="${bookmarkCount}">0</span>
+        </a>
+    </div>
+</nav>
 
 <!-- Toolbar Bộ Lọc & Sắp Xếp (Strategy Pattern) -->
 <section class="toolbar-section">
     <div class="container">
         <form th:action="@{/}" method="get" class="filter-form">
-            <!-- Lọc theo Chuyên mục -->
+            <!-- Lọc theo Chuyên mục (CategoryFilterStrategy) -->
             <div class="filter-group">
                 <label for="category" class="filter-label">🏷️ Chuyên mục:</label>
                 <select id="category" name="category" class="filter-select">
@@ -28,7 +59,7 @@
                 </select>
             </div>
 
-            <!-- Lọc theo Nguồn báo -->
+            <!-- Lọc theo Nguồn báo (SourceFilterStrategy) -->
             <div class="filter-group">
                 <label for="source" class="filter-label">📰 Nguồn báo:</label>
                 <select id="source" name="source" class="filter-select">
@@ -41,7 +72,7 @@
                 </select>
             </div>
 
-            <!-- Sắp xếp (SortStrategy) -->
+            <!-- Sắp xếp (SortStrategy: Newest, Oldest, Title) -->
             <div class="filter-group">
                 <label for="sort" class="filter-label">⚡ Sắp xếp:</label>
                 <select id="sort" name="sort" class="filter-select">
@@ -51,8 +82,18 @@
                 </select>
             </div>
 
-            <button type="submit" class="btn btn-primary btn-sm">Áp dụng</button>
-            <a th:href="@{/}" class="btn btn-outline btn-sm">Đặt lại</a>
+            <!-- Lựa chọn lọc chỉ tin nổi bật -->
+            <div class="filter-group filter-checkbox-group">
+                <label class="checkbox-label" title="Chỉ hiển thị các bài viết được trang trí bởi [FeaturedArticle Decorator]">
+                    <input type="checkbox" name="featured" value="true" th:checked="${selectedFeatured}">
+                    <span class="custom-check-text">⭐ Chỉ tin nổi bật</span>
+                </label>
+            </div>
+
+            <div class="filter-actions">
+                <button type="submit" class="btn btn-primary btn-sm">Áp dụng</button>
+                <a th:href="@{/}" class="btn btn-outline btn-sm">Đặt lại</a>
+            </div>
         </form>
     </div>
 </section>
@@ -61,32 +102,177 @@
 <main class="container">
     <!-- Thông báo nếu có tin mới hoặc sự kiện từ Observer -->
     <div th:if="${refreshMessage != null}" class="alert-banner alert-success">
-        <span th:text="${refreshMessage}">Đã cập nhật tin tức mới!</span>
+        <div class="alert-content">
+            <span class="alert-icon">🔔</span>
+            <span th:text="${refreshMessage}">Đã cập nhật tin tức mới!</span>
+        </div>
+        <button type="button" class="alert-close" onclick="this.parentElement.remove()">✕</button>
+    </div>
+
+    <!-- Thông báo tác vụ chung -->
+    <div th:if="${message != null}" class="alert-banner alert-info">
+        <div class="alert-content">
+            <span class="alert-icon">✨</span>
+            <span th:text="${message}">Thao tác thành công!</span>
+        </div>
+        <button type="button" class="alert-close" onclick="this.parentElement.remove()">✕</button>
     </div>
 
     <!-- Thông báo chế độ dự phòng nếu offline / nguồn RSS lỗi -->
-    <div th:if="${fallbackMode}" class="alert-banner" style="background-color: #fef3c7; border-color: #fde68a; color: #92400e;">
-        <span>⚠️ <strong>Chế độ dự phòng đang hoạt động:</strong> Ứng dụng đang đọc dữ liệu mẫu cục bộ từ <code>src/main/resources/sample/</code> do không có mạng hoặc nguồn RSS không phản hồi.</span>
+    <div th:if="${fallbackMode}" class="alert-banner alert-warning">
+        <div class="alert-content">
+            <span class="alert-icon">⚠️</span>
+            <span><strong>Chế độ dự phòng đang hoạt động:</strong> Ứng dụng nạp dữ liệu từ <code>news-sample.json</code> do chưa kết nối được mạng.</span>
+        </div>
     </div>
 
-    <!-- Thanh thống kê -->
-    <div class="stats-bar">
-        <div>
-            <span>Tổng cộng: <strong th:text="${totalArticles}">0</strong> bài viết</span>
-            <span th:if="${totalArticles != filteredCount}" style="color: var(--primary); font-weight: 600;">
-                (Đang hiển thị <span th:text="${filteredCount}">0</span> bài)
-            </span>
+    <!-- ================================================================= -->
+    <!-- ⭐ KHU VỰC BÀI VIẾT NỔI BẬT & TIÊU ĐIỂM (FeaturedArticle Showcase) -->
+    <!-- ================================================================= -->
+    <section class="featured-section" th:if="${not #lists.isEmpty(featuredArticles) and (selectedCategory == null or selectedCategory.empty) and (selectedSource == null or selectedSource.empty)}">
+        <div class="section-header">
+            <div class="section-title-wrap">
+                <span class="section-icon">🔥</span>
+                <h2 class="section-title">Tin Tiêu Điểm &amp; Nổi Bật</h2>
+                <span class="pattern-pill">[Decorator: FeaturedArticle]</span>
+            </div>
+            <a th:href="@{/(featured='true')}" class="view-all-link">Xem tất cả tin nổi bật &rarr;</a>
         </div>
-        <div th:if="${(selectedCategory != null and !selectedCategory.empty) or (selectedSource != null and !selectedSource.empty)}" style="color: var(--text-muted);">
-            Bộ lọc đang dùng:
+
+        <div class="featured-grid">
+            <!-- Bài viết tiêu điểm chính (Hero Card lớn bên trái) -->
+            <article class="featured-hero-card" th:with="hero=${featuredArticles[0]}">
+                <div class="hero-image-wrap">
+                    <img th:if="${hero.imageUrl != null and !hero.imageUrl.empty}"
+                         th:src="${hero.imageUrl}"
+                         th:alt="${hero.title}"
+                         class="hero-image"
+                         loading="lazy"
+                         onerror="this.onerror=null; this.src='https://placehold.co/800x480/1e293b/ffffff?text=Tin+Tieu+Diem';">
+                    <img th:unless="${hero.imageUrl != null and !hero.imageUrl.empty}"
+                         src="https://placehold.co/800x480/1e293b/ffffff?text=Tin+Tieu+Diem"
+                         th:alt="${hero.title}"
+                         class="hero-image">
+                    <div class="hero-gradient-overlay"></div>
+                </div>
+
+                <div class="hero-content">
+                    <div class="hero-badges">
+                        <span class="badge badge-featured-hero">★ TIÊU ĐIỂM</span>
+                        <span class="badge badge-source" th:text="${hero.source}">VnExpress</span>
+                        <span class="badge badge-category" th:text="${hero.category}">Thời sự</span>
+                        <span class="badge badge-time" th:text="'⏱️ ' + ${hero.estimatedReadingTime}">⏱️ 2 phút đọc</span>
+                    </div>
+
+                    <h3 class="featured-hero-title">
+                        <a th:href="@{'/article/' + ${hero.id}}" th:text="${hero.title}">Tiêu đề bài viết tiêu điểm nổi bật</a>
+                    </h3>
+
+                    <p class="featured-hero-desc" th:text="${hero.description}">Mô tả tóm tắt súc tích bài viết...</p>
+
+                    <div class="hero-footer">
+                        <div class="hero-meta">
+                            <span th:text="'🕒 ' + ${hero.formattedDate}">15/10/2026 08:30</span>
+                        </div>
+                        <div class="hero-actions">
+                            <a th:href="@{'/article/' + ${hero.id}}" class="btn btn-hero-read">
+                                Đọc bài viết &rarr;
+                            </a>
+                            <!-- Nút Bookmark -->
+                            <form th:action="@{/bookmarks/toggle}" method="post" style="display:inline;">
+                                <input type="hidden" name="articleId" th:value="${hero.id}">
+                                <input type="hidden" name="returnUrl" th:value="@{/}">
+                                <button type="submit" class="btn-icon-hero" th:classappend="${hero.bookmarked} ? 'bookmarked' : ''"
+                                        th:title="${hero.bookmarked} ? 'Bỏ lưu' : 'Lưu tin'">
+                                    <span th:text="${hero.bookmarked} ? '★' : '☆'">☆</span>
+                                </button>
+                            </form>
+                            <!-- Nút Share link -->
+                            <button type="button" class="btn-icon-hero" th:data-url="@{'/article/' + ${hero.id}}" onclick="copyArticleLink(this.getAttribute('data-url'), event)" title="Sao chép liên kết">
+                                <span>🔗</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Cột 3 bài viết nổi bật phụ bên phải -->
+            <div class="featured-sub-column">
+                <article class="featured-sub-card" th:each="subArt, iterStat : ${featuredArticles}" th:if="${iterStat.index > 0}">
+                    <div class="sub-card-image-wrap">
+                        <img th:if="${subArt.imageUrl != null and !subArt.imageUrl.empty}"
+                             th:src="${subArt.imageUrl}"
+                             th:alt="${subArt.title}"
+                             class="sub-card-image"
+                             loading="lazy"
+                             onerror="this.onerror=null; this.src='https://placehold.co/300x200/334155/ffffff?text=Tin+Noi+Bat';">
+                        <img th:unless="${subArt.imageUrl != null and !subArt.imageUrl.empty}"
+                             src="https://placehold.co/300x200/334155/ffffff?text=Tin+Noi+Bat"
+                             th:alt="${subArt.title}"
+                             class="sub-card-image">
+                    </div>
+                    <div class="sub-card-content">
+                        <div class="sub-card-badges">
+                            <span class="badge badge-featured">★ NỔI BẬT</span>
+                            <span class="badge badge-category" th:text="${subArt.category}">Chuyên mục</span>
+                            <span class="sub-card-reading-time" th:text="'⏱️ ' + ${subArt.estimatedReadingTime}">⏱️ 2 phút</span>
+                        </div>
+                        <h4 class="sub-card-title">
+                            <a th:href="@{'/article/' + ${subArt.id}}" th:text="${subArt.title}">Tiêu đề bài viết</a>
+                        </h4>
+                        <div class="sub-card-footer">
+                            <span class="sub-card-date" th:text="'🕒 ' + ${subArt.formattedDate}">15/10/2026</span>
+                            <div class="sub-card-actions">
+                                <form th:action="@{/bookmarks/toggle}" method="post" style="display:inline;">
+                                    <input type="hidden" name="articleId" th:value="${subArt.id}">
+                                    <input type="hidden" name="returnUrl" th:value="@{/}">
+                                    <button type="submit" class="btn-sub-icon" th:classappend="${subArt.bookmarked} ? 'bookmarked' : ''"
+                                            th:title="${subArt.bookmarked} ? 'Bỏ lưu' : 'Lưu tin'">
+                                        <span th:text="${subArt.bookmarked} ? '★' : '☆'">☆</span>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- Thanh Thống Kê & Kết Quả Lọc -->
+    <div class="stats-bar">
+        <div class="stats-left">
+            <span class="stats-chip">
+                <span>Tổng số:</span>
+                <strong th:text="${totalArticles}">0</strong> bài viết
+            </span>
+            <span class="stats-chip" th:if="${totalArticles != filteredCount}">
+                <span>Đang hiển thị:</span>
+                <strong th:text="${filteredCount}">0</strong> bài
+            </span>
+            <span id="searchResultCount" class="stats-chip search-chip" style="display:none;"></span>
+        </div>
+
+        <div class="stats-right" th:if="${(selectedCategory != null and !selectedCategory.empty) or (selectedSource != null and !selectedSource.empty) or selectedFeatured}">
+            <span class="filter-tag-label">Đang lọc:</span>
+            <span th:if="${selectedFeatured}" class="badge badge-featured">★ NỔI BẬT</span>
             <span th:if="${selectedCategory != null and !selectedCategory.empty}" class="badge badge-category" th:text="${selectedCategory}"></span>
             <span th:if="${selectedSource != null and !selectedSource.empty}" class="badge badge-source" th:text="${selectedSource}"></span>
+            <a th:href="@{/}" class="clear-filters-link" title="Xóa tất cả bộ lọc">✕ Xóa lọc</a>
         </div>
     </div>
 
-    <!-- Danh sách bài viết dạng Card -->
+    <!-- Danh Sách Bài Viết Dạng Card -->
     <div class="article-grid" th:if="${not #lists.isEmpty(articles)}">
-        <article class="article-card" th:each="article : ${articles}">
+        <article class="article-card"
+                 th:each="article : ${articles}"
+                 th:classappend="${article.featured} ? 'featured-card' : ''">
+
+            <!-- Dải băng góc cho bài viết Nổi Bật -->
+            <div th:if="${article.featured}" class="featured-ribbon">
+                <span>★ NỔI BẬT</span>
+            </div>
+
             <div class="card-image-wrap">
                 <div class="card-badges">
                     <span class="badge badge-source" th:text="${article.source}">Nguồn</span>
@@ -104,44 +290,74 @@
                      src="https://placehold.co/600x400/e2e8f0/1e293b?text=Tin+Tuc"
                      th:alt="${article.title}"
                      class="card-image">
+
+                <span class="card-reading-time" th:text="'⏱️ ' + ${article.estimatedReadingTime}">⏱️ 2 phút</span>
             </div>
 
             <div class="card-content">
                 <div class="card-meta">
-                    <span th:text="'🕒 ' + ${article.formattedDate}">15/10/2026 08:30</span>
+                    <span class="meta-date" th:text="'🕒 ' + ${article.formattedDate}">15/10/2026 08:30</span>
+                    <span class="meta-dot">•</span>
+                    <span class="meta-source" th:text="${article.source}">VnExpress</span>
                 </div>
+
                 <h2 class="card-title">
                     <a th:href="@{'/article/' + ${article.id}}" th:text="${article.title}">Tiêu đề bài viết</a>
                 </h2>
+
                 <p class="card-desc" th:text="${article.description}">Tóm tắt nội dung bài viết...</p>
 
                 <div class="card-footer">
-                    <a th:href="@{'/article/' + ${article.id}}" class="btn btn-outline btn-sm">
+                    <a th:href="@{'/article/' + ${article.id}}" class="btn btn-read-more btn-sm">
                         Đọc tiếp &rarr;
                     </a>
 
-                    <!-- Nút đánh dấu Bookmark (Decorator & Bookmarking) -->
-                    <form th:action="@{/bookmarks/toggle}" method="post" style="display:inline;">
-                        <input type="hidden" name="articleId" th:value="${article.id}">
-                        <input type="hidden" name="returnUrl" th:value="@{/}">
-                        <button type="submit" class="btn-bookmark" th:classappend="${article.bookmarked} ? 'active' : ''"
-                                th:title="${article.bookmarked} ? 'Bỏ lưu bài viết' : 'Lưu bài viết'">
-                            <span th:text="${article.bookmarked} ? '★ Đã lưu' : '☆ Lưu tin'">☆ Lưu tin</span>
+                    <div class="card-actions-group">
+                        <!-- Nút Bookmark (BookmarkedArticle Decorator) -->
+                        <form th:action="@{/bookmarks/toggle}" method="post" style="display:inline;">
+                            <input type="hidden" name="articleId" th:value="${article.id}">
+                            <input type="hidden" name="returnUrl" th:value="@{/}">
+                            <button type="submit" class="btn-card-action"
+                                    th:classappend="${article.bookmarked} ? 'active-bookmark' : ''"
+                                    th:title="${article.bookmarked} ? 'Bỏ lưu bài viết' : 'Lưu bài viết'">
+                                <span th:text="${article.bookmarked} ? '★ Đã lưu' : '☆ Lưu'">☆ Lưu</span>
+                            </button>
+                        </form>
+
+                        <!-- Nút Ghim Nổi Bật (FeaturedArticle Decorator) -->
+                        <form th:action="@{/featured/toggle}" method="post" style="display:inline;">
+                            <input type="hidden" name="articleId" th:value="${article.id}">
+                            <input type="hidden" name="returnUrl" th:value="@{/}">
+                            <button type="submit" class="btn-card-action"
+                                    th:classappend="${article.featured} ? 'active-featured' : ''"
+                                    th:title="${article.featured} ? 'Hủy đánh dấu nổi bật' : 'Đánh dấu bài viết nổi bật (FeaturedArticle Decorator)'">
+                                <span th:text="${article.featured} ? '★ Nổi bật' : '⭐ Ghim'">⭐ Ghim</span>
+                            </button>
+                        </form>
+
+                        <!-- Nút Chia sẻ / Sao chép link -->
+                        <button type="button" class="btn-card-action btn-share"
+                                th:data-url="@{'/article/' + ${article.id}}"
+                                onclick="copyArticleLink(this.getAttribute('data-url'), event)"
+                                title="Sao chép liên kết bài viết">
+                            <span>🔗</span>
                         </button>
-                    </form>
+                    </div>
                 </div>
             </div>
         </article>
     </div>
 
     <!-- Khi không có bài viết nào phù hợp -->
-    <div th:if="${#lists.isEmpty(articles)}" style="text-align: center; padding: 60px 20px; background: white; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 40px;">
-        <p style="font-size: 1.2rem; color: var(--text-muted); margin-bottom: 12px;">Không tìm thấy bài viết nào phù hợp với bộ lọc.</p>
-        <a th:href="@{/}" class="btn btn-primary btn-sm">Xem tất cả bài viết</a>
+    <div th:if="${#lists.isEmpty(articles)}" class="empty-state">
+        <div class="empty-icon">🔍</div>
+        <h3>Không tìm thấy bài viết nào phù hợp</h3>
+        <p>Vui lòng thử chọn chuyên mục, nguồn báo khác hoặc đặt lại bộ lọc tìm kiếm.</p>
+        <a th:href="@{/}" class="btn btn-primary">Xem tất cả bài viết</a>
     </div>
 </main>
 
-<!-- Footer -->
+<!-- Footer chung -->
 <div th:replace="~{fragments/footer :: footer}"></div>
 
 </body>

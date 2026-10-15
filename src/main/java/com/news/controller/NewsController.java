@@ -26,19 +26,25 @@ public class NewsController {
     }
 
     /**
-     * Trang chủ hiển thị danh sách tin tức với bộ lọc và sắp xếp (Strategy Pattern).
+     * Trang chủ hiển thị danh sách tin tức với bộ lọc và sắp xếp (Strategy Pattern),
+     * kèm khu vực hiển thị bài viết nổi bật (FeaturedArticle Decorator).
      */
     @GetMapping("/")
     public String index(
             @org.springframework.web.bind.annotation.RequestParam(name = "category", required = false) String category,
             @org.springframework.web.bind.annotation.RequestParam(name = "source", required = false) String source,
             @org.springframework.web.bind.annotation.RequestParam(name = "sort", required = false, defaultValue = "newest") String sort,
+            @org.springframework.web.bind.annotation.RequestParam(name = "featured", required = false) Boolean featured,
             Model model) {
 
         // [Strategy] Lấy danh sách bài viết đã qua lọc và sắp xếp
-        List<Article> processedArticles = newsService.getProcessedArticles(category, source, sort);
+        List<Article> processedArticles = newsService.getProcessedArticles(category, source, sort, featured);
+
+        // [Decorator: FeaturedArticle] Lấy danh sách các bài viết tiêu điểm nổi bật
+        List<Article> featuredArticles = newsService.getFeaturedArticles(4);
 
         model.addAttribute("articles", processedArticles);
+        model.addAttribute("featuredArticles", featuredArticles);
         model.addAttribute("categories", newsService.getAllCategories());
         model.addAttribute("sources", newsService.getAllSources());
         model.addAttribute("totalArticles", newsService.getAllArticles().size());
@@ -46,13 +52,14 @@ public class NewsController {
         model.addAttribute("selectedCategory", category != null ? category : "");
         model.addAttribute("selectedSource", source != null ? source : "");
         model.addAttribute("selectedSort", sort != null ? sort : "newest");
+        model.addAttribute("selectedFeatured", Boolean.TRUE.equals(featured));
         model.addAttribute("fallbackMode", newsService.isFallbackMode());
         model.addAttribute("bookmarkCount", bookmarkService.getBookmarkCount());
         return "index";
     }
 
     /**
-     * Xem chi tiết một bài viết.
+     * Xem chi tiết một bài viết kèm danh sách bài viết liên quan.
      */
     @GetMapping("/article/{id}")
     public String viewArticle(@PathVariable("id") String id, Model model) {
@@ -62,8 +69,18 @@ public class NewsController {
             model.addAttribute("bookmarkCount", bookmarkService.getBookmarkCount());
             return "error/404";
         }
-        model.addAttribute("article", articleOpt.get());
+        Article currentArticle = articleOpt.get();
+        model.addAttribute("article", currentArticle);
         model.addAttribute("bookmarkCount", bookmarkService.getBookmarkCount());
+
+        // Lấy 3 bài viết liên quan cùng chuyên mục
+        List<Article> related = newsService.getAllArticles().stream()
+                .filter(a -> a.getCategory() != null && a.getCategory().equalsIgnoreCase(currentArticle.getCategory()))
+                .filter(a -> !id.equals(a.getId()))
+                .limit(3)
+                .collect(java.util.stream.Collectors.toList());
+        model.addAttribute("relatedArticles", related);
+
         return "detail";
     }
 
@@ -103,6 +120,25 @@ public class NewsController {
             } else {
                 redirectAttributes.addFlashAttribute("message", "Đã gỡ bài viết khỏi danh sách đánh dấu!");
             }
+        }
+
+        return "redirect:" + (returnUrl.startsWith("/") ? returnUrl : "/");
+    }
+
+    /**
+     * [Decorator: FeaturedArticle] Thao tác Đánh dấu / Bỏ đánh dấu bài viết Nổi Bật.
+     */
+    @org.springframework.web.bind.annotation.PostMapping("/featured/toggle")
+    public String toggleFeatured(
+            @org.springframework.web.bind.annotation.RequestParam("articleId") String articleId,
+            @org.springframework.web.bind.annotation.RequestParam(name = "returnUrl", defaultValue = "/") String returnUrl,
+            org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+
+        boolean isFeatured = newsService.toggleFeatured(articleId);
+        if (isFeatured) {
+            redirectAttributes.addFlashAttribute("message", "Đã ghim bài viết vào danh sách [NỔI BẬT] (FeaturedArticle Decorator)!");
+        } else {
+            redirectAttributes.addFlashAttribute("message", "Đã bỏ ghim bài viết khỏi danh sách [NỔI BẬT]!");
         }
 
         return "redirect:" + (returnUrl.startsWith("/") ? returnUrl : "/");

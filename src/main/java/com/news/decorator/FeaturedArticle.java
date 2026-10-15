@@ -34,4 +34,9 @@ public class FeaturedArticle extends ArticleDecorator {
         }
         return baseTitle;
     }
+
+    @Override
+    public String getHighlightReason() {
+        return "★ Tin tiêu điểm nổi bật trong ngày";
+    }
 }

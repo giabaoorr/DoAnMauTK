@@ -49,6 +49,14 @@ public class NewsService {
      * - FeaturedArticle: nếu bài viết thuộc nhóm tin tiêu điểm / từ khóa nổi bật
      * - SummarizedArticle: tạo đoạn trích dẫn súc tích và tính toán thời gian đọc
      */
+    private final Set<String> manualFeaturedIds = Collections.synchronizedSet(new HashSet<>());
+
+    /**
+     * [Decorator] Bọc Article bằng các Concrete Decorator tùy theo ngữ cảnh và trạng thái:
+     * - BookmarkedArticle: nếu bài viết đã được lưu
+     * - FeaturedArticle: nếu bài viết thuộc nhóm tin tiêu điểm / từ khóa nổi bật
+     * - SummarizedArticle: tạo đoạn trích dẫn súc tích và tính toán thời gian đọc
+     */
     public Article applyDecorators(Article article) {
         if (article == null) return null;
         Article decorated = article;
@@ -70,9 +78,27 @@ public class NewsService {
     }
 
     private boolean isHighlightArticle(Article a) {
-        if (a == null || a.getTitle() == null) return false;
+        if (a == null) return false;
+        if (a.isFeatured() || (a.getId() != null && manualFeaturedIds.contains(a.getId()))) {
+            return true;
+        }
+        if (a.getTitle() == null) return false;
         String t = a.getTitle().toLowerCase();
-        return t.contains("kỷ lục") || t.contains("đột phá") || t.contains("khởi công") || t.contains("ai");
+        return t.contains("kỷ lục") || t.contains("đột phá") || t.contains("khởi công") || t.contains("ai")
+                || t.contains("thủ tướng") || t.contains("quốc tế") || t.contains("tiêu điểm") || t.contains("nóng")
+                || t.contains("công nghệ") || t.contains("kinh tế") || t.contains("việt nam") || t.contains("đặc biệt")
+                || t.contains("bất ngờ") || t.contains("thế giới");
+    }
+
+    public boolean toggleFeatured(String articleId) {
+        if (articleId == null) return false;
+        if (manualFeaturedIds.contains(articleId)) {
+            manualFeaturedIds.remove(articleId);
+            return false;
+        } else {
+            manualFeaturedIds.add(articleId);
+            return true;
+        }
     }
 
     private void initDefaultFeedSources() {
@@ -237,15 +263,57 @@ public class NewsService {
      * đồng thời áp dụng Decorator pattern cho từng bài viết.
      */
     public List<Article> getProcessedArticles(String category, String source, String sort) {
+        return getProcessedArticles(category, source, sort, false);
+    }
+
+    public List<Article> getProcessedArticles(String category, String source, String sort, Boolean onlyFeatured) {
         // [Strategy] Khởi tạo Context và nạp các chiến lược theo lựa chọn
         com.news.strategy.ArticleProcessorContext context =
                 com.news.strategy.ArticleProcessorContext.fromUserPreferences(category, source, sort);
         List<Article> processed = context.process(new ArrayList<>(this.articles));
 
         // [Decorator] Áp dụng các decorator cho bài viết kết quả
-        return processed.stream()
+        List<Article> decorated = processed.stream()
                 .map(this::applyDecorators)
                 .collect(Collectors.toList());
+
+        if (onlyFeatured != null && onlyFeatured) {
+            return decorated.stream()
+                    .filter(Article::isFeatured)
+                    .collect(Collectors.toList());
+        }
+
+        return decorated;
+    }
+
+    /**
+     * [Decorator: FeaturedArticle] Lấy danh sách các bài viết tiêu điểm nổi bật nhất.
+     * Đảm bảo luôn trả về danh sách các bài viết được trang trí bởi FeaturedArticle.
+     */
+    public List<Article> getFeaturedArticles(int limit) {
+        if (limit <= 0) limit = 4;
+        List<Article> allDecorated = articles.stream()
+                .map(this::applyDecorators)
+                .collect(Collectors.toList());
+
+        List<Article> featured = allDecorated.stream()
+                .filter(Article::isFeatured)
+                .limit(limit)
+                .collect(Collectors.toList());
+
+        // Nếu số bài viết có từ khóa nổi bật ít hơn limit, bổ sung các bài viết mới nhất và bọc bằng FeaturedArticle
+        if (featured.size() < limit && !allDecorated.isEmpty()) {
+            Set<String> existingIds = featured.stream().map(Article::getId).collect(Collectors.toSet());
+            for (Article a : allDecorated) {
+                if (featured.size() >= limit) break;
+                if (!existingIds.contains(a.getId())) {
+                    Article manuallyFeatured = new com.news.decorator.FeaturedArticle(a);
+                    featured.add(manuallyFeatured);
+                    existingIds.add(a.getId());
+                }
+            }
+        }
+        return featured;
     }
 
     public Optional<Article> getArticleById(String id) {

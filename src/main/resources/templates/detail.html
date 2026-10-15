@@ -4,43 +4,67 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${article.title} + ' - Chi Tiết Tin Tức'">Chi Tiết Tin Tức</title>
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
 
-<!-- Header -->
+<!-- Header chung -->
 <div th:replace="~{fragments/header :: header('')}"></div>
 
 <main class="container">
-    <div class="detail-container">
-        <!-- Breadcrumb -->
-        <div class="breadcrumb">
-            <a th:href="@{/}">Trang chủ</a>
-            <span>&rsaquo;</span>
-            <a th:href="@{/(category=${article.category})}" th:text="${article.category}">Chuyên mục</a>
-            <span>&rsaquo;</span>
-            <span style="color: var(--text-light); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 300px;" th:text="${article.title}">Tiêu đề</span>
+    <article class="detail-container">
+        <!-- Breadcrumb & Cỡ chữ đọc -->
+        <div class="detail-top-bar">
+            <nav class="breadcrumb" aria-label="Điều hướng">
+                <a th:href="@{/}">Trang chủ</a>
+                <span class="bc-sep">&rsaquo;</span>
+                <a th:href="@{/(category=${article.category})}" th:text="${article.category}">Chuyên mục</a>
+                <span class="bc-sep">&rsaquo;</span>
+                <span class="bc-current" th:text="${article.title}">Tiêu đề</span>
+            </nav>
+
+            <!-- Bộ công cụ điều chỉnh cỡ chữ khi đọc (User-Friendly Reader Mode) -->
+            <div class="reading-controls" title="Điều chỉnh cỡ chữ đọc bài">
+                <span class="rc-label">Cỡ chữ:</span>
+                <button type="button" id="fontDecBtn" class="rc-btn" title="Giảm cỡ chữ">A-</button>
+                <button type="button" id="fontResetBtn" class="rc-btn" title="Cỡ chữ mặc định"><span id="fontSizeLabel">17px</span></button>
+                <button type="button" id="fontIncBtn" class="rc-btn" title="Tăng cỡ chữ">A+</button>
+            </div>
         </div>
 
-        <!-- Tiêu đề & Thông tin -->
+        <!-- Banner cảnh báo nếu là bài viết Nổi bật -->
+        <div th:if="${article.featured}" class="featured-article-banner">
+            <span class="fab-icon">⭐</span>
+            <div class="fab-text">
+                <strong>Bài Viết Nổi Bật &amp; Tiêu Điểm</strong>
+                <span>Bài viết này đang được trang trí bởi <code>[FeaturedArticle Decorator]</code>.</span>
+            </div>
+        </div>
+
+        <!-- Header bài viết -->
         <header class="detail-header">
-            <div style="display: flex; gap: 8px; margin-bottom: 12px; align-items: center;">
+            <div class="detail-badges">
                 <span class="badge badge-source" th:text="${article.source}">Nguồn</span>
                 <span class="badge badge-category" th:text="${article.category}">Chuyên mục</span>
                 <span th:if="${article.featured}" class="badge badge-featured">★ NỔI BẬT</span>
                 <span th:if="${article.bookmarked}" class="badge badge-bookmarked">✓ ĐÃ LƯU</span>
+                <span class="badge badge-time" th:text="'⏱️ ' + ${article.estimatedReadingTime}">⏱️ 2 phút đọc</span>
             </div>
 
             <h1 class="detail-title" th:text="${article.title}">Tiêu đề bài viết đầy đủ</h1>
 
             <div class="detail-meta">
                 <span th:text="'🕒 Xuất bản: ' + ${article.formattedDate}">15/10/2026 08:30</span>
-                <span>•</span>
-                <span th:text="'Nguồn: ' + ${article.source}">VnExpress</span>
+                <span class="meta-dot">•</span>
+                <span th:text="'Nguồn tin: ' + ${article.source}">VnExpress</span>
             </div>
         </header>
 
-        <!-- Ảnh lớn -->
+        <!-- Ảnh lớn bài viết -->
         <div class="detail-image-wrap" th:if="${article.imageUrl != null and !article.imageUrl.empty}">
             <img th:src="${article.imageUrl}"
                  th:alt="${article.title}"
@@ -48,11 +72,11 @@
                  onerror="this.onerror=null; this.src='https://placehold.co/800x450/e2e8f0/1e293b?text=Tin+Tuc';">
         </div>
 
-        <!-- Đoạn tóm tắt mở đầu -->
-        <p class="detail-lead" th:text="${article.description}">Đoạn mô tả tóm tắt ngắn...</p>
+        <!-- Đoạn tóm tắt mở đầu (SummarizedArticle Decorator) -->
+        <p class="detail-lead" th:text="${article.description}">Đoạn mô tả tóm tắt ngắn của bài viết...</p>
 
         <!-- Thân bài viết -->
-        <div class="detail-body">
+        <div id="articleBodyContent" class="detail-body">
             <p th:text="${article.content}" style="white-space: pre-line;">Nội dung bài viết chi tiết...</p>
         </div>
 
@@ -62,15 +86,32 @@
                 &larr; Quay lại danh sách
             </a>
 
-            <div style="display: flex; gap: 10px; align-items: center;">
+            <div class="detail-action-buttons">
                 <!-- Nút Bookmark -->
                 <form th:action="@{/bookmarks/toggle}" method="post" style="display:inline;">
                     <input type="hidden" name="articleId" th:value="${article.id}">
                     <input type="hidden" name="returnUrl" th:value="@{'/article/' + ${article.id}}">
-                    <button type="submit" class="btn btn-outline" th:classappend="${article.bookmarked} ? 'btn-bookmark active' : ''">
+                    <button type="submit" class="btn btn-outline" th:classappend="${article.bookmarked} ? 'btn-active-bookmark' : ''">
                         <span th:text="${article.bookmarked} ? '★ Đã lưu bài này' : '☆ Lưu bài viết'">☆ Lưu bài viết</span>
                     </button>
                 </form>
+
+                <!-- Nút Ghim Nổi Bật -->
+                <form th:action="@{/featured/toggle}" method="post" style="display:inline;">
+                    <input type="hidden" name="articleId" th:value="${article.id}">
+                    <input type="hidden" name="returnUrl" th:value="@{'/article/' + ${article.id}}">
+                    <button type="submit" class="btn btn-outline" th:classappend="${article.featured} ? 'btn-active-featured' : ''">
+                        <span th:text="${article.featured} ? '★ Đã ghim nổi bật' : '⭐ Ghim nổi bật'">⭐ Ghim nổi bật</span>
+                    </button>
+                </form>
+
+                <!-- Nút Chia sẻ link -->
+                <button type="button" class="btn btn-outline"
+                        th:data-url="@{'/article/' + ${article.id}}"
+                        onclick="copyArticleLink(this.getAttribute('data-url'), event)"
+                        title="Sao chép link bài viết">
+                    <span>🔗 Sao chép link</span>
+                </button>
 
                 <!-- Link xem bài gốc -->
                 <a th:if="${article.url != null and !article.url.empty}"
@@ -82,10 +123,41 @@
                 </a>
             </div>
         </div>
-    </div>
+
+        <!-- Khu vực Bài Viết Cùng Chuyên Mục (Related Articles) -->
+        <section class="related-section" th:if="${relatedArticles != null and !relatedArticles.isEmpty()}">
+            <h3 class="related-title">📰 Bài Viết Cùng Chuyên Mục [<span th:text="${article.category}">Chuyên mục</span>]</h3>
+            <div class="related-grid">
+                <article class="related-card" th:each="rel : ${relatedArticles}">
+                    <div class="related-image-wrap">
+                        <img th:if="${rel.imageUrl != null and !rel.imageUrl.empty}"
+                             th:src="${rel.imageUrl}"
+                             th:alt="${rel.title}"
+                             class="related-image"
+                             loading="lazy"
+                             onerror="this.onerror=null; this.src='https://placehold.co/300x200/e2e8f0/1e293b?text=Tin+Lien+Quan';">
+                        <img th:unless="${rel.imageUrl != null and !rel.imageUrl.empty}"
+                             src="https://placehold.co/300x200/e2e8f0/1e293b?text=Tin+Lien+Quan"
+                             th:alt="${rel.title}"
+                             class="related-image">
+                    </div>
+                    <div class="related-content">
+                        <div class="related-meta">
+                            <span class="badge badge-source" th:text="${rel.source}">Nguồn</span>
+                            <span class="related-time" th:text="'⏱️ ' + ${rel.estimatedReadingTime}">⏱️ 2 phút</span>
+                        </div>
+                        <h4 class="related-article-title">
+                            <a th:href="@{'/article/' + ${rel.id}}" th:text="${rel.title}">Tiêu đề bài liên quan</a>
+                        </h4>
+                        <span class="related-date" th:text="'🕒 ' + ${rel.formattedDate}">15/10/2026</span>
+                    </div>
+                </article>
+            </div>
+        </section>
+    </article>
 </main>
 
-<!-- Footer -->
+<!-- Footer chung -->
 <div th:replace="~{fragments/footer :: footer}"></div>
 
 </body>

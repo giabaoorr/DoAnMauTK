@@ -143,4 +143,14 @@ public abstract class ArticleDecorator extends Article {
     public String getBadge() {
         return decoratedArticle.getBadge();
     }
+
+    @Override
+    public String getEstimatedReadingTime() {
+        return decoratedArticle.getEstimatedReadingTime();
+    }
+
+    @Override
+    public String getHighlightReason() {
+        return decoratedArticle.getHighlightReason();
+    }
 }

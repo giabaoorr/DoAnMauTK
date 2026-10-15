@@ -2,10 +2,221 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <footer th:fragment="footer" class="site-footer">
     <div class="container footer-content">
-        <p><strong>Ứng dụng đọc báo đa nguồn</strong> &copy; 2026 - Đồ án môn Mẫu thiết kế</p>
-        <div class="footer-patterns">
-            <span>Áp dụng 6 Mẫu: <strong>Factory Method</strong> • <strong>Adapter</strong> • <strong>Strategy</strong> • <strong>Observer</strong> • <strong>Decorator</strong> • <strong>Singleton</strong></span>
+        <div class="footer-brand">
+            <span class="footer-logo">NEWS READER</span>
+            <p class="footer-desc">Ứng dụng Web đọc báo đa nguồn áp dụng chuẩn mực 6 Mẫu Thiết Kế GoF</p>
         </div>
+
+        <div class="footer-patterns">
+            <span class="patterns-title">6 Mẫu Thiết Kế (Pure Java):</span>
+            <span class="pattern-tag">Factory Method</span>
+            <span class="pattern-tag">Adapter</span>
+            <span class="pattern-tag">Strategy</span>
+            <span class="pattern-tag">Observer</span>
+            <span class="pattern-tag">Decorator</span>
+            <span class="pattern-tag">Singleton</span>
+        </div>
+
+        <p class="footer-copy">&copy; 2026 Đồ án môn Mẫu Thiết Kế • Chạy trên Spring Boot 3 &amp; Thymeleaf</p>
     </div>
+
+    <!-- Nút cuộn nhanh lên đầu trang (Back to top) -->
+    <button type="button" id="backToTopBtn" class="back-to-top" title="Cuộn lên đầu trang" aria-label="Lên đầu trang">
+        <span>↑</span>
+    </button>
+
+    <!-- Hộp thông báo nhanh Toast Popup -->
+    <div id="toastNotification" class="toast-popup" role="alert" aria-live="polite">
+        <span id="toastIcon">✨</span>
+        <span id="toastMessage">Thông báo</span>
+    </div>
+
+    <!-- Script tương tác thân thiện người dùng (Vanilla JS) -->
+    <script>
+        // 1. Chế độ Giao diện Sáng / Tối (Dark / Light Mode)
+        (function() {
+            const currentTheme = localStorage.getItem('theme') ||
+                (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            if (currentTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+            updateThemeIcon(currentTheme);
+
+            const toggleBtn = document.getElementById('themeToggleBtn');
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', function() {
+                    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+                    if (theme === 'dark') {
+                        document.documentElement.setAttribute('data-theme', 'dark');
+                    } else {
+                        document.documentElement.removeAttribute('data-theme');
+                    }
+                    localStorage.setItem('theme', theme);
+                    updateThemeIcon(theme);
+                    showToast(theme === 'dark' ? '🌙 Đã bật chế độ ban đêm' : '☀️ Đã chuyển sang chế độ ban ngày');
+                });
+            }
+
+            function updateThemeIcon(theme) {
+                const icon = document.getElementById('themeToggleIcon');
+                if (icon) {
+                    icon.textContent = theme === 'dark' ? '☀️' : '🌙';
+                }
+            }
+        })();
+
+        // 2. Tìm kiếm nhanh thời gian thực (Live Client-Side Search)
+        (function() {
+            const searchInput = document.getElementById('liveSearchInput');
+            const clearBtn = document.getElementById('clearSearchBtn');
+            if (!searchInput) return;
+
+            searchInput.addEventListener('input', function() {
+                const query = this.value.trim().toLowerCase();
+                if (clearBtn) {
+                    clearBtn.style.display = query ? 'block' : 'none';
+                }
+
+                const cards = document.querySelectorAll('.article-card, .featured-hero-card, .featured-sub-card');
+                let matchCount = 0;
+
+                cards.forEach(card => {
+                    const titleElem = card.querySelector('.card-title, .featured-hero-title, .sub-card-title');
+                    const descElem = card.querySelector('.card-desc, .featured-hero-desc');
+                    const titleText = titleElem ? titleElem.textContent.toLowerCase() : '';
+                    const descText = descElem ? descElem.textContent.toLowerCase() : '';
+
+                    if (!query || titleText.includes(query) || descText.includes(query)) {
+                        card.style.display = '';
+                        matchCount++;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+
+                // Cập nhật thông báo số lượng tìm thấy
+                const searchCounter = document.getElementById('searchResultCount');
+                if (searchCounter) {
+                    if (query) {
+                        searchCounter.style.display = 'inline-block';
+                        searchCounter.textContent = 'Tìm thấy ' + matchCount + ' bài viết';
+                    } else {
+                        searchCounter.style.display = 'none';
+                    }
+                }
+            });
+
+            if (clearBtn) {
+                clearBtn.addEventListener('click', function() {
+                    searchInput.value = '';
+                    searchInput.dispatchEvent(new Event('input'));
+                    searchInput.focus();
+                });
+            }
+        })();
+
+        // 3. Nút cuộn lên đầu trang (Back to Top)
+        (function() {
+            const btn = document.getElementById('backToTopBtn');
+            if (!btn) return;
+
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 300) {
+                    btn.classList.add('visible');
+                } else {
+                    btn.classList.remove('visible');
+                }
+            });
+
+            btn.addEventListener('click', function() {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        })();
+
+        // 4. Hàm hiển thị Toast Popup
+        function showToast(message, icon) {
+            const toast = document.getElementById('toastNotification');
+            const msgSpan = document.getElementById('toastMessage');
+            const iconSpan = document.getElementById('toastIcon');
+            if (!toast || !msgSpan) return;
+
+            msgSpan.textContent = message;
+            if (icon && iconSpan) iconSpan.textContent = icon;
+            toast.classList.add('show');
+
+            clearTimeout(window._toastTimer);
+            window._toastTimer = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // 5. Nút sao chép liên kết bài viết
+        function copyArticleLink(url, event) {
+            if (event) event.preventDefault();
+            const fullUrl = url.startsWith('http') ? url : window.location.origin + url;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(fullUrl).then(() => {
+                    showToast('Đã sao chép liên kết vào bộ nhớ tạm!', '📋');
+                }).catch(() => {
+                    promptCopy(fullUrl);
+                });
+            } else {
+                promptCopy(fullUrl);
+            }
+        }
+
+        function promptCopy(text) {
+            const temp = document.createElement('input');
+            document.body.appendChild(temp);
+            temp.value = text;
+            temp.select();
+            document.execCommand('copy');
+            document.body.removeChild(temp);
+            showToast('Đã sao chép liên kết!', '📋');
+        }
+
+        // 6. Điều chỉnh cỡ chữ trang đọc tin (Font Size Adjuster)
+        (function() {
+            const bodyElem = document.getElementById('articleBodyContent');
+            if (!bodyElem) return;
+
+            let currentSize = parseInt(localStorage.getItem('articleFontSize') || '17');
+            applyFontSize(currentSize);
+
+            const decBtn = document.getElementById('fontDecBtn');
+            const incBtn = document.getElementById('fontIncBtn');
+            const resetBtn = document.getElementById('fontResetBtn');
+
+            if (decBtn) {
+                decBtn.addEventListener('click', () => {
+                    if (currentSize > 14) {
+                        currentSize -= 1.5;
+                        applyFontSize(currentSize);
+                    }
+                });
+            }
+            if (incBtn) {
+                incBtn.addEventListener('click', () => {
+                    if (currentSize < 24) {
+                        currentSize += 1.5;
+                        applyFontSize(currentSize);
+                    }
+                });
+            }
+            if (resetBtn) {
+                resetBtn.addEventListener('click', () => {
+                    currentSize = 17;
+                    applyFontSize(currentSize);
+                });
+            }
+
+            function applyFontSize(size) {
+                bodyElem.style.fontSize = size + 'px';
+                localStorage.setItem('articleFontSize', size);
+                const label = document.getElementById('fontSizeLabel');
+                if (label) label.textContent = size + 'px';
+            }
+        })();
+    </script>
 </footer>
 </html>
