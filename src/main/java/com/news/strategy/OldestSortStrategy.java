@@ -16,7 +16,7 @@ public class OldestSortStrategy implements SortStrategy {
         if (articles == null) return List.of();
         List<Article> copy = new ArrayList<>(articles);
         copy.sort(Comparator.comparing(
-                Article::getPublishedDate,
+                a -> a != null ? a.getPublishedDate() : null,
                 Comparator.nullsLast(Comparator.naturalOrder())
         ));
         return copy;

@@ -163,7 +163,10 @@ public class NewsService {
             }
         }
 
-        Set<String> oldUrls = articles.stream().map(Article::getUrl).filter(Objects::nonNull).collect(Collectors.toSet());
+        Set<String> oldUrls = articles.stream()
+                .map(a -> a != null ? a.getUrl() : null)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
 
         if (successFeedCount > 0 && !articleMap.isEmpty()) {
             this.fallbackMode = false;
@@ -255,7 +258,7 @@ public class NewsService {
 
     public List<String> getAllCategories() {
         return articles.stream()
-                .map(Article::getCategory)
+                .map(a -> a != null ? a.getCategory() : null)
                 .filter(Objects::nonNull)
                 .distinct()
                 .sorted()
@@ -264,7 +267,7 @@ public class NewsService {
 
     public List<String> getAllSources() {
         return articles.stream()
-                .map(Article::getSource)
+                .map(a -> a != null ? a.getSource() : null)
                 .filter(Objects::nonNull)
                 .distinct()
                 .sorted()

@@ -16,7 +16,7 @@ public class TitleSortStrategy implements SortStrategy {
     private final Collator collator;
 
     public TitleSortStrategy() {
-        this.collator = Collator.getInstance(new Locale("vi", "VN"));
+        this.collator = Collator.getInstance(Locale.forLanguageTag("vi-VN"));
         this.collator.setStrength(Collator.PRIMARY);
     }
 

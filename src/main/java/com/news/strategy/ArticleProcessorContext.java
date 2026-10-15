@@ -71,18 +71,18 @@ public class ArticleProcessorContext {
      */
     public static ArticleProcessorContext fromUserPreferences(String category, String source, String sortCode) {
         // [Strategy] Lựa chọn chiến lược lọc động
-        FilterStrategy filter;
-        boolean hasCategory = category != null && !category.trim().isEmpty();
-        boolean hasSource = source != null && !source.trim().isEmpty();
+        String trimmedCategory = (category != null && !category.trim().isEmpty()) ? category.trim() : null;
+        String trimmedSource = (source != null && !source.trim().isEmpty()) ? source.trim() : null;
 
-        if (hasCategory && hasSource) {
+        FilterStrategy filter;
+        if (trimmedCategory != null && trimmedSource != null) {
             filter = new CompositeFilterStrategy()
-                    .addStrategy(new CategoryFilterStrategy(category.trim()))
-                    .addStrategy(new SourceFilterStrategy(source.trim()));
-        } else if (hasCategory) {
-            filter = new CategoryFilterStrategy(category.trim());
-        } else if (hasSource) {
-            filter = new SourceFilterStrategy(source.trim());
+                    .addStrategy(new CategoryFilterStrategy(trimmedCategory))
+                    .addStrategy(new SourceFilterStrategy(trimmedSource));
+        } else if (trimmedCategory != null) {
+            filter = new CategoryFilterStrategy(trimmedCategory);
+        } else if (trimmedSource != null) {
+            filter = new SourceFilterStrategy(trimmedSource);
         } else {
             filter = new AllPassFilterStrategy();
         }
