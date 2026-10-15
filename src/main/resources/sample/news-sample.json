@@ -1,0 +1,90 @@
+[
+  {
+    "id": "vne-thoi-su-01",
+    "title": "Khởi công xây dựng cầu vượt biển dài nhất khu vực miền Trung",
+    "description": "Dự án cầu vượt biển quy mô hơn 5.000 tỷ đồng chính thức được phát lệnh khởi công, kỳ vọng thúc đẩy kết nối kinh tế liên vùng và phát triển du lịch ven biển.",
+    "content": "Sáng nay, tại khu vực ven biển miền Trung, lễ khởi công cây cầu vượt biển quy mô lớn đã chính thức diễn ra. Cây cầu có tổng chiều dài hơn 7 km, kết cấu dây văng hiện đại, chịu được bão cấp 12 và động đất cấp 8. Dự án hoàn thành sẽ rút ngắn thời gian di chuyển giữa các khu kinh tế trọng điểm từ 2 giờ xuống còn 30 phút, mở ra cơ hội đột phá cho giao thương hàng hải và du lịch sinh thái.",
+    "url": "https://vnexpress.net/khoi-cong-cau-vuot-bien-mien-trung-4789012.html",
+    "imageUrl": "https://images.unsplash.com/photo-1545558014-8692077e9b5c?w=600&auto=format&fit=crop&q=80",
+    "publishedDate": "2026-10-15T08:30:00",
+    "source": "VnExpress",
+    "category": "Thời sự"
+  },
+  {
+    "id": "vne-cong-nghe-02",
+    "title": "Trung tâm dữ liệu AI công nghệ xanh đi vào vận hành tại Đà Nẵng",
+    "description": "Trung tâm siêu tính toán và trí tuệ nhân tạo sử dụng 100% năng lượng tái tạo và hệ thống làm mát bằng chất lỏng tiên tiến vừa được khai trương.",
+    "content": "Trung tâm dữ liệu AI thế hệ mới với công suất 50MW vừa chính thức đi vào vận hành tại Khu công nghệ cao Đà Nẵng. Hệ thống trang bị hàng nghìn chip tăng tốc chuyên dụng, phục vụ đào tạo các mô hình ngôn ngữ lớn và giải pháp xe tự hành. Điểm đặc biệt là toàn bộ hệ thống sử dụng nguồn điện mặt trời và giải pháp tản nhiệt chìm trong chất lỏng, giảm 40% lượng điện tiêu thụ so với trung tâm truyền thống.",
+    "url": "https://vnexpress.net/trung-tam-du-lieu-ai-xanh-da-nang-4789015.html",
+    "imageUrl": "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=600&auto=format&fit=crop&q=80",
+    "publishedDate": "2026-10-15T09:15:00",
+    "source": "VnExpress",
+    "category": "Công nghệ"
+  },
+  {
+    "id": "tt-kinh-doanh-03",
+    "title": "Xuất khẩu nông sản Việt Nam lập kỷ lục mới trong 9 tháng đầu năm",
+    "description": "Kim ngạch xuất khẩu sầu riêng, gạo và cà phê tiếp tục bứt phá mạnh mẽ, đóng góp lớn vào thặng dư thương mại cả nước.",
+    "content": "Theo số liệu của Bộ Nông nghiệp và Phát triển nông thôn, tổng kim ngạch xuất khẩu nông lâm thủy sản 9 tháng đầu năm đạt mức kỷ lục trên 46 tỷ USD. Trong đó, sầu riêng và cà phê ghi nhận mức tăng trưởng hơn 60% sang các thị trường lớn như EU, Hoa Kỳ và Trung Quốc. Việc chuẩn hóa quy trình trồng trọt VietGAP và GlobalGAP đã giúp nông sản Việt Nam giữ vững vị thế tại các thị trường khó tính.",
+    "url": "https://tuoitre.vn/xuat-khau-nong-san-lap-ky-luc-20261015100021.htm",
+    "imageUrl": "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=600&auto=format&fit=crop&q=80",
+    "publishedDate": "2026-10-15T10:00:00",
+    "source": "Tuổi Trẻ",
+    "category": "Kinh doanh"
+  },
+  {
+    "id": "tt-the-thao-04",
+    "title": "Đội tuyển bóng đá nữ Việt Nam giành vé vào vòng chung kết châu lục",
+    "description": "Chiến thắng nghẹt thở 2-1 trước đối thủ nhiều duyên nợ đã đưa các cô gái vàng Việt Nam tiến thẳng vào vòng chung kết với ngôi đầu bảng.",
+    "content": "Tối qua, trong trận đấu quyết định của bảng đấu vòng loại, đội tuyển bóng đá nữ Việt Nam đã thi đấu xuất sắc và giành thắng lợi 2-1. Bàn thắng quyết định được ghi ở phút thứ 88 sau một pha phối hợp đá phạt góc đẹp mắt. Huấn luyện viên trưởng khen ngợi tinh thần quả cảm và kỷ luật chiến thuật của toàn đội trong suốt 90 phút thi đấu căng thẳng.",
+    "url": "https://tuoitre.vn/tuyen-nu-viet-nam-vao-vck-chau-luc-20261015111005.htm",
+    "imageUrl": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=600&auto=format&fit=crop&q=80",
+    "publishedDate": "2026-10-14T20:45:00",
+    "source": "Tuổi Trẻ",
+    "category": "Thể thao"
+  },
+  {
+    "id": "vne-giai-tri-05",
+    "title": "Phim điện ảnh chuyển thể văn học Việt Nam được vinh danh tại LHP quốc tế",
+    "description": "Bộ phim khắc họa vẻ đẹp thiên nhiên và chiều sâu tâm hồn con người Tây Bắc đã xuất sắc nhận giải 'Đạo diễn xuất sắc nhất'.",
+    "content": "Tại bế mạc Liên hoan phim quốc tế vừa diễn ra, tác phẩm điện ảnh độc lập của Việt Nam chuyển thể từ tác phẩm văn học nổi tiếng đã vinh dự nhận giải Đạo diễn xuất sắc nhất. Ban giám khảo đánh giá cao ngôn ngữ điện ảnh giàu chất thơ, hình ảnh thiên nhiên hùng vĩ và diễn xuất tự nhiên, mộc mạc của dàn diễn viên bản địa.",
+    "url": "https://vnexpress.net/phim-viet-nam-nhan-giai-lhp-quoc-te-4789020.html",
+    "imageUrl": "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=600&auto=format&fit=crop&q=80",
+    "publishedDate": "2026-10-14T15:20:00",
+    "source": "VnExpress",
+    "category": "Giải trí"
+  },
+  {
+    "id": "tt-thoi-su-06",
+    "title": "Tuyến metro số 2 hoàn tất 95% khối lượng mặt bằng thi công",
+    "description": "Công tác giải phóng mặt bằng dọc các quận trung tâm đang về đích, chuẩn bị đồng loạt triển khai các gói thầu ngầm.",
+    "content": "Ban Quản lý đường sắt đô thị cho biết công tác giải phóng mặt bằng cho tuyến metro số 2 đã đạt trên 95%. Hệ thống hạ tầng kỹ thuật gồm điện toán, cấp thoát nước và viễn thông cơ bản đã được di dời sang tuyến mới an toàn. Các nhà thầu quốc tế đang tập kết máy đào hầm TBM hiện đại nhất để chuẩn bị khoan ngầm vào đầu quý sau.",
+    "url": "https://tuoitre.vn/tuyen-metro-so-2-hoan-tat-mat-bang-20261015120530.htm",
+    "imageUrl": "https://images.unsplash.com/photo-1517649763962-0c623266ddc0?w=600&auto=format&fit=crop&q=80",
+    "publishedDate": "2026-10-15T07:10:00",
+    "source": "Tuổi Trẻ",
+    "category": "Thời sự"
+  },
+  {
+    "id": "vne-kinh-doanh-07",
+    "title": "Lãi suất cho vay mua nhà tiếp tục giảm về mức thấp nhất 5 năm",
+    "description": "Nhiều ngân hàng thương mại tung các gói ưu đãi lãi suất cố định 5.5% - 6.5%/năm nhằm kích cầu tiêu dùng và thị trường bất động sản.",
+    "content": "Khảo sát biểu lãi suất tại các ngân hàng thương mại lớn cho thấy mức lãi suất vay mua nhà kỳ hạn ưu đãi từ 12-24 tháng đã giảm đáng kể. Các chuyên gia tài chính nhận định dòng tiền đang có xu hướng dịch chuyển trở lại các kênh đầu tư sản xuất kinh doanh và nhà ở thực khi chi phí vốn vay trở nên dễ tiếp cận hơn.",
+    "url": "https://vnexpress.net/lai-suat-vay-mua-nha-giam-sau-4789033.html",
+    "imageUrl": "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600&auto=format&fit=crop&q=80",
+    "publishedDate": "2026-10-14T11:00:00",
+    "source": "VnExpress",
+    "category": "Kinh doanh"
+  },
+  {
+    "id": "tt-cong-nghe-08",
+    "title": "Ra mắt thiết bị vệ tinh Internet băng thông rộng tự phát triển tại Việt Nam",
+    "description": "Thiết bị thu phát tín hiệu vệ tinh quỹ đạo thấp giúp kết nối mạng Internet tốc độ cao cho tàu thuyền đánh cá xa bờ và vùng sâu vùng xa.",
+    "content": "Các kỹ sư công nghệ trong nước vừa chế tạo thành công thiết bị đầu cuối thu phát sóng vệ tinh LEO thế hệ mới. Thiết bị có khả năng tự động bám bắt quỹ đạo vệ tinh trong điều kiện sóng biển dữ dội, cung cấp tốc độ truy cập Internet lên đến 150 Mbps. Sản phẩm hứa hẹn mang lại kết nối thông tin cứu nạn, thời tiết trực tiếp cho hàng vạn ngư dân bám biển.",
+    "url": "https://tuoitre.vn/ve-tinh-internet-cho-ngu-dan-20261015132045.htm",
+    "imageUrl": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&auto=format&fit=crop&q=80",
+    "publishedDate": "2026-10-15T11:45:00",
+    "source": "Tuổi Trẻ",
+    "category": "Công nghệ"
+  }
+]

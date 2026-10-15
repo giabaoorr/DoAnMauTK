@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang Chủ - Đọc Báo Đa Nguồn</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<!-- Header -->
+<div th:replace="~{fragments/header :: header('home')}"></div>
+
+<!-- Toolbar Bộ Lọc & Sắp Xếp (Strategy Pattern) -->
+<section class="toolbar-section">
+    <div class="container">
+        <form th:action="@{/}" method="get" class="filter-form">
+            <!-- Lọc theo Chuyên mục -->
+            <div class="filter-group">
+                <label for="category" class="filter-label">🏷️ Chuyên mục:</label>
+                <select id="category" name="category" class="filter-select">
+                    <option value="">-- Tất cả --</option>
+                    <option th:each="cat : ${categories}"
+                            th:value="${cat}"
+                            th:text="${cat}"
+                            th:selected="${param.category != null and param.category[0] == cat}">
+                    </option>
+                </select>
+            </div>
+
+            <!-- Lọc theo Nguồn báo -->
+            <div class="filter-group">
+                <label for="source" class="filter-label">📰 Nguồn báo:</label>
+                <select id="source" name="source" class="filter-select">
+                    <option value="">-- Tất cả --</option>
+                    <option th:each="src : ${sources}"
+                            th:value="${src}"
+                            th:text="${src}"
+                            th:selected="${param.source != null and param.source[0] == src}">
+                    </option>
+                </select>
+            </div>
+
+            <!-- Sắp xếp (SortStrategy) -->
+            <div class="filter-group">
+                <label for="sort" class="filter-label">⚡ Sắp xếp:</label>
+                <select id="sort" name="sort" class="filter-select">
+                    <option value="newest" th:selected="${param.sort == null or param.sort[0] == 'newest'}">Mới nhất</option>
+                    <option value="oldest" th:selected="${param.sort != null and param.sort[0] == 'oldest'}">Cũ nhất</option>
+                    <option value="title" th:selected="${param.sort != null and param.sort[0] == 'title'}">Theo tiêu đề (A-Z)</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-sm">Áp dụng</button>
+            <a th:href="@{/}" class="btn btn-outline btn-sm">Đặt lại</a>
+        </form>
+    </div>
+</section>
+
+<!-- Nội Dung Chính -->
+<main class="container">
+    <!-- Thông báo nếu có tin mới hoặc sự kiện từ Observer -->
+    <div th:if="${refreshMessage != null}" class="alert-banner alert-success">
+        <span th:text="${refreshMessage}">Đã cập nhật tin tức mới!</span>
+    </div>
+
+    <!-- Thanh thống kê -->
+    <div class="stats-bar">
+        <span>Tổng cộng: <strong th:text="${articles.size()}">0</strong> bài viết</span>
+        <span th:if="${param.category != null or param.source != null}" style="color: var(--primary);">
+            Đang lọc:
+            <span th:if="${param.category != null and param.category[0] != ''}" th:text="'[' + ${param.category[0]} + '] '"></span>
+            <span th:if="${param.source != null and param.source[0] != ''}" th:text="'(' + ${param.source[0]} + ')'"></span>
+        </span>
+    </div>
+
+    <!-- Danh sách bài viết dạng Card -->
+    <div class="article-grid" th:if="${not #lists.isEmpty(articles)}">
+        <article class="article-card" th:each="article : ${articles}">
+            <div class="card-image-wrap">
+                <div class="card-badges">
+                    <span class="badge badge-source" th:text="${article.source}">Nguồn</span>
+                    <span class="badge badge-category" th:text="${article.category}">Chuyên mục</span>
+                    <span th:if="${article.featured}" class="badge badge-featured">★ NỔI BẬT</span>
+                    <span th:if="${article.bookmarked}" class="badge badge-bookmarked">✓ ĐÃ LƯU</span>
+                </div>
+                <img th:if="${article.imageUrl != null and !article.imageUrl.empty}"
+                     th:src="${article.imageUrl}"
+                     th:alt="${article.title}"
+                     class="card-image"
+                     loading="lazy"
+                     onerror="this.onerror=null; this.src='https://placehold.co/600x400/e2e8f0/1e293b?text=Tin+Tuc';">
+                <img th:unless="${article.imageUrl != null and !article.imageUrl.empty}"
+                     src="https://placehold.co/600x400/e2e8f0/1e293b?text=Tin+Tuc"
+                     th:alt="${article.title}"
+                     class="card-image">
+            </div>
+
+            <div class="card-content">
+                <div class="card-meta">
+                    <span th:text="'🕒 ' + ${article.formattedDate}">15/10/2026 08:30</span>
+                </div>
+                <h2 class="card-title">
+                    <a th:href="@{'/article/' + ${article.id}}" th:text="${article.title}">Tiêu đề bài viết</a>
+                </h2>
+                <p class="card-desc" th:text="${article.description}">Tóm tắt nội dung bài viết...</p>
+
+                <div class="card-footer">
+                    <a th:href="@{'/article/' + ${article.id}}" class="btn btn-outline btn-sm">
+                        Đọc tiếp &rarr;
+                    </a>
+
+                    <!-- Nút đánh dấu Bookmark (Decorator & Bookmarking) -->
+                    <form th:action="@{/bookmarks/toggle}" method="post" style="display:inline;">
+                        <input type="hidden" name="articleId" th:value="${article.id}">
+                        <input type="hidden" name="returnUrl" th:value="@{/}">
+                        <button type="submit" class="btn-bookmark" th:classappend="${article.bookmarked} ? 'active' : ''"
+                                th:title="${article.bookmarked} ? 'Bỏ lưu bài viết' : 'Lưu bài viết'">
+                            <span th:text="${article.bookmarked} ? '★ Đã lưu' : '☆ Lưu tin'">☆ Lưu tin</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </article>
+    </div>
+
+    <!-- Khi không có bài viết nào phù hợp -->
+    <div th:if="${#lists.isEmpty(articles)}" style="text-align: center; padding: 60px 20px; background: white; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 40px;">
+        <p style="font-size: 1.2rem; color: var(--text-muted); margin-bottom: 12px;">Không tìm thấy bài viết nào phù hợp với bộ lọc.</p>
+        <a th:href="@{/}" class="btn btn-primary btn-sm">Xem tất cả bài viết</a>
+    </div>
+</main>
+
+<!-- Footer -->
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+</body>
+</html>

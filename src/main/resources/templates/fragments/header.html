@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<header th:fragment="header(activePage)" class="site-header">
+    <div class="container header-content">
+        <a th:href="@{/}" class="logo-area">
+            <span class="logo-badge">NEWS</span>
+            <div class="site-title">
+                <span>Tin Tức Đa Nguồn</span>
+                <span class="site-subtitle">Đồ án Mẫu Thiết Kế (Design Patterns)</span>
+            </div>
+        </a>
+
+        <nav class="header-actions">
+            <a th:href="@{/}" class="nav-link" th:classappend="${activePage == 'home'} ? 'active' : ''">
+                <span>📰 Trang chủ</span>
+            </a>
+            <a th:href="@{/bookmarks}" class="nav-link" th:classappend="${activePage == 'bookmarks'} ? 'active' : ''">
+                <span>⭐ Đã lưu</span>
+                <span th:if="${bookmarkCount != null and bookmarkCount > 0}"
+                      class="badge badge-featured"
+                      style="margin-left: 4px; padding: 2px 6px; font-size: 0.7rem;"
+                      th:text="${bookmarkCount}">0</span>
+            </a>
+            <form th:action="@{/refresh}" method="post" style="display: inline;">
+                <button type="submit" class="btn btn-primary btn-sm">
+                    <span>🔄 Làm mới</span>
+                </button>
+            </form>
+        </nav>
+    </div>
+</header>
+</html>

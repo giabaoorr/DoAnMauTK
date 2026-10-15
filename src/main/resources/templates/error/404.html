@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Không Tìm Thấy Bài Viết - 404</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/header :: header('')}"></div>
+
+<main class="container" style="text-align: center; padding: 80px 20px;">
+    <h1 style="font-size: 3rem; color: var(--secondary); margin-bottom: 12px;">404</h1>
+    <h2 style="font-size: 1.5rem; color: var(--text-muted); margin-bottom: 24px;" th:text="${errorMessage != null ? errorMessage : 'Không tìm thấy trang hoặc bài viết yêu cầu.'}">
+        Không tìm thấy bài viết yêu cầu.
+    </h2>
+    <a th:href="@{/}" class="btn btn-primary">Quay về trang chủ</a>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+</body>
+</html>

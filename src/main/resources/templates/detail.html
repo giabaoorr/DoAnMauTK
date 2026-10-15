@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${article.title} + ' - Chi Tiết Tin Tức'">Chi Tiết Tin Tức</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<!-- Header -->
+<div th:replace="~{fragments/header :: header('')}"></div>
+
+<main class="container">
+    <div class="detail-container">
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+            <a th:href="@{/}">Trang chủ</a>
+            <span>&rsaquo;</span>
+            <a th:href="@{/(category=${article.category})}" th:text="${article.category}">Chuyên mục</a>
+            <span>&rsaquo;</span>
+            <span style="color: var(--text-light); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 300px;" th:text="${article.title}">Tiêu đề</span>
+        </div>
+
+        <!-- Tiêu đề & Thông tin -->
+        <header class="detail-header">
+            <div style="display: flex; gap: 8px; margin-bottom: 12px; align-items: center;">
+                <span class="badge badge-source" th:text="${article.source}">Nguồn</span>
+                <span class="badge badge-category" th:text="${article.category}">Chuyên mục</span>
+                <span th:if="${article.featured}" class="badge badge-featured">★ NỔI BẬT</span>
+                <span th:if="${article.bookmarked}" class="badge badge-bookmarked">✓ ĐÃ LƯU</span>
+            </div>
+
+            <h1 class="detail-title" th:text="${article.title}">Tiêu đề bài viết đầy đủ</h1>
+
+            <div class="detail-meta">
+                <span th:text="'🕒 Xuất bản: ' + ${article.formattedDate}">15/10/2026 08:30</span>
+                <span>•</span>
+                <span th:text="'Nguồn: ' + ${article.source}">VnExpress</span>
+            </div>
+        </header>
+
+        <!-- Ảnh lớn -->
+        <div class="detail-image-wrap" th:if="${article.imageUrl != null and !article.imageUrl.empty}">
+            <img th:src="${article.imageUrl}"
+                 th:alt="${article.title}"
+                 class="detail-image"
+                 onerror="this.onerror=null; this.src='https://placehold.co/800x450/e2e8f0/1e293b?text=Tin+Tuc';">
+        </div>
+
+        <!-- Đoạn tóm tắt mở đầu -->
+        <p class="detail-lead" th:text="${article.description}">Đoạn mô tả tóm tắt ngắn...</p>
+
+        <!-- Thân bài viết -->
+        <div class="detail-body">
+            <p th:text="${article.content}" style="white-space: pre-line;">Nội dung bài viết chi tiết...</p>
+        </div>
+
+        <!-- Thao tác dưới chân bài viết -->
+        <div class="detail-actions">
+            <a th:href="@{/}" class="btn btn-outline">
+                &larr; Quay lại danh sách
+            </a>
+
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <!-- Nút Bookmark -->
+                <form th:action="@{/bookmarks/toggle}" method="post" style="display:inline;">
+                    <input type="hidden" name="articleId" th:value="${article.id}">
+                    <input type="hidden" name="returnUrl" th:value="@{'/article/' + ${article.id}}">
+                    <button type="submit" class="btn btn-outline" th:classappend="${article.bookmarked} ? 'btn-bookmark active' : ''">
+                        <span th:text="${article.bookmarked} ? '★ Đã lưu bài này' : '☆ Lưu bài viết'">☆ Lưu bài viết</span>
+                    </button>
+                </form>
+
+                <!-- Link xem bài gốc -->
+                <a th:if="${article.url != null and !article.url.empty}"
+                   th:href="${article.url}"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="btn btn-primary">
+                    Xem bài gốc &nearr;
+                </a>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Footer -->
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+</body>
+</html>
