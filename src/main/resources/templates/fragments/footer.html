@@ -33,36 +33,10 @@
 
     <!-- Script tương tác thân thiện người dùng (Vanilla JS) -->
     <script>
-        // 1. Chế độ Giao diện Sáng / Tối (Dark / Light Mode)
+        // Đảm bảo luôn sử dụng giao diện sáng tiêu chuẩn báo chí
         (function() {
-            const currentTheme = localStorage.getItem('theme') ||
-                (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-            if (currentTheme === 'dark') {
-                document.documentElement.setAttribute('data-theme', 'dark');
-            }
-            updateThemeIcon(currentTheme);
-
-            const toggleBtn = document.getElementById('themeToggleBtn');
-            if (toggleBtn) {
-                toggleBtn.addEventListener('click', function() {
-                    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-                    if (theme === 'dark') {
-                        document.documentElement.setAttribute('data-theme', 'dark');
-                    } else {
-                        document.documentElement.removeAttribute('data-theme');
-                    }
-                    localStorage.setItem('theme', theme);
-                    updateThemeIcon(theme);
-                    showToast(theme === 'dark' ? '🌙 Đã bật chế độ ban đêm' : '☀️ Đã chuyển sang chế độ ban ngày');
-                });
-            }
-
-            function updateThemeIcon(theme) {
-                const icon = document.getElementById('themeToggleIcon');
-                if (icon) {
-                    icon.textContent = theme === 'dark' ? '☀️' : '🌙';
-                }
-            }
+            localStorage.removeItem('theme');
+            document.documentElement.removeAttribute('data-theme');
         })();
 
         // 2. Tìm kiếm nhanh thời gian thực (Live Client-Side Search)

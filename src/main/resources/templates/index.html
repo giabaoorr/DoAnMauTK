@@ -197,21 +197,26 @@
                     <div class="sub-card-content">
                         <div class="sub-card-kicker">
                             <span class="sub-kicker-tag" th:text="${subArt.category}">Chuyên mục</span>
+                            <span class="sub-kicker-source" th:text="${subArt.source}">Nguồn</span>
                             <span class="sub-kicker-time" th:text="${subArt.estimatedReadingTime}">2 phút đọc</span>
                         </div>
                         <h4 class="sub-card-title">
                             <a th:href="@{'/article/' + ${subArt.id}}" th:text="${subArt.title}">Tiêu đề bài viết tiêu điểm phụ</a>
                         </h4>
+                        <p class="sub-card-desc" th:if="${subArt.description != null and !subArt.description.empty}" th:text="${subArt.description}">Mô tả tóm tắt bài viết...</p>
                         <div class="sub-card-footer">
                             <span class="sub-card-date" th:text="${subArt.formattedDate}">15/10/2026</span>
-                            <form th:action="@{/bookmarks/toggle}" method="post" style="display:inline;">
-                                <input type="hidden" name="articleId" th:value="${subArt.id}">
-                                <input type="hidden" name="returnUrl" th:value="@{/}">
-                                <button type="submit" class="btn-sub-icon" th:classappend="${subArt.bookmarked} ? 'bookmarked' : ''"
-                                        th:title="${subArt.bookmarked} ? 'Bỏ lưu' : 'Lưu tin'">
-                                    <span th:text="${subArt.bookmarked} ? '★' : '☆'">☆</span>
-                                </button>
-                            </form>
+                            <div class="sub-card-actions">
+                                <a th:href="@{'/article/' + ${subArt.id}}" class="sub-read-link">Chi tiết &rarr;</a>
+                                <form th:action="@{/bookmarks/toggle}" method="post" style="display:inline;">
+                                    <input type="hidden" name="articleId" th:value="${subArt.id}">
+                                    <input type="hidden" name="returnUrl" th:value="@{/}">
+                                    <button type="submit" class="btn-sub-icon" th:classappend="${subArt.bookmarked} ? 'bookmarked' : ''"
+                                            th:title="${subArt.bookmarked} ? 'Bỏ lưu' : 'Lưu tin'">
+                                        <span th:text="${subArt.bookmarked} ? '★' : '☆'">☆</span>
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </article>

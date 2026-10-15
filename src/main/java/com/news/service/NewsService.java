@@ -104,17 +104,27 @@ public class NewsService {
     private void initDefaultFeedSources() {
         // Nguồn VnExpress
         feedSources.add(new FeedSource("VnExpress", "Thời sự", "https://vnexpress.net/rss/tin-moi-nhat.rss", SourceType.RSS));
+        feedSources.add(new FeedSource("VnExpress", "Thế giới", "https://vnexpress.net/rss/the-gioi.rss", SourceType.RSS));
         feedSources.add(new FeedSource("VnExpress", "Kinh doanh", "https://vnexpress.net/rss/kinh-doanh.rss", SourceType.RSS));
         feedSources.add(new FeedSource("VnExpress", "Công nghệ", "https://vnexpress.net/rss/so-hoa.rss", SourceType.RSS));
         feedSources.add(new FeedSource("VnExpress", "Thể thao", "https://vnexpress.net/rss/the-thao.rss", SourceType.RSS));
         feedSources.add(new FeedSource("VnExpress", "Giải trí", "https://vnexpress.net/rss/giai-tri.rss", SourceType.RSS));
+        feedSources.add(new FeedSource("VnExpress", "Sức khỏe", "https://vnexpress.net/rss/suc-khoe.rss", SourceType.RSS));
+        feedSources.add(new FeedSource("VnExpress", "Giáo dục", "https://vnexpress.net/rss/giao-duc.rss", SourceType.RSS));
+        feedSources.add(new FeedSource("VnExpress", "Du lịch", "https://vnexpress.net/rss/du-lich.rss", SourceType.RSS));
+        feedSources.add(new FeedSource("VnExpress", "Pháp luật", "https://vnexpress.net/rss/phap-luat.rss", SourceType.RSS));
 
         // Nguồn Tuổi Trẻ
         feedSources.add(new FeedSource("Tuổi Trẻ", "Thời sự", "https://tuoitre.vn/rss/tin-moi-nhat.rss", SourceType.RSS));
+        feedSources.add(new FeedSource("Tuổi Trẻ", "Thế giới", "https://tuoitre.vn/rss/the-gioi.rss", SourceType.RSS));
         feedSources.add(new FeedSource("Tuổi Trẻ", "Kinh doanh", "https://tuoitre.vn/rss/kinh-doanh.rss", SourceType.RSS));
         feedSources.add(new FeedSource("Tuổi Trẻ", "Công nghệ", "https://tuoitre.vn/rss/nhip-song-so.rss", SourceType.RSS));
         feedSources.add(new FeedSource("Tuổi Trẻ", "Thể thao", "https://tuoitre.vn/rss/the-thao.rss", SourceType.RSS));
         feedSources.add(new FeedSource("Tuổi Trẻ", "Giải trí", "https://tuoitre.vn/rss/giai-tri.rss", SourceType.RSS));
+        feedSources.add(new FeedSource("Tuổi Trẻ", "Sức khỏe", "https://tuoitre.vn/rss/suc-khoe.rss", SourceType.RSS));
+        feedSources.add(new FeedSource("Tuổi Trẻ", "Giáo dục", "https://tuoitre.vn/rss/giao-duc.rss", SourceType.RSS));
+        feedSources.add(new FeedSource("Tuổi Trẻ", "Du lịch", "https://tuoitre.vn/rss/du-lich.rss", SourceType.RSS));
+        feedSources.add(new FeedSource("Tuổi Trẻ", "Pháp luật", "https://tuoitre.vn/rss/phap-luat.rss", SourceType.RSS));
     }
 
     @PostConstruct
@@ -343,13 +353,29 @@ public class NewsService {
                 .map(this::applyDecorators);
     }
 
+    private static final List<String> EDITORIAL_CATEGORY_ORDER = List.of(
+            "Thời sự", "Thế giới", "Kinh doanh", "Công nghệ", "Thể thao",
+            "Giải trí", "Sức khỏe", "Giáo dục", "Du lịch", "Pháp luật"
+    );
+
     public List<String> getAllCategories() {
-        return articles.stream()
+        Set<String> found = articles.stream()
                 .map(a -> a != null ? a.getCategory() : null)
                 .filter(Objects::nonNull)
-                .distinct()
-                .sorted()
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
+
+        List<String> ordered = new java.util.ArrayList<>();
+        for (String cat : EDITORIAL_CATEGORY_ORDER) {
+            if (found.contains(cat)) {
+                ordered.add(cat);
+            }
+        }
+        found.stream().sorted().forEach(cat -> {
+            if (!ordered.contains(cat)) {
+                ordered.add(cat);
+            }
+        });
+        return ordered;
     }
 
     public List<String> getAllSources() {

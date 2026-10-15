@@ -86,5 +86,60 @@
     "publishedDate": "2026-10-15T11:45:00",
     "source": "Tuổi Trẻ",
     "category": "Công nghệ"
+  },
+  {
+    "id": "vne-the-gioi-09",
+    "title": "Hội nghị thượng đỉnh khí hậu toàn cầu thông qua gói tài chính 300 tỷ USD",
+    "description": "Các nhà lãnh đạo thế giới đã đạt được đồng thuận lịch sử về quỹ chuyển đổi năng lượng sạch và hỗ trợ ứng phó thiên tai cho các nước đang phát triển.",
+    "content": "Tại phiên bế mạc hội nghị thượng đỉnh khí hậu, đại diện hơn 190 quốc gia đã nhất trí thông qua cơ chế tài chính mới quy mô 300 tỷ USD hàng năm. Nguồn vốn này ưu tiên đầu tư vào lưới điện thông minh, năng lượng hydro xanh và bảo tồn các cánh rừng nhiệt đới nguyên sinh.",
+    "url": "https://vnexpress.net/thuong-dinh-khi-hau-thong-qua-goi-300-ty-usd-4789040.html",
+    "imageUrl": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&auto=format&fit=crop&q=80",
+    "publishedDate": "2026-10-15T13:00:00",
+    "source": "VnExpress",
+    "category": "Thế giới"
+  },
+  {
+    "id": "tt-suc-khoe-10",
+    "title": "Bệnh viện tuyến đầu ghép thành công cùng lúc tim và thận cho bệnh nhân nguy kịch",
+    "description": "Ca đại phẫu thuật kéo dài 10 giờ liên tục với sự tham gia của hơn 50 y bác sĩ đầu ngành đã cứu sống kỳ diệu nam bệnh nhân suy đa tạng.",
+    "content": "Đội ngũ chuyên gia ghép tạng vừa thực hiện thành công ca ghép đồng thời tim và thận từ người hiến chết não. Sau 48 giờ phẫu thuật, các chỉ số huyết động và chức năng bài tiết của bệnh nhân đã hồi phục ấn tượng. Đây là dấu mốc quan trọng khẳng định trình độ ghép tạng chuyên sâu của y học Việt Nam.",
+    "url": "https://tuoitre.vn/ghep-thanh-cong-tim-than-cuu-song-benh-nhan-20261015143000.htm",
+    "imageUrl": "https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=600&auto=format&fit=crop&q=80",
+    "publishedDate": "2026-10-15T14:30:00",
+    "source": "Tuổi Trẻ",
+    "category": "Sức khỏe"
+  },
+  {
+    "id": "vne-giao-duc-11",
+    "title": "Thí điểm đưa tư duy AI và lập trình vào chương trình phổ thông từ năm học mới",
+    "description": "Bộ Giáo dục và Đào tạo công bố khung chuẩn năng lực số nhằm trang bị cho học sinh khả năng làm chủ công nghệ trí tuệ nhân tạo một cách an toàn và sáng tạo.",
+    "content": "Chương trình thí điểm sẽ bắt đầu tại 100 trường phổ thông trên cả nước từ học kỳ tới. Nội dung tập trung vào ứng dụng AI giải quyết vấn đề thực tiễn, an toàn thông tin mạng và đạo đức trí tuệ nhân tạo, giúp học sinh phát triển tư duy phản biện và sáng tạo trong kỷ nguyên số.",
+    "url": "https://vnexpress.net/thi-diem-dua-ai-vao-truong-pho-thong-4789055.html",
+    "imageUrl": "https://images.unsplash.com/photo-1509062522246-3755977927d7?w=600&auto=format&fit=crop&q=80",
+    "publishedDate": "2026-10-15T15:10:00",
+    "source": "VnExpress",
+    "category": "Giáo dục"
+  },
+  {
+    "id": "tt-du-lich-12",
+    "title": "Vịnh Hạ Long và Quần đảo Cát Bà lọt top điểm đến thiên nhiên ngoạn mục nhất châu Á",
+    "description": "Tạp chí du lịch danh tiếng thế giới vinh danh cảnh quan karst tuyệt mỹ cùng trải nghiệm du thuyền sinh thái và bảo tồn đa dạng sinh học độc đáo.",
+    "content": "Theo bình chọn thường niên của độc giả quốc tế, quần thể di sản thiên nhiên Vịnh Hạ Long - Cát Bà xếp vị trí thứ 2 trong danh sách điểm đến thiên nhiên hàng đầu châu Á. Sự kết hợp giữa các hang động kỳ vĩ, làn nước ngọc bích và các cung trekking rừng nguyên sinh tạo nên sức hút khó cưỡng cho du khách quốc tế.",
+    "url": "https://tuoitre.vn/ha-long-cat-ba-top-diem-den-chau-a-20261015154500.htm",
+    "imageUrl": "https://images.unsplash.com/photo-1528127269322-539801943592?w=600&auto=format&fit=crop&q=80",
+    "publishedDate": "2026-10-15T15:45:00",
+    "source": "Tuổi Trẻ",
+    "category": "Du lịch"
+  },
+  {
+    "id": "vne-phap-luat-13",
+    "title": "Bộ Công an triệt phá đường dây lừa đảo đầu tư tiền ảo xuyên biên giới hàng nghìn tỷ đồng",
+    "description": "Lực lượng an ninh mạng phối hợp cảnh sát quốc tế bắt giữ hàng chục đối tượng chủ mưu, phong tỏa nhiều tài khoản và bất động sản giá trị lớn.",
+    "content": "Cục An ninh mạng và phòng chống tội phạm công nghệ cao vừa phối hợp cùng công an các địa phương bóc gỡ đường dây lừa đảo công nghệ cao. Các đối tượng lập các sàn giao dịch tài chính ảo giả mạo cam kết lợi nhuận 30%/tháng để thu hút người tham gia rồi đánh sập hệ thống chiếm đoạt tài sản.",
+    "url": "https://vnexpress.net/triet-pha-duong-day-lua-dao-tien-ao-4789066.html",
+    "imageUrl": "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80",
+    "publishedDate": "2026-10-15T16:20:00",
+    "source": "VnExpress",
+    "category": "Pháp luật"
   }
 ]

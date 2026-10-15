@@ -29,12 +29,6 @@
                       class="nav-counter"
                       th:text="${bookmarkCount}">0</span>
             </a>
-
-            <!-- Nút đổi giao diện Sáng / Tối (Dark Mode) -->
-            <button type="button" id="themeToggleBtn" class="btn-theme-toggle" title="Chuyển chế độ Sáng / Tối" aria-label="Đổi giao diện">
-                <span id="themeToggleIcon">🌙</span>
-            </button>
-
             <!-- Nút làm mới dữ liệu (Observer Pattern) -->
             <form th:action="@{/refresh}" method="post" style="display: inline;">
                 <button type="submit" class="btn btn-primary btn-sm btn-refresh" title="Làm mới tin tức từ các nguồn RSS [Observer Pattern]">
