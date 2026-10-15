@@ -12,6 +12,9 @@
 </head>
 <body>
 
+<!-- Thanh tiến độ đọc bài viết (Reading Progress Bar) -->
+<div id="readingProgressBar" class="reading-progress-bar" aria-hidden="true"></div>
+
 <!-- Header chung -->
 <div th:replace="~{fragments/header :: header('')}"></div>
 
@@ -28,20 +31,21 @@
             </nav>
 
             <!-- Bộ công cụ điều chỉnh cỡ chữ khi đọc (User-Friendly Reader Mode) -->
-            <div class="reading-controls" title="Điều chỉnh cỡ chữ đọc bài">
-                <span class="rc-label">Cỡ chữ:</span>
-                <button type="button" id="fontDecBtn" class="rc-btn" title="Giảm cỡ chữ">A-</button>
-                <button type="button" id="fontResetBtn" class="rc-btn" title="Cỡ chữ mặc định"><span id="fontSizeLabel">17px</span></button>
-                <button type="button" id="fontIncBtn" class="rc-btn" title="Tăng cỡ chữ">A+</button>
+            <div class="text-size-toolbar" title="Điều chỉnh cỡ chữ đọc bài (Reader Mode)">
+                <span class="text-size-label">Cỡ chữ:</span>
+                <button type="button" id="fontSizeSm" class="btn-text-size" onclick="changeFontSize('sm')" title="Chữ nhỏ (15px)">A-</button>
+                <button type="button" id="fontSizeMd" class="btn-text-size active" onclick="changeFontSize('md')" title="Chữ chuẩn (17px)">A</button>
+                <button type="button" id="fontSizeLg" class="btn-text-size" onclick="changeFontSize('lg')" title="Chữ lớn (19px)">A+</button>
+                <button type="button" id="fontSizeXl" class="btn-text-size" onclick="changeFontSize('xl')" title="Chữ rất lớn (21px)">A++</button>
             </div>
         </div>
 
         <!-- Banner cảnh báo nếu là bài viết Nổi bật -->
         <div th:if="${article.featured}" class="featured-article-banner">
-            <span class="fab-icon">⭐</span>
+            <span class="fab-icon">📌</span>
             <div class="fab-text">
-                <strong>Bài Viết Nổi Bật &amp; Tiêu Điểm</strong>
-                <span>Bài viết này đang được trang trí bởi <code>[FeaturedArticle Decorator]</code>.</span>
+                <strong>Bài Viết Tiêu Điểm</strong>
+                <span>Bài viết này đang được trang trí bởi <code>FeaturedArticle Decorator</code>.</span>
             </div>
         </div>
 
@@ -50,9 +54,13 @@
             <div class="detail-badges">
                 <span class="badge badge-source" th:text="${article.source}">Nguồn</span>
                 <span class="badge badge-category" th:text="${article.category}">Chuyên mục</span>
-                <span th:if="${article.featured}" class="badge badge-featured">★ NỔI BẬT</span>
-                <span th:if="${article.bookmarked}" class="badge badge-bookmarked">✓ ĐÃ LƯU</span>
-                <span class="badge badge-time" th:text="'⏱️ ' + ${article.estimatedReadingTime}">⏱️ 2 phút đọc</span>
+                <span class="badge badge-time" th:text="${article.estimatedReadingTime}">2 phút đọc</span>
+                <!-- Decorator Stack trực quan -->
+                <div class="decorator-stack" title="Các Decorator đang trang trí bài viết này">
+                    <span th:if="${article.featured}" class="badge-decorator badge-featured" title="FeaturedArticle Decorator">★ Tiêu điểm</span>
+                    <span th:if="${article.bookmarked}" class="badge-decorator badge-bookmarked" title="BookmarkedArticle Decorator">✓ Đã lưu</span>
+                    <span class="badge-decorator badge-summarized" title="SummarizedArticle Decorator">📄 Đã tóm tắt</span>
+                </div>
             </div>
 
             <h1 class="detail-title" th:text="${article.title}">Tiêu đề bài viết đầy đủ</h1>
@@ -150,6 +158,40 @@
 
 <!-- Footer chung -->
 <div th:replace="~{fragments/footer :: footer}"></div>
+
+<!-- Script hỗ trợ Reader Mode & Reading Progress Bar -->
+<script>
+    // 1. Reading Progress Bar
+    window.addEventListener('scroll', function() {
+        const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
+        const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const scrolled = height > 0 ? (winScroll / height) * 100 : 0;
+        const bar = document.getElementById('readingProgressBar');
+        if (bar) {
+            bar.style.width = scrolled + '%';
+        }
+    });
+
+    // 2. Text Size Resizer
+    function changeFontSize(size) {
+        const bodyContent = document.getElementById('articleBodyContent');
+        if (!bodyContent) return;
+        bodyContent.classList.remove('font-sm', 'font-md', 'font-lg', 'font-xl');
+        bodyContent.classList.add('font-' + size);
+        localStorage.setItem('news_font_size', size);
+
+        ['sm', 'md', 'lg', 'xl'].forEach(s => {
+            const btn = document.getElementById('fontSize' + s.charAt(0).toUpperCase() + s.slice(1));
+            if (btn) btn.classList.toggle('active', s === size);
+        });
+    }
+
+    // Khôi phục cỡ chữ đã lưu khi tải trang
+    document.addEventListener('DOMContentLoaded', function() {
+        const savedSize = localStorage.getItem('news_font_size') || 'md';
+        changeFontSize(savedSize);
+    });
+</script>
 
 </body>
 </html>

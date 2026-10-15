@@ -39,14 +39,19 @@
             document.documentElement.removeAttribute('data-theme');
         })();
 
-        // 2. Tìm kiếm nhanh thời gian thực (Live Client-Side Search)
+        // 2. Tìm kiếm nhanh thời gian thực với Highlight từ khóa (Live Search & Keyword Highlight)
         (function() {
             const searchInput = document.getElementById('liveSearchInput');
             const clearBtn = document.getElementById('clearSearchBtn');
             if (!searchInput) return;
 
+            function escapeRegExp(string) {
+                return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            }
+
             searchInput.addEventListener('input', function() {
-                const query = this.value.trim().toLowerCase();
+                const query = this.value.trim();
+                const lowerQuery = query.toLowerCase();
                 if (clearBtn) {
                     clearBtn.style.display = query ? 'block' : 'none';
                 }
@@ -55,16 +60,35 @@
                 let matchCount = 0;
 
                 cards.forEach(card => {
-                    const titleElem = card.querySelector('.card-title, .featured-hero-title, .sub-card-title');
-                    const descElem = card.querySelector('.card-desc, .featured-hero-desc');
-                    const titleText = titleElem ? titleElem.textContent.toLowerCase() : '';
+                    const titleLink = card.querySelector('.card-title a, .featured-hero-title a, .sub-card-title a');
+                    const descElem = card.querySelector('.card-desc, .featured-hero-desc, .sub-card-desc');
+
+                    if (titleLink && !titleLink.dataset.originalTitle) {
+                        titleLink.dataset.originalTitle = titleLink.textContent;
+                    }
+
+                    const rawTitle = titleLink ? (titleLink.dataset.originalTitle || titleLink.textContent) : '';
+                    const titleLower = rawTitle.toLowerCase();
                     const descText = descElem ? descElem.textContent.toLowerCase() : '';
 
-                    if (!query || titleText.includes(query) || descText.includes(query)) {
+                    if (!query || titleLower.includes(lowerQuery) || descText.includes(lowerQuery)) {
                         card.style.display = '';
                         matchCount++;
+
+                        // Highlight từ khóa khớp trong tiêu đề bài viết
+                        if (titleLink) {
+                            if (query && titleLower.includes(lowerQuery)) {
+                                const regex = new RegExp('(' + escapeRegExp(query) + ')', 'gi');
+                                titleLink.innerHTML = rawTitle.replace(regex, '<mark class="search-highlight">$1</mark>');
+                            } else {
+                                titleLink.textContent = rawTitle;
+                            }
+                        }
                     } else {
                         card.style.display = 'none';
+                        if (titleLink) {
+                            titleLink.textContent = rawTitle;
+                        }
                     }
                 });
 

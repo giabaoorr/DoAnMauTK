@@ -269,7 +269,10 @@
                     <span class="card-kicker-cat" th:text="${article.category}">Chuyên mục</span>
                     <span class="card-kicker-dot">•</span>
                     <span class="card-kicker-src" th:text="${article.source}">VnExpress</span>
-                    <span th:if="${article.bookmarked}" class="card-bookmarked-tag">ĐÃ LƯU</span>
+                    <div class="decorator-stack">
+                        <span th:if="${article.featured}" class="badge-decorator badge-featured" title="FeaturedArticle Decorator">Tiêu điểm</span>
+                        <span th:if="${article.bookmarked}" class="badge-decorator badge-bookmarked" title="BookmarkedArticle Decorator">Đã lưu</span>
+                    </div>
                 </div>
 
                 <h2 class="card-title">
