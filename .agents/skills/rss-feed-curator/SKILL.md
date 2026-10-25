@@ -10,7 +10,7 @@ Skill này hướng dẫn quy trình kiểm tra, bóc tách an toàn và mở r�
 ## 1. Danh Sách Kênh RSS Đã Xác Thực Khả Dụng (100% Hoạt Động)
 
 ### Nguồn VnExpress:
-- Thời sự: `https://vnexpress.net/rss/tin-moi-nhat.rss`
+- Thời sự: `https://vnexpress.net/rss/thoi-su.rss`
 - Thế giới: `https://vnexpress.net/rss/the-gioi.rss`
 - Kinh doanh: `https://vnexpress.net/rss/kinh-doanh.rss`
 - Công nghệ: `https://vnexpress.net/rss/so-hoa.rss`
@@ -22,7 +22,7 @@ Skill này hướng dẫn quy trình kiểm tra, bóc tách an toàn và mở r�
 - Pháp luật: `https://vnexpress.net/rss/phap-luat.rss`
 
 ### Nguồn Tuổi Trẻ:
-- Thời sự: `https://tuoitre.vn/rss/tin-moi-nhat.rss`
+- Thời sự: `https://tuoitre.vn/rss/thoi-su.rss`
 - Thế giới: `https://tuoitre.vn/rss/the-gioi.rss`
 - Kinh doanh: `https://tuoitre.vn/rss/kinh-doanh.rss`
 - Công nghệ: `https://tuoitre.vn/rss/nhip-song-so.rss`

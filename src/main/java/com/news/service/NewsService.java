@@ -103,7 +103,7 @@ public class NewsService {
 
     private void initDefaultFeedSources() {
         // Nguồn VnExpress
-        feedSources.add(new FeedSource("VnExpress", "Thời sự", "https://vnexpress.net/rss/tin-moi-nhat.rss", SourceType.RSS));
+        feedSources.add(new FeedSource("VnExpress", "Thời sự", "https://vnexpress.net/rss/thoi-su.rss", SourceType.RSS));
         feedSources.add(new FeedSource("VnExpress", "Thế giới", "https://vnexpress.net/rss/the-gioi.rss", SourceType.RSS));
         feedSources.add(new FeedSource("VnExpress", "Kinh doanh", "https://vnexpress.net/rss/kinh-doanh.rss", SourceType.RSS));
         feedSources.add(new FeedSource("VnExpress", "Công nghệ", "https://vnexpress.net/rss/so-hoa.rss", SourceType.RSS));
@@ -115,7 +115,7 @@ public class NewsService {
         feedSources.add(new FeedSource("VnExpress", "Pháp luật", "https://vnexpress.net/rss/phap-luat.rss", SourceType.RSS));
 
         // Nguồn Tuổi Trẻ
-        feedSources.add(new FeedSource("Tuổi Trẻ", "Thời sự", "https://tuoitre.vn/rss/tin-moi-nhat.rss", SourceType.RSS));
+        feedSources.add(new FeedSource("Tuổi Trẻ", "Thời sự", "https://tuoitre.vn/rss/thoi-su.rss", SourceType.RSS));
         feedSources.add(new FeedSource("Tuổi Trẻ", "Thế giới", "https://tuoitre.vn/rss/the-gioi.rss", SourceType.RSS));
         feedSources.add(new FeedSource("Tuổi Trẻ", "Kinh doanh", "https://tuoitre.vn/rss/kinh-doanh.rss", SourceType.RSS));
         feedSources.add(new FeedSource("Tuổi Trẻ", "Công nghệ", "https://tuoitre.vn/rss/nhip-song-so.rss", SourceType.RSS));
@@ -316,32 +316,56 @@ public class NewsService {
                 .filter(a -> a != null
                         && (!hasCategory || (category != null && category.equalsIgnoreCase(a.getCategory())))
                         && (!hasSource || (source != null && source.equalsIgnoreCase(a.getSource()))))
+                .sorted(Comparator.comparing(
+                        a -> a != null ? a.getPublishedDate() : null,
+                        Comparator.nullsLast(Comparator.reverseOrder())
+                ))
                 .collect(Collectors.toList());
 
-        // 1. Tìm các bài viết có từ khóa tiêu điểm hoặc ghim nổi bật trong tập đã lọc
-        List<Article> featured = pool.stream()
-                .filter(this::isHighlightArticle)
-                .map(this::applyDecorators)
-                .limit(limit)
-                .collect(Collectors.toList());
+        List<Article> featured = new ArrayList<>();
+        Set<String> pickedCategories = new HashSet<>();
+        Set<String> pickedIds = new HashSet<>();
 
-        // 2. Nếu chưa đủ limit bài, chọn các bài mới nhất trong tập đã lọc và bọc bằng FeaturedArticle Decorator
-        if (featured.size() < limit && !pool.isEmpty()) {
-            Set<String> existingIds = featured.stream()
-                    .filter(Objects::nonNull)
-                    .map(Article::getId)
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toSet());
+        if (!hasCategory) {
+            // Khi xem "Mới nhất" (Toàn trang):
+            // Ưu tiên chọn 3 bài tiêu điểm từ 3 chuyên mục KHÁC NHAU để khu vực tiêu điểm trang chủ
+            // phong phú đa diện (ví dụ: 1 Thời sự, 1 Thế giới/Kinh doanh, 1 Sức khỏe/Công nghệ/Thể thao),
+            // tạo sự khác biệt hoàn toàn với khi người dùng bấm vào xem riêng từng chuyên mục Thời sự.
             for (Article a : pool) {
-                if (a == null) continue;
+                if (a == null || a.getId() == null) continue;
                 if (featured.size() >= limit) break;
-                if (a.getId() != null && !existingIds.contains(a.getId())) {
+                String cat = a.getCategory() != null ? a.getCategory().trim() : "Khác";
+                if (isHighlightArticle(a) && !pickedCategories.contains(cat) && !pickedIds.contains(a.getId())) {
+                    featured.add(applyDecorators(a));
+                    pickedCategories.add(cat);
+                    pickedIds.add(a.getId());
+                }
+            }
+        } else {
+            // Khi xem một chuyên mục cụ thể (ví dụ: Thời sự, Kinh doanh, Công nghệ...):
+            // Chọn các bài viết tiêu điểm nổi bật nhất trong chính chuyên mục đó.
+            for (Article a : pool) {
+                if (a == null || a.getId() == null) continue;
+                if (featured.size() >= limit) break;
+                if (isHighlightArticle(a) && !pickedIds.contains(a.getId())) {
+                    featured.add(applyDecorators(a));
+                    pickedIds.add(a.getId());
+                }
+            }
+        }
+
+        // Bổ sung các bài từ pool nếu chưa đủ limit
+        if (featured.size() < limit && !pool.isEmpty()) {
+            for (Article a : pool) {
+                if (a == null || a.getId() == null) continue;
+                if (featured.size() >= limit) break;
+                if (!pickedIds.contains(a.getId())) {
                     Article baseDecorated = applyDecorators(a);
                     Article manuallyFeatured = (baseDecorated instanceof com.news.decorator.FeaturedArticle)
                             ? baseDecorated
                             : new com.news.decorator.FeaturedArticle(baseDecorated);
                     featured.add(manuallyFeatured);
-                    existingIds.add(a.getId());
+                    pickedIds.add(a.getId());
                 }
             }
         }

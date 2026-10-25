@@ -83,13 +83,20 @@ public class NewsController {
         model.addAttribute("article", currentArticle);
         model.addAttribute("bookmarkCount", bookmarkService.getBookmarkCount());
 
-        // Lấy 3 bài viết liên quan cùng chuyên mục
+        // Lấy 4 bài viết liên quan cùng chuyên mục
         List<Article> related = newsService.getAllArticles().stream()
                 .filter(a -> a.getCategory() != null && a.getCategory().equalsIgnoreCase(currentArticle.getCategory()))
                 .filter(a -> !id.equals(a.getId()))
-                .limit(3)
+                .limit(4)
                 .collect(java.util.stream.Collectors.toList());
         model.addAttribute("relatedArticles", related);
+
+        // Lấy 5 bài viết thịnh hành cho Sidebar chi tiết
+        List<Article> trending = newsService.getAllArticles().stream()
+                .filter(a -> a != null && !id.equals(a.getId()))
+                .limit(5)
+                .collect(java.util.stream.Collectors.toList());
+        model.addAttribute("trendingArticles", trending);
 
         return "detail";
     }

@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trang Chủ - Đọc Báo Đa Nguồn (Phong Cách VnExpress • Design Patterns)</title>
+    <title>Trang Chủ - Tin Tức Đa Nguồn</title>
     <!-- Google Fonts: Plus Jakarta Sans chuẩn tạp chí báo chí hiện đại -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/style.css(v='5.0')}">
+    <link rel="stylesheet" th:href="@{/css/style.css(v='6.0')}">
 </head>
 <body class="vne-editorial-theme">
 
@@ -75,7 +75,6 @@
             <div class="vne-filter-actions">
                 <button type="submit" class="btn-vne-apply">Áp dụng</button>
                 <a th:href="@{/}" class="btn-vne-reset" title="Đặt lại bộ lọc về mặc định">Đặt lại</a>
-                <span class="vne-pattern-tag" title="Mẫu thiết kế Strategy Pattern áp dụng cho bộ lọc">[Strategy Pattern]</span>
             </div>
         </form>
     </div>
@@ -138,7 +137,7 @@
                             <input type="hidden" name="returnUrl" th:value="@{/}">
                             <button type="submit" class="vne-icon-btn btn-action-bookmark"
                                     th:classappend="${hero.bookmarked} ? 'saved' : ''"
-                                    th:title="${hero.bookmarked} ? 'Đã lưu (Bấm để bỏ lưu)' : 'Lưu bài viết [Bookmarked Decorator]'">
+                                    th:title="${hero.bookmarked} ? 'Đã lưu (Bấm để bỏ lưu)' : 'Lưu bài viết'">
                                 <svg class="action-svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
                                 </svg>
@@ -189,7 +188,7 @@
                             <input type="hidden" name="returnUrl" th:value="@{/}">
                             <button type="submit" class="vne-icon-btn btn-action-bookmark"
                                     th:classappend="${sub1.bookmarked} ? 'saved' : ''"
-                                    th:title="${sub1.bookmarked} ? 'Đã lưu (Bấm để bỏ lưu)' : 'Lưu bài viết [Bookmarked Decorator]'">
+                                    th:title="${sub1.bookmarked} ? 'Đã lưu (Bấm để bỏ lưu)' : 'Lưu bài viết'">
                                 <svg class="action-svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
                                 </svg>
@@ -208,60 +207,56 @@
                 </div>
             </article>
 
-            <!-- CỘT 3: Cột "Góc Nhìn" (VnExpress Editorial Opinion Column) -->
-            <aside class="vne-col-opinion" th:if="${#lists.size(featuredArticles) > 2}" th:with="op=${featuredArticles[2]}">
-                <div class="vne-opinion-box">
-                    <div class="vne-opinion-content-wrap">
-                        <div class="vne-opinion-header">
-                            <span class="vne-opinion-kicker">Góc nhìn</span>
-                            <span class="vne-decorator-pill" title="FeaturedArticle Decorator">[Decorator]</span>
-                        </div>
-                        <h3 class="vne-opinion-title">
-                            <a th:href="@{'/article/' + ${op.id}}" th:text="${op.title}">Tiêu đề bài viết góc nhìn bình luận</a>
-                        </h3>
-                        <p class="vne-opinion-sapo" th:text="${op.description}">Góc phân tích, bình luận thời cuộc từ các chuyên gia hàng đầu...</p>
-                    </div>
-
-                    <div class="vne-opinion-bottom-wrap">
-                        <div class="vne-opinion-author">
-                            <div class="vne-author-info">
-                                <span class="vne-author-name">Minh Trường</span>
-                                <span class="vne-author-role">Chuyên gia phân tích</span>
-                                <span class="vne-opinion-comments">💬 15 bình luận</span>
-                            </div>
-                            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&h=120&q=80"
-                                 alt="Tác giả Minh Trường"
-                                 class="vne-author-avatar">
-                        </div>
-
-                        <div class="vne-opinion-footer">
-                            <span class="vne-meta-src" th:text="${op.source}">VnExpress</span>
-                            <div class="vne-meta-actions">
-                                <form th:action="@{/bookmarks/toggle}" method="post" style="display:inline;">
-                                    <input type="hidden" name="articleId" th:value="${op.id}">
-                                    <input type="hidden" name="returnUrl" th:value="@{/}">
-                                    <button type="submit" class="vne-icon-btn btn-action-bookmark"
-                                            th:classappend="${op.bookmarked} ? 'saved' : ''"
-                                            th:title="${op.bookmarked} ? 'Đã lưu (Bấm để bỏ lưu)' : 'Lưu bài viết [Bookmarked Decorator]'">
-                                        <svg class="action-svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
-                                        </svg>
-                                    </button>
-                                </form>
-                                <button type="button" class="vne-icon-btn btn-action-share"
-                                        th:data-url="@{'/article/' + ${op.id}}"
-                                        onclick="copyArticleLink(this.getAttribute('data-url'), event)"
-                                        title="Sao chép liên kết bài viết">
-                                    <svg class="action-svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-                                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
+            <!-- CỘT 3: Tin Tiêu Điểm Thứ 3 -->
+            <article class="vne-col-sub vne-col-sub-last" th:if="${#lists.size(featuredArticles) > 2}" th:with="sub2=${featuredArticles[2]}">
+                <h3 class="vne-sub-headline">
+                    <a th:href="@{'/article/' + ${sub2.id}}" th:text="${sub2.title}">Tiêu đề bài viết tiêu điểm thứ 3</a>
+                </h3>
+                <div class="vne-sub-media">
+                    <a th:href="@{'/article/' + ${sub2.id}}">
+                        <img th:if="${sub2.imageUrl != null and !sub2.imageUrl.empty}"
+                             th:src="${sub2.imageUrl}"
+                             th:alt="${sub2.title}"
+                             class="vne-sub-img"
+                             loading="lazy"
+                             onerror="this.onerror=null; this.src='https://placehold.co/400x260/334155/ffffff?text=Tin+Tuc';">
+                        <img th:unless="${sub2.imageUrl != null and !sub2.imageUrl.empty}"
+                             src="https://placehold.co/400x260/334155/ffffff?text=Tin+Tuc"
+                             th:alt="${sub2.title}"
+                             class="vne-sub-img">
+                    </a>
+                </div>
+                <p class="vne-sub-sapo" th:text="${sub2.description}">Đoạn trích tóm tắt bài viết thứ ba...</p>
+                <div class="vne-sub-meta">
+                    <span class="vne-meta-cat" th:text="${sub2.category}">Chuyên mục</span>
+                    <span class="vne-meta-sep">•</span>
+                    <span class="vne-meta-src" th:text="${sub2.source}">Nguồn</span>
+                    <span class="vne-meta-sep">•</span>
+                    <span class="vne-meta-time" th:text="${sub2.estimatedReadingTime}">2 phút đọc</span>
+                    <div class="vne-meta-actions">
+                        <form th:action="@{/bookmarks/toggle}" method="post" style="display:inline;">
+                            <input type="hidden" name="articleId" th:value="${sub2.id}">
+                            <input type="hidden" name="returnUrl" th:value="@{/}">
+                            <button type="submit" class="vne-icon-btn btn-action-bookmark"
+                                    th:classappend="${sub2.bookmarked} ? 'saved' : ''"
+                                    th:title="${sub2.bookmarked} ? 'Đã lưu (Bấm để bỏ lưu)' : 'Lưu bài viết'">
+                                <svg class="action-svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                                </svg>
+                            </button>
+                        </form>
+                        <button type="button" class="vne-icon-btn btn-action-share"
+                                th:data-url="@{'/article/' + ${sub2.id}}"
+                                onclick="copyArticleLink(this.getAttribute('data-url'), event)"
+                                title="Sao chép liên kết bài viết">
+                            <svg class="action-svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                            </svg>
+                        </button>
                     </div>
                 </div>
-            </aside>
+            </article>
         </div>
     </section>
 
@@ -284,7 +279,6 @@
                           th:text="${selectedCategory} + (${selectedSource != null and !selectedSource.empty} ? ' (' + ${selectedSource} + ')' : '')">Thời sự</span>
                 </h3>
                 <span class="vne-stream-count" th:text="'(' + ${filteredCount} + ' bài viết)'">(45 bài viết)</span>
-                <span class="vne-pattern-tag-sm">[Strategy Filtered]</span>
             </div>
 
             <!-- Danh sách bài viết dạng luồng báo chí (VnExpress Continuous Stream) -->
@@ -324,7 +318,7 @@
                                             <input type="hidden" name="returnUrl" th:value="@{/}">
                                             <button type="submit" class="vne-icon-btn btn-action-bookmark"
                                                     th:classappend="${art.bookmarked} ? 'saved' : ''"
-                                                    th:title="${art.bookmarked} ? 'Đã lưu (Bấm để bỏ lưu)' : 'Lưu bài viết [Bookmarked Decorator]'">
+                                                    th:title="${art.bookmarked} ? 'Đã lưu (Bấm để bỏ lưu)' : 'Lưu bài viết'">
                                                 <svg class="action-svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                     <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
                                                 </svg>

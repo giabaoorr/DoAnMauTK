@@ -3,168 +3,267 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${article.title} + ' - Chi Tiết Tin Tức'">Chi Tiết Tin Tức</title>
-    <!-- Google Fonts: Plus Jakarta Sans -->
+    <title th:text="${article.title} + ' - Tin Tức Đa Nguồn'">Chi Tiết Tin Tức</title>
+    <!-- Google Fonts: Plus Jakarta Sans & Merriweather chuẩn báo chí tòa soạn -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css(v='7.0')}">
 </head>
-<body>
+<body class="vne-editorial-theme">
 
 <!-- Thanh tiến độ đọc bài viết (Reading Progress Bar) -->
 <div id="readingProgressBar" class="reading-progress-bar" aria-hidden="true"></div>
 
-<!-- Header chung -->
+<!-- Header chung chuẩn tòa soạn VnExpress -->
 <div th:replace="~{fragments/header :: header('')}"></div>
 
-<main class="container">
-    <article class="detail-container">
-        <!-- Breadcrumb & Cỡ chữ đọc -->
-        <div class="detail-top-bar">
-            <nav class="breadcrumb" aria-label="Điều hướng">
+<!-- Navigation Bar chuyên mục chuẩn VnExpress -->
+<nav class="vne-nav-bar" aria-label="Danh mục tin tức">
+    <div class="container vne-nav-container">
+        <a th:href="@{/}" class="vne-nav-item">
+            <span>Mới nhất</span>
+        </a>
+        <a th:each="cat : ${#strings.arraySplit('Thời sự,Thế giới,Kinh doanh,Công nghệ,Thể thao,Giải trí,Sức khỏe,Giáo dục,Du lịch,Pháp luật', ',')}"
+           th:href="@{/(category=${cat})}"
+           class="vne-nav-item"
+           th:classappend="${article.category == cat} ? 'active' : ''">
+            <span th:text="${cat}">Chuyên mục</span>
+        </a>
+    </div>
+</nav>
+
+<!-- Nội dung chi tiết bài viết với bố cục 2 cột tòa soạn chuẩn -->
+<main class="container vne-article-container">
+    <div class="vne-article-layout">
+
+        <!-- CỘT CHÍNH: NỘI DUNG BÀI BÁO (Editorial Reading Area) -->
+        <article class="vne-article-main">
+
+            <!-- Breadcrumb điều hướng tinh tế -->
+            <nav class="vne-detail-breadcrumb" aria-label="Điều hướng chuyên mục">
                 <a th:href="@{/}">Trang chủ</a>
-                <span class="bc-sep">&rsaquo;</span>
-                <a th:href="@{/(category=${article.category})}" th:text="${article.category}">Chuyên mục</a>
-                <span class="bc-sep">&rsaquo;</span>
-                <span class="bc-current" th:text="${article.title}">Tiêu đề</span>
+                <span class="vne-bc-sep">&rsaquo;</span>
+                <a th:href="@{/(category=${article.category})}" class="vne-bc-cat" th:text="${article.category}">Chuyên mục</a>
             </nav>
 
-            <!-- Bộ công cụ điều chỉnh cỡ chữ khi đọc (User-Friendly Reader Mode) -->
-            <div class="text-size-toolbar" title="Điều chỉnh cỡ chữ đọc bài (Reader Mode)">
-                <span class="text-size-label">Cỡ chữ:</span>
-                <button type="button" id="fontSizeSm" class="btn-text-size" onclick="changeFontSize('sm')" title="Chữ nhỏ (15px)">A-</button>
-                <button type="button" id="fontSizeMd" class="btn-text-size active" onclick="changeFontSize('md')" title="Chữ chuẩn (17px)">A</button>
-                <button type="button" id="fontSizeLg" class="btn-text-size" onclick="changeFontSize('lg')" title="Chữ lớn (19px)">A+</button>
-                <button type="button" id="fontSizeXl" class="btn-text-size" onclick="changeFontSize('xl')" title="Chữ rất lớn (21px)">A++</button>
-            </div>
-        </div>
+            <!-- Tiêu đề bài viết chuẩn typography báo chí -->
+            <h1 class="vne-detail-headline" th:text="${article.title}">Tiêu đề bài viết đầy đủ</h1>
 
-        <!-- Banner cảnh báo nếu là bài viết Nổi bật -->
-        <div th:if="${article.featured}" class="featured-article-banner">
-            <span class="fab-icon">📌</span>
-            <div class="fab-text">
-                <strong>Bài Viết Tiêu Điểm</strong>
-                <span>Bài viết này đang được trang trí bởi <code>FeaturedArticle Decorator</code>.</span>
-            </div>
-        </div>
+            <!-- Hàng thông tin thời gian, nguồn báo & thanh công cụ đọc -->
+            <div class="vne-detail-meta-bar">
+                <div class="vne-meta-author-time">
+                    <span class="vne-meta-source-badge" th:text="${article.source}">Tuổi Trẻ</span>
+                    <span class="vne-meta-sep">•</span>
+                    <span class="vne-meta-publish-date" th:text="${article.formattedDate}">25/10/2026, 21:35</span>
+                    <span class="vne-meta-sep">•</span>
+                    <span class="vne-meta-read-estimate" th:text="${article.estimatedReadingTime}">2 phút đọc</span>
+                </div>
 
-        <!-- Header bài viết -->
-        <header class="detail-header">
-            <div class="detail-badges">
-                <span class="badge badge-source" th:text="${article.source}">Nguồn</span>
-                <span class="badge badge-category" th:text="${article.category}">Chuyên mục</span>
-                <span class="badge badge-time" th:text="${article.estimatedReadingTime}">2 phút đọc</span>
-                <!-- Decorator Stack trực quan -->
-                <div class="decorator-stack" title="Các Decorator đang trang trí bài viết này">
-                    <span th:if="${article.featured}" class="badge-decorator badge-featured" title="FeaturedArticle Decorator">★ Tiêu điểm</span>
-                    <span th:if="${article.bookmarked}" class="badge-decorator badge-bookmarked" title="BookmarkedArticle Decorator">✓ Đã lưu</span>
-                    <span class="badge-decorator badge-summarized" title="SummarizedArticle Decorator">📄 Đã tóm tắt</span>
+                <!-- Bộ công cụ tương tác & đổi cỡ chữ (Reader Mode Toolbar) -->
+                <div class="vne-detail-toolbar">
+                    <div class="vne-font-resizer" title="Điều chỉnh cỡ chữ khi đọc">
+                        <span class="vne-resizer-label">Cỡ chữ:</span>
+                        <div class="vne-font-btn-group">
+                            <button type="button" id="fontSizeSm" class="btn-font-toggle" onclick="changeFontSize('sm')" title="Cỡ nhỏ (15px)">A-</button>
+                            <button type="button" id="fontSizeMd" class="btn-font-toggle active" onclick="changeFontSize('md')" title="Cỡ chuẩn (17px)">A</button>
+                            <button type="button" id="fontSizeLg" class="btn-font-toggle" onclick="changeFontSize('lg')" title="Cỡ lớn (19px)">A+</button>
+                            <button type="button" id="fontSizeXl" class="btn-font-toggle" onclick="changeFontSize('xl')" title="Cỡ rất lớn (21px)">A++</button>
+                        </div>
+                    </div>
+
+                    <!-- Nút Lưu bài viết & Chia sẻ -->
+                    <div class="vne-detail-action-group">
+                        <form th:action="@{/bookmarks/toggle}" method="post" style="display:inline;">
+                            <input type="hidden" name="articleId" th:value="${article.id}">
+                            <input type="hidden" name="returnUrl" th:value="@{'/article/' + ${article.id}}">
+                            <button type="submit" class="vne-btn-action-pill btn-action-bookmark"
+                                    th:classappend="${article.bookmarked} ? 'saved' : ''"
+                                    th:title="${article.bookmarked} ? 'Bỏ lưu bài viết' : 'Lưu bài viết'">
+                                <svg class="action-svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                                </svg>
+                                <span th:text="${article.bookmarked} ? 'Đã lưu' : 'Lưu tin'">Lưu tin</span>
+                            </button>
+                        </form>
+
+                        <button type="button" class="vne-btn-action-pill btn-action-share"
+                                th:data-url="@{'/article/' + ${article.id}}"
+                                onclick="copyArticleLink(this.getAttribute('data-url'), event)"
+                                title="Sao chép liên kết bài viết">
+                            <svg class="action-svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                            </svg>
+                            <span>Chia sẻ</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <h1 class="detail-title" th:text="${article.title}">Tiêu đề bài viết đầy đủ</h1>
-
-            <div class="detail-meta">
-                <span th:text="'🕒 Xuất bản: ' + ${article.formattedDate}">15/10/2026 08:30</span>
-                <span class="meta-dot">•</span>
-                <span th:text="'Nguồn tin: ' + ${article.source}">VnExpress</span>
+            <!-- Đoạn tóm tắt mở đầu (Sapo) đậm chất báo chí chuyên nghiệp -->
+            <div class="vne-detail-sapo" th:text="${article.description}">
+                Đoạn tóm tắt dẫn nhập bài viết...
             </div>
-        </header>
 
-        <!-- Ảnh lớn bài viết -->
-        <div class="detail-image-wrap" th:if="${article.imageUrl != null and !article.imageUrl.empty}">
-            <img th:src="${article.imageUrl}"
-                 th:alt="${article.title}"
-                 class="detail-image"
-                 onerror="this.onerror=null; this.src='https://placehold.co/800x450/e2e8f0/1e293b?text=Tin+Tuc';">
-        </div>
+            <!-- Khối hình ảnh chính sắc nét với caption -->
+            <figure class="vne-detail-figure" th:if="${article.imageUrl != null and !article.imageUrl.empty}">
+                <div class="vne-detail-img-wrap">
+                    <img th:src="${article.imageUrl}"
+                         th:alt="${article.title}"
+                         class="vne-detail-img"
+                         onerror="this.onerror=null; this.src='https://placehold.co/900x520/334155/ffffff?text=Tin+Tuc';">
+                </div>
+                <figcaption class="vne-detail-caption" th:text="${article.title}">Ảnh minh họa bài viết.</figcaption>
+            </figure>
 
-        <!-- Đoạn tóm tắt mở đầu (SummarizedArticle Decorator) -->
-        <p class="detail-lead" th:text="${article.description}">Đoạn mô tả tóm tắt ngắn của bài viết...</p>
+            <!-- Nội dung bài báo đầy đủ với typography chuẩn báo in -->
+            <div id="articleBodyContent" class="vne-detail-body">
+                <p th:text="${article.content}" style="white-space: pre-line;">Nội dung bài viết chi tiết...</p>
+            </div>
 
-        <!-- Thân bài viết -->
-        <div id="articleBodyContent" class="detail-body">
-            <p th:text="${article.content}" style="white-space: pre-line;">Nội dung bài viết chi tiết...</p>
-        </div>
-
-        <!-- Thao tác dưới chân bài viết -->
-        <div class="detail-actions">
-            <a th:href="@{/}" class="btn btn-outline">
-                &larr; Quay lại danh sách
-            </a>
-
-            <div class="detail-action-buttons">
-                <!-- Nút Bookmark -->
-                <form th:action="@{/bookmarks/toggle}" method="post" style="display:inline;">
-                    <input type="hidden" name="articleId" th:value="${article.id}">
-                    <input type="hidden" name="returnUrl" th:value="@{'/article/' + ${article.id}}">
-                    <button type="submit" class="vne-action-btn btn-action-bookmark" th:classappend="${article.bookmarked} ? 'saved' : ''"
-                            th:title="${article.bookmarked} ? 'Đã lưu (Bấm để bỏ lưu)' : 'Lưu bài viết [Bookmarked Decorator]'">
-                        <svg class="action-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
-                        </svg>
-                        <span th:text="${article.bookmarked} ? 'Đã lưu' : 'Lưu bài viết'">Lưu bài viết</span>
-                    </button>
-                </form>
-
-                <!-- Nút Chia sẻ link -->
-                <button type="button" class="vne-action-btn btn-action-share"
-                        th:data-url="@{'/article/' + ${article.id}}"
-                        onclick="copyArticleLink(this.getAttribute('data-url'), event)"
-                        title="Sao chép liên kết bài viết">
-                    <svg class="action-svg" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-                    </svg>
-                    <span>Sao chép link</span>
-                </button>
-
-                <!-- Link xem bài gốc -->
+            <!-- Hộp bản quyền nguồn tin & Chuyển hướng xem bài gốc -->
+            <div class="vne-source-signature-box">
+                <div class="vne-source-meta">
+                    <span class="vne-sig-icon">📰</span>
+                    <div class="vne-sig-text">
+                        <span class="vne-sig-source" th:text="'Nguồn tin: Báo ' + ${article.source}">Báo Tuổi Trẻ</span>
+                        <span class="vne-sig-note">Bài viết được tổng hợp trực tiếp từ cổng RSS chính thức.</span>
+                    </div>
+                </div>
                 <a th:if="${article.url != null and !article.url.empty}"
                    th:href="${article.url}"
                    target="_blank"
                    rel="noopener noreferrer"
-                   class="btn btn-primary">
-                    Xem bài gốc &nearr;
+                   class="vne-btn-origin">
+                    <span>Xem bài gốc trên <strong th:text="${article.source}">Nguồn báo</strong></span>
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                        <polyline points="15 3 21 3 21 9"></polyline>
+                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
                 </a>
             </div>
-        </div>
 
-        <!-- Khu vực Bài Viết Cùng Chuyên Mục (Related Articles) -->
-        <section class="related-section" th:if="${relatedArticles != null and !relatedArticles.isEmpty()}">
-            <h3 class="related-title">📰 Bài Viết Cùng Chuyên Mục [<span th:text="${article.category}">Chuyên mục</span>]</h3>
-            <div class="related-grid">
-                <article class="related-card" th:each="rel : ${relatedArticles}">
-                    <div class="related-image-wrap">
-                        <img th:if="${rel.imageUrl != null and !rel.imageUrl.empty}"
-                             th:src="${rel.imageUrl}"
-                             th:alt="${rel.title}"
-                             class="related-image"
-                             loading="lazy"
-                             onerror="this.onerror=null; this.src='https://placehold.co/300x200/e2e8f0/1e293b?text=Tin+Lien+Quan';">
-                        <img th:unless="${rel.imageUrl != null and !rel.imageUrl.empty}"
-                             src="https://placehold.co/300x200/e2e8f0/1e293b?text=Tin+Lien+Quan"
-                             th:alt="${rel.title}"
-                             class="related-image">
-                    </div>
-                    <div class="related-content">
-                        <div class="related-meta">
-                            <span class="badge badge-source" th:text="${rel.source}">Nguồn</span>
-                            <span class="related-time" th:text="'⏱️ ' + ${rel.estimatedReadingTime}">⏱️ 2 phút</span>
-                        </div>
-                        <h4 class="related-article-title">
-                            <a th:href="@{'/article/' + ${rel.id}}" th:text="${rel.title}">Tiêu đề bài liên quan</a>
-                        </h4>
-                        <span class="related-date" th:text="'🕒 ' + ${rel.formattedDate}">15/10/2026</span>
-                    </div>
-                </article>
+            <!-- Khối điều hướng chân bài viết -->
+            <div class="vne-bottom-nav-bar">
+                <a th:href="@{/(category=${article.category})}" class="vne-btn-back">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                    <span>Xem thêm tin <strong th:text="${article.category}">Chuyên mục</strong></span>
+                </a>
+                <a th:href="@{/}" class="vne-btn-back secondary">
+                    <span>Về trang chủ</span>
+                </a>
             </div>
-        </section>
-    </article>
+
+            <!-- Tin cùng chuyên mục dạng lưới bên dưới bài viết -->
+            <section class="vne-related-bottom" th:if="${relatedArticles != null and !relatedArticles.isEmpty()}">
+                <div class="vne-related-header">
+                    <h3 class="vne-related-title">
+                        <span>Bài viết cùng chuyên mục</span>
+                        <span class="vne-related-cat-name" th:text="${article.category}">Thời sự</span>
+                    </h3>
+                </div>
+                <div class="vne-related-grid">
+                    <article class="vne-related-card" th:each="rel : ${relatedArticles}">
+                        <a th:href="@{'/article/' + ${rel.id}}" class="vne-rel-thumb-link">
+                            <div class="vne-rel-media">
+                                <img th:if="${rel.imageUrl != null and !rel.imageUrl.empty}"
+                                     th:src="${rel.imageUrl}"
+                                     th:alt="${rel.title}"
+                                     class="vne-rel-img"
+                                     loading="lazy"
+                                     onerror="this.onerror=null; this.src='https://placehold.co/400x260/cbd5e1/1e293b?text=Tin+Tuc';">
+                                <img th:unless="${rel.imageUrl != null and !rel.imageUrl.empty}"
+                                     src="https://placehold.co/400x260/cbd5e1/1e293b?text=Tin+Tuc"
+                                     th:alt="${rel.title}"
+                                     class="vne-rel-img">
+                            </div>
+                        </a>
+                        <div class="vne-rel-info">
+                            <h4 class="vne-rel-title">
+                                <a th:href="@{'/article/' + ${rel.id}}" th:text="${rel.title}">Tiêu đề bài viết liên quan...</a>
+                            </h4>
+                            <div class="vne-rel-meta">
+                                <span class="vne-rel-src" th:text="${rel.source}">Tuổi Trẻ</span>
+                                <span class="vne-meta-sep">•</span>
+                                <span class="vne-rel-time" th:text="${rel.formattedDate}">15/10/2026</span>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </section>
+        </article>
+
+        <!-- CỘT PHẢI: SIDEBAR TIỆN ÍCH & TIN ĐỌC NHIỀU (Sticky Sidebar) -->
+        <aside class="vne-article-sidebar">
+
+            <!-- Widget 1: Hộp tiện ích nhanh của bài đọc -->
+            <div class="vne-sidebar-card vne-article-quick-widget">
+                <h4 class="vne-side-widget-title">Tác vụ bài viết</h4>
+                <div class="vne-side-actions-list">
+                    <form th:action="@{/bookmarks/toggle}" method="post" style="width:100%;">
+                        <input type="hidden" name="articleId" th:value="${article.id}">
+                        <input type="hidden" name="returnUrl" th:value="@{'/article/' + ${article.id}}">
+                        <button type="submit" class="vne-side-action-btn" th:classappend="${article.bookmarked} ? 'saved' : ''">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                            <span th:text="${article.bookmarked} ? 'Đã lưu vào bộ sưu tập' : 'Lưu bài viết để đọc lại'">Lưu bài viết</span>
+                        </button>
+                    </form>
+
+                    <button type="button" class="vne-side-action-btn"
+                            th:data-url="@{'/article/' + ${article.id}}"
+                            onclick="copyArticleLink(this.getAttribute('data-url'), event)">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                        </svg>
+                        <span>Sao chép liên kết</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Widget 2: Tin đọc nhiều nhất (Trending ranking) -->
+            <div class="vne-sidebar-card" th:if="${trendingArticles != null and !trendingArticles.isEmpty()}">
+                <h4 class="vne-side-widget-title">🔥 Đọc nhiều nhất</h4>
+                <ol class="vne-side-trending-list">
+                    <li class="vne-side-trend-item" th:each="trend, iterStat : ${trendingArticles}">
+                        <span class="vne-trend-rank" th:text="${iterStat.count}">1</span>
+                        <a th:href="@{'/article/' + ${trend.id}}" class="vne-side-trend-title" th:text="${trend.title}">Tiêu đề tin đọc nhiều...</a>
+                    </li>
+                </ol>
+            </div>
+
+            <!-- Widget 3: Tỷ giá thị trường nhỏ gọn -->
+            <div class="vne-sidebar-card vne-side-market-widget">
+                <h4 class="vne-side-widget-title">Thị trường &amp; Giá vàng</h4>
+                <div class="vne-side-market-rows">
+                    <div class="vne-side-market-row">
+                        <span>Vàng SJC</span>
+                        <strong>138,7 tr/lượng</strong>
+                    </div>
+                    <div class="vne-side-market-row">
+                        <span>Xăng RON 95</span>
+                        <strong style="color:var(--vne-red);">25.210 đ/l</strong>
+                    </div>
+                    <div class="vne-side-market-row">
+                        <span>Lãi suất 12T</span>
+                        <strong style="color:#16a34a;">7.0% / năm</strong>
+                    </div>
+                </div>
+            </div>
+
+        </aside>
+
+    </div>
 </main>
 
-<!-- Footer chung -->
+<!-- Footer chung chuẩn tòa soạn -->
 <div th:replace="~{fragments/footer :: footer}"></div>
 
 <!-- Script hỗ trợ Reader Mode & Reading Progress Bar -->

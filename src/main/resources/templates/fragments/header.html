@@ -7,7 +7,7 @@
             <span class="logo-vne-badge">E</span>
             <div class="site-title">
                 <span class="site-title-main">Tin Tức Đa Nguồn</span>
-                <span class="site-subtitle">Báo Điện Tử • Chuẩn Mực 6 Mẫu Thiết Kế GoF</span>
+                <span class="site-subtitle">Báo Điện Tử Tổng Hợp</span>
             </div>
         </a>
 
@@ -27,7 +27,7 @@
             <a th:href="@{/}" class="nav-link" th:classappend="${activePage == 'home'} ? 'active' : ''">
                 <span>Trang chủ</span>
             </a>
-            <a th:href="@{/bookmarks}" class="nav-link" th:classappend="${activePage == 'bookmarks'} ? 'active' : ''" title="Bài viết đã lưu (BookmarkedArticle Decorator)">
+            <a th:href="@{/bookmarks}" class="nav-link" th:classappend="${activePage == 'bookmarks'} ? 'active' : ''" title="Bài viết đã lưu">
                 <span>Đã lưu</span>
                 <span th:if="${bookmarkCount != null and bookmarkCount > 0}"
                       class="nav-counter"
@@ -35,7 +35,7 @@
             </a>
             <!-- Nút làm mới dữ liệu (Observer Pattern) -->
             <form th:action="@{/refresh}" method="post" style="display: inline;">
-                <button type="submit" class="btn-refresh" title="Làm mới tin tức từ các nguồn RSS [Observer Pattern]">
+                <button type="submit" class="btn-refresh" title="Làm mới tin tức từ các nguồn RSS">
                     <svg class="btn-refresh-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="23 4 23 10 17 10"></polyline>
                         <polyline points="1 20 1 14 7 14"></polyline>
