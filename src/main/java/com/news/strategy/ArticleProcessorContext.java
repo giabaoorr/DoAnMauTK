@@ -89,10 +89,14 @@ public class ArticleProcessorContext {
 
         // [Strategy] Lựa chọn chiến lược sắp xếp động
         SortStrategy sort;
-        if ("oldest".equalsIgnoreCase(sortCode)) {
-            sort = new OldestSortStrategy();
+        if ("featured".equalsIgnoreCase(sortCode)) {
+            sort = new FeaturedFirstSortStrategy();
+        } else if ("reading_time".equalsIgnoreCase(sortCode) || "readingtime".equalsIgnoreCase(sortCode)) {
+            sort = new ReadingTimeSortStrategy();
         } else if ("title".equalsIgnoreCase(sortCode)) {
             sort = new TitleSortStrategy();
+        } else if ("oldest".equalsIgnoreCase(sortCode)) {
+            sort = new OldestSortStrategy();
         } else {
             // Mặc định: mới nhất
             sort = new NewestSortStrategy();

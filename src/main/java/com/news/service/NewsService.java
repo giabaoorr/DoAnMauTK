@@ -297,37 +297,42 @@ public class NewsService {
     }
 
     /**
-     * [Decorator: FeaturedArticle] Lấy danh sách các bài viết tiêu điểm nổi bật theo từng chuyên mục.
-     * Áp dụng tính năng Tin Tiêu Điểm & Nổi Bật cho mọi chủ đề: Thời sự, Công nghệ, Kinh doanh, Thể thao, Giải trí...
+    /**
+     * [Decorator: FeaturedArticle] Lấy danh sách các bài viết tiêu điểm nổi bật theo Chuyên mục và Nguồn báo.
+     * Áp dụng tính năng Tin Tiêu Điểm & Nổi Bật đồng bộ với bộ lọc Strategy của người dùng.
      *
-     * @param category Tên chuyên mục (hoặc null/rỗng nếu ở Trang chủ)
+     * @param category Tên chuyên mục (hoặc null/rỗng nếu xem tất cả)
+     * @param source Tên nguồn báo (hoặc null/rỗng nếu xem tất cả nguồn)
      * @param limit Số lượng bài tiêu điểm cần lấy (mặc định 3: 1 hero lớn + 2 tin phụ)
      * @return Danh sách bài viết được bọc bởi FeaturedArticle Decorator
      */
-    public List<Article> getFeaturedArticlesForCategory(String category, int limit) {
+    public List<Article> getFeaturedArticles(String category, String source, int limit) {
         if (limit <= 0) limit = 3;
 
         boolean hasCategory = (category != null && !category.trim().isEmpty());
+        boolean hasSource = (source != null && !source.trim().isEmpty());
 
-        List<Article> categoryPool = articles.stream()
-                .filter(a -> a != null && (!hasCategory || (category != null && category.equalsIgnoreCase(a.getCategory()))))
+        List<Article> pool = articles.stream()
+                .filter(a -> a != null
+                        && (!hasCategory || (category != null && category.equalsIgnoreCase(a.getCategory())))
+                        && (!hasSource || (source != null && source.equalsIgnoreCase(a.getSource()))))
                 .collect(Collectors.toList());
 
-        // 1. Tìm các bài viết có từ khóa tiêu điểm hoặc ghim nổi bật trong chuyên mục
-        List<Article> featured = categoryPool.stream()
+        // 1. Tìm các bài viết có từ khóa tiêu điểm hoặc ghim nổi bật trong tập đã lọc
+        List<Article> featured = pool.stream()
                 .filter(this::isHighlightArticle)
                 .map(this::applyDecorators)
                 .limit(limit)
                 .collect(Collectors.toList());
 
-        // 2. Nếu chưa đủ limit bài, chọn các bài mới nhất trong chuyên mục và bọc bằng FeaturedArticle Decorator
-        if (featured.size() < limit && !categoryPool.isEmpty()) {
+        // 2. Nếu chưa đủ limit bài, chọn các bài mới nhất trong tập đã lọc và bọc bằng FeaturedArticle Decorator
+        if (featured.size() < limit && !pool.isEmpty()) {
             Set<String> existingIds = featured.stream()
                     .filter(Objects::nonNull)
-                    .map(a -> a.getId())
+                    .map(Article::getId)
                     .filter(Objects::nonNull)
                     .collect(Collectors.toSet());
-            for (Article a : categoryPool) {
+            for (Article a : pool) {
                 if (a == null) continue;
                 if (featured.size() >= limit) break;
                 if (a.getId() != null && !existingIds.contains(a.getId())) {
@@ -343,11 +348,38 @@ public class NewsService {
         return featured;
     }
 
+    public List<Article> getFeaturedArticlesForCategory(String category, int limit) {
+        return getFeaturedArticles(category, null, limit);
+    }
+
     /**
      * [Decorator: FeaturedArticle] Lấy danh sách các bài viết tiêu điểm nổi bật toàn trang.
      */
     public List<Article> getFeaturedArticles(int limit) {
-        return getFeaturedArticlesForCategory(null, limit);
+        return getFeaturedArticles(null, null, limit);
+    }
+
+    /**
+     * Lấy các bài viết gom nhóm theo danh mục chuẩn để hiển thị các khối chuyên mục phong cách VnExpress.
+     * Áp dụng Decorator cho từng bài viết để đồng bộ các thuộc tính mở rộng.
+     *
+     * @param perCategoryLimit Số bài tối đa cho mỗi khối chuyên mục (1 bài tiêu biểu + các bài tin vắn)
+     * @return Map liên kết: Tên chuyên mục -> Danh sách bài viết
+     */
+    public Map<String, List<Article>> getCategoryBlocks(int perCategoryLimit) {
+        if (perCategoryLimit <= 0) perCategoryLimit = 4;
+        Map<String, List<Article>> blocks = new LinkedHashMap<>();
+        for (String cat : EDITORIAL_CATEGORY_ORDER) {
+            List<Article> catArticles = articles.stream()
+                    .filter(a -> a != null && cat.equalsIgnoreCase(a.getCategory()))
+                    .map(this::applyDecorators)
+                    .limit(perCategoryLimit)
+                    .collect(Collectors.toList());
+            if (!catArticles.isEmpty()) {
+                blocks.put(cat, catArticles);
+            }
+        }
+        return blocks;
     }
 
     public Optional<Article> getArticleById(String id) {

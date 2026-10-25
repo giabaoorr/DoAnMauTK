@@ -1,1 +1,3 @@
-@"D:\netbeans\java\maven\bin\mvn.cmd" %*
+@echo off
+setlocal
+call "%~dp0mvn.cmd" %*

@@ -40,8 +40,8 @@ public class NewsController {
         // [Strategy] Lấy danh sách bài viết đã qua lọc và sắp xếp
         List<Article> processedArticles = newsService.getProcessedArticles(category, source, sort);
 
-        // [Decorator: FeaturedArticle] Lấy 3 bài tiêu điểm nổi bật phù hợp cho chủ đề đang xem
-        List<Article> featuredArticles = newsService.getFeaturedArticlesForCategory(category, 3);
+        // [Decorator: FeaturedArticle] Lấy 3 bài tiêu điểm nổi bật phù hợp cho cả chủ đề VÀ nguồn báo đang lọc
+        List<Article> featuredArticles = newsService.getFeaturedArticles(category, source, 3);
         Set<String> featuredIds = featuredArticles.stream()
                 .filter(java.util.Objects::nonNull)
                 .map(a -> a.getId())
@@ -62,6 +62,7 @@ public class NewsController {
         model.addAttribute("selectedCategory", category != null ? category : "");
         model.addAttribute("selectedSource", source != null ? source : "");
         model.addAttribute("selectedSort", sort != null ? sort : "newest");
+        model.addAttribute("categoryBlocks", newsService.getCategoryBlocks(4));
         model.addAttribute("fallbackMode", newsService.isFallbackMode());
         model.addAttribute("bookmarkCount", bookmarkService.getBookmarkCount());
         return "index";

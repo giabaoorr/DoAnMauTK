@@ -3,61 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trang Chủ - Đọc Báo Đa Nguồn (Design Patterns)</title>
+    <title>Trang Chủ - Đọc Báo Đa Nguồn (Phong Cách VnExpress • Design Patterns)</title>
     <!-- Google Fonts: Plus Jakarta Sans chuẩn tạp chí báo chí hiện đại -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css(v='5.0')}">
 </head>
-<body>
+<body class="vne-editorial-theme">
 
-<!-- Header chung -->
+<!-- Header chung chuẩn tòa soạn VnExpress -->
 <div th:replace="~{fragments/header :: header('home')}"></div>
 
-<!-- Thanh Danh Mục Chuyên Mục Báo Chí (Clean Editorial Navigation) -->
-<nav class="category-chips-bar" aria-label="Danh mục tin tức">
-    <div class="container chips-container">
-        <a th:href="@{/}" class="chip-item"
+<!-- Thanh Danh Mục Chuyên Mục Báo Chí (VnExpress Horizontal Navigation) -->
+<nav class="vne-nav-bar" aria-label="Danh mục tin tức">
+    <div class="container vne-nav-container">
+        <a th:href="@{/(source=${selectedSource != null and !selectedSource.empty ? selectedSource : null}, sort=${selectedSort != null and !selectedSort.empty ? selectedSort : null})}"
+           class="vne-nav-item"
            th:classappend="${selectedCategory == null or selectedCategory.empty} ? 'active' : ''">
-            <span>Tất cả</span>
+            <span>Mới nhất</span>
         </a>
         <a th:each="cat : ${categories}"
-           th:href="@{/(category=${cat})}"
-           class="chip-item"
+           th:href="@{/(category=${cat}, source=${selectedSource != null and !selectedSource.empty ? selectedSource : null}, sort=${selectedSort != null and !selectedSort.empty ? selectedSort : null})}"
+           class="vne-nav-item"
            th:classappend="${selectedCategory == cat} ? 'active' : ''">
             <span th:text="${cat}">Chuyên mục</span>
-        </a>
-        <a th:href="@{/bookmarks}" class="chip-item chip-bookmark">
-            <span>Đã lưu</span>
-            <span th:if="${bookmarkCount != null and bookmarkCount > 0}"
-                  class="chip-counter"
-                  th:text="${bookmarkCount}">0</span>
         </a>
     </div>
 </nav>
 
-<!-- Thanh Lọc Tinh Gọn (Strategy Pattern: SortStrategy & FilterStrategy) -->
-<section class="toolbar-section">
-    <div class="container">
-        <form th:action="@{/}" method="get" class="filter-form">
-            <!-- Lọc theo Chuyên mục -->
-            <div class="filter-group">
-                <label for="category" class="filter-label">Chuyên mục:</label>
-                <select id="category" name="category" class="filter-select">
-                    <option value="">Tất cả chuyên mục</option>
-                    <option th:each="cat : ${categories}"
-                            th:value="${cat}"
-                            th:text="${cat}"
-                            th:selected="${selectedCategory == cat}">
-                    </option>
-                </select>
+<!-- Thanh Công Cụ Bộ Lọc Tinh Tế (Strategy Pattern: SortStrategy & FilterStrategy) -->
+<section class="vne-toolbar-section">
+    <div class="container vne-toolbar-container">
+        <form th:action="@{/}" method="get" class="vne-filter-form" id="filterForm">
+            <!-- Tìm kiếm từ khóa thời gian thực (Live Search) -->
+            <div class="vne-search-wrap">
+                <span class="vne-search-icon">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                </span>
+                <input type="text" id="liveSearchInput" class="vne-search-input"
+                       placeholder="Tìm kiếm bài viết, từ khóa..."
+                       aria-label="Tìm kiếm bài viết">
+                <button type="button" id="clearSearchBtn" class="vne-search-clear" title="Xóa tìm kiếm">✕</button>
             </div>
 
             <!-- Lọc theo Nguồn báo -->
-            <div class="filter-group">
-                <label for="source" class="filter-label">Nguồn báo:</label>
-                <select id="source" name="source" class="filter-select">
+            <div class="vne-filter-item">
+                <label for="source" class="vne-filter-label">Nguồn báo:</label>
+                <select id="source" name="source" class="vne-filter-select" onchange="this.form.submit()">
                     <option value="">Tất cả nguồn báo</option>
                     <option th:each="src : ${sources}"
                             th:value="${src}"
@@ -67,38 +63,31 @@
                 </select>
             </div>
 
-            <!-- Sắp xếp bài viết -->
-            <div class="filter-group">
-                <label for="sort" class="filter-label">Sắp xếp:</label>
-                <select id="sort" name="sort" class="filter-select">
+            <!-- Sắp xếp bài viết (Strategy Pattern) -->
+            <div class="vne-filter-item">
+                <label for="sort" class="vne-filter-label">Sắp xếp:</label>
+                <select id="sort" name="sort" class="vne-filter-select" onchange="this.form.submit()">
                     <option value="newest" th:selected="${selectedSort == 'newest'}">Mới nhất</option>
-                    <option value="oldest" th:selected="${selectedSort == 'oldest'}">Cũ nhất</option>
-                    <option value="title" th:selected="${selectedSort == 'title'}">Tiêu đề (A-Z)</option>
+                    <option value="featured" th:selected="${selectedSort == 'featured'}">★ Ưu tiên nổi bật</option>
                 </select>
             </div>
 
-            <div class="filter-actions">
-                <button type="submit" class="btn btn-primary btn-sm">Áp dụng</button>
-                <a th:href="@{/}" class="btn btn-outline btn-sm">Đặt lại</a>
+            <div class="vne-filter-actions">
+                <button type="submit" class="btn-vne-apply">Áp dụng</button>
+                <a th:href="@{/}" class="btn-vne-reset" title="Đặt lại bộ lọc về mặc định">Đặt lại</a>
+                <span class="vne-pattern-tag" title="Mẫu thiết kế Strategy Pattern áp dụng cho bộ lọc">[Strategy Pattern]</span>
             </div>
         </form>
     </div>
 </section>
 
-<!-- Nội Dung Chính -->
-<main class="container">
+<!-- Nội Dung Báo Chí Chính (Editorial Content) -->
+<main class="container vne-main-container">
+
     <!-- Thông báo làm mới từ Observer Pattern -->
     <div th:if="${refreshMessage != null}" class="alert-banner alert-success">
         <div class="alert-content">
             <span th:text="${refreshMessage}">Đã cập nhật tin tức mới!</span>
-        </div>
-        <button type="button" class="alert-close" onclick="this.parentElement.remove()">✕</button>
-    </div>
-
-    <!-- Thông báo chung -->
-    <div th:if="${message != null}" class="alert-banner alert-info">
-        <div class="alert-content">
-            <span th:text="${message}">Thao tác thành công!</span>
         </div>
         <button type="button" class="alert-close" onclick="this.parentElement.remove()">✕</button>
     </div>
@@ -111,217 +100,378 @@
     </div>
 
     <!-- ================================================================= -->
-    <!-- KHU VỰC BÀI VIẾT TIÊU ĐIỂM & NỔI BẬT (Áp dụng cho MỌI chủ đề)     -->
-    <!-- Mẫu thiết kế: [FeaturedArticle Decorator]                        -->
+    <!-- 1. KHU VỰC TIÊU ĐIỂM HÀNG ĐẦU 3 CỘT (VnExpress Top 3-Column Spotlight) -->
+    <!-- Mẫu thiết kế: [FeaturedArticle Decorator]                         -->
     <!-- ================================================================= -->
-    <section class="featured-section" th:if="${not #lists.isEmpty(featuredArticles)}">
-        <div class="section-header">
-            <div class="section-title-wrap">
-                <h2 class="section-title">
-                    <span th:if="${selectedCategory == null or selectedCategory.empty}">Tiêu điểm hôm nay</span>
-                    <span th:unless="${selectedCategory == null or selectedCategory.empty}" th:text="'Tiêu điểm ' + ${selectedCategory}">Tiêu điểm chuyên mục</span>
+    <section class="vne-top-spotlight" th:if="${not #lists.isEmpty(featuredArticles)}">
+        <div class="vne-spotlight-row">
+
+            <!-- CỘT 1: Tin Chính Tiêu Điểm Lớn (Hero Lead Story) -->
+            <article class="vne-col-hero" th:with="hero=${featuredArticles[0]}">
+                <h2 class="vne-hero-headline">
+                    <a th:href="@{'/article/' + ${hero.id}}" th:text="${hero.title}">Tiêu đề bài viết tiêu điểm chính</a>
                 </h2>
-                <span class="editorial-badge">[FeaturedArticle Decorator]</span>
-            </div>
-        </div>
-
-        <div class="featured-grid">
-            <!-- Bài viết tiêu điểm chính (Hero Card) -->
-            <article class="featured-hero-card" th:with="hero=${featuredArticles[0]}">
-                <div class="hero-image-wrap">
-                    <img th:if="${hero.imageUrl != null and !hero.imageUrl.empty}"
-                         th:src="${hero.imageUrl}"
-                         th:alt="${hero.title}"
-                         class="hero-image"
-                         loading="lazy"
-                         onerror="this.onerror=null; this.src='https://placehold.co/800x480/1e293b/ffffff?text=Tin+Tieu+Diem';">
-                    <img th:unless="${hero.imageUrl != null and !hero.imageUrl.empty}"
-                         src="https://placehold.co/800x480/1e293b/ffffff?text=Tin+Tieu+Diem"
-                         th:alt="${hero.title}"
-                         class="hero-image">
-                    <div class="hero-gradient-overlay"></div>
+                <div class="vne-hero-media">
+                    <a th:href="@{'/article/' + ${hero.id}}">
+                        <img th:if="${hero.imageUrl != null and !hero.imageUrl.empty}"
+                             th:src="${hero.imageUrl}"
+                             th:alt="${hero.title}"
+                             class="vne-hero-img"
+                             loading="eager"
+                             onerror="this.onerror=null; this.src='https://placehold.co/700x420/1e293b/ffffff?text=Tin+Tieu+Diem';">
+                        <img th:unless="${hero.imageUrl != null and !hero.imageUrl.empty}"
+                             src="https://placehold.co/700x420/1e293b/ffffff?text=Tin+Tieu+Diem"
+                             th:alt="${hero.title}"
+                             class="vne-hero-img">
+                    </a>
                 </div>
-
-                <div class="hero-content">
-                    <div class="hero-meta-kicker">
-                        <span class="kicker-tag" th:text="${hero.category}">Chuyên mục</span>
-                        <span class="kicker-source" th:text="${hero.source}">VnExpress</span>
-                        <span class="kicker-time" th:text="${hero.estimatedReadingTime}">2 phút đọc</span>
-                    </div>
-
-                    <h3 class="featured-hero-title">
-                        <a th:href="@{'/article/' + ${hero.id}}" th:text="${hero.title}">Tiêu đề bài viết tiêu điểm</a>
-                    </h3>
-
-                    <p class="featured-hero-desc" th:text="${hero.description}">Mô tả tóm tắt súc tích bài viết...</p>
-
-                    <div class="hero-footer">
-                        <span class="hero-date" th:text="${hero.formattedDate}">15/10/2026 08:30</span>
-                        <div class="hero-actions">
-                            <a th:href="@{'/article/' + ${hero.id}}" class="btn-hero-read">
-                                Đọc bài viết &rarr;
-                            </a>
-                            <!-- Nút Lưu tin -->
-                            <form th:action="@{/bookmarks/toggle}" method="post" style="display:inline;">
-                                <input type="hidden" name="articleId" th:value="${hero.id}">
-                                <input type="hidden" name="returnUrl" th:value="@{/}">
-                                <button type="submit" class="btn-icon-hero" th:classappend="${hero.bookmarked} ? 'bookmarked' : ''"
-                                        th:title="${hero.bookmarked} ? 'Bỏ lưu' : 'Lưu tin'">
-                                    <span th:text="${hero.bookmarked} ? '★' : '☆'">☆</span>
-                                </button>
-                            </form>
-                            <!-- Nút Share link -->
-                            <button type="button" class="btn-icon-hero" th:data-url="@{'/article/' + ${hero.id}}" onclick="copyArticleLink(this.getAttribute('data-url'), event)" title="Sao chép liên kết">
-                                <span>🔗</span>
+                <p class="vne-hero-sapo" th:text="${hero.description}">Đoạn trích tóm tắt mở đầu sắc bén...</p>
+                <div class="vne-hero-meta">
+                    <span class="vne-meta-cat" th:text="${hero.category}">Thời sự</span>
+                    <span class="vne-meta-sep">•</span>
+                    <span class="vne-meta-src" th:text="${hero.source}">VnExpress</span>
+                    <span class="vne-meta-sep">•</span>
+                    <span class="vne-meta-time" th:text="${hero.estimatedReadingTime}">2 phút đọc</span>
+                    <div class="vne-meta-actions">
+                        <form th:action="@{/bookmarks/toggle}" method="post" style="display:inline;">
+                            <input type="hidden" name="articleId" th:value="${hero.id}">
+                            <input type="hidden" name="returnUrl" th:value="@{/}">
+                            <button type="submit" class="vne-icon-btn btn-action-bookmark"
+                                    th:classappend="${hero.bookmarked} ? 'saved' : ''"
+                                    th:title="${hero.bookmarked} ? 'Đã lưu (Bấm để bỏ lưu)' : 'Lưu bài viết [Bookmarked Decorator]'">
+                                <svg class="action-svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                                </svg>
                             </button>
-                        </div>
+                        </form>
+                        <button type="button" class="vne-icon-btn btn-action-share"
+                                th:data-url="@{'/article/' + ${hero.id}}"
+                                onclick="copyArticleLink(this.getAttribute('data-url'), event)"
+                                title="Sao chép liên kết bài viết">
+                            <svg class="action-svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                            </svg>
+                        </button>
                     </div>
                 </div>
             </article>
 
-            <!-- Cột các bài viết tiêu điểm phụ (Secondary Spotlight) -->
-            <div class="featured-sub-column">
-                <article class="featured-sub-card" th:each="subArt, iterStat : ${featuredArticles}" th:if="${iterStat.index > 0}">
-                    <div class="sub-card-image-wrap">
-                        <img th:if="${subArt.imageUrl != null and !subArt.imageUrl.empty}"
-                             th:src="${subArt.imageUrl}"
-                             th:alt="${subArt.title}"
-                             class="sub-card-image"
+            <!-- CỘT 2: Tin Tiêu Điểm Thứ 2 (Secondary Spotlight) -->
+            <article class="vne-col-sub" th:if="${#lists.size(featuredArticles) > 1}" th:with="sub1=${featuredArticles[1]}">
+                <h3 class="vne-sub-headline">
+                    <a th:href="@{'/article/' + ${sub1.id}}" th:text="${sub1.title}">Tiêu đề bài viết tiêu điểm thứ 2</a>
+                </h3>
+                <div class="vne-sub-media">
+                    <a th:href="@{'/article/' + ${sub1.id}}">
+                        <img th:if="${sub1.imageUrl != null and !sub1.imageUrl.empty}"
+                             th:src="${sub1.imageUrl}"
+                             th:alt="${sub1.title}"
+                             class="vne-sub-img"
                              loading="lazy"
-                             onerror="this.onerror=null; this.src='https://placehold.co/300x200/334155/ffffff?text=Tin+Tieu+Diem';">
-                        <img th:unless="${subArt.imageUrl != null and !subArt.imageUrl.empty}"
-                             src="https://placehold.co/300x200/334155/ffffff?text=Tin+Tieu+Diem"
-                             th:alt="${subArt.title}"
-                             class="sub-card-image">
+                             onerror="this.onerror=null; this.src='https://placehold.co/400x260/334155/ffffff?text=Tin+Tieu+Diem';">
+                        <img th:unless="${sub1.imageUrl != null and !sub1.imageUrl.empty}"
+                             src="https://placehold.co/400x260/334155/ffffff?text=Tin+Tieu+Diem"
+                             th:alt="${sub1.title}"
+                             class="vne-sub-img">
+                    </a>
+                </div>
+                <p class="vne-sub-sapo" th:text="${sub1.description}">Đoạn trích tóm tắt bài viết thứ hai...</p>
+                <div class="vne-sub-meta">
+                    <span class="vne-meta-cat" th:text="${sub1.category}">Chuyên mục</span>
+                    <span class="vne-meta-sep">•</span>
+                    <span class="vne-meta-src" th:text="${sub1.source}">Nguồn</span>
+                    <span class="vne-meta-sep">•</span>
+                    <span class="vne-meta-time" th:text="${sub1.estimatedReadingTime}">2 phút đọc</span>
+                    <div class="vne-meta-actions">
+                        <form th:action="@{/bookmarks/toggle}" method="post" style="display:inline;">
+                            <input type="hidden" name="articleId" th:value="${sub1.id}">
+                            <input type="hidden" name="returnUrl" th:value="@{/}">
+                            <button type="submit" class="vne-icon-btn btn-action-bookmark"
+                                    th:classappend="${sub1.bookmarked} ? 'saved' : ''"
+                                    th:title="${sub1.bookmarked} ? 'Đã lưu (Bấm để bỏ lưu)' : 'Lưu bài viết [Bookmarked Decorator]'">
+                                <svg class="action-svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                                </svg>
+                            </button>
+                        </form>
+                        <button type="button" class="vne-icon-btn btn-action-share"
+                                th:data-url="@{'/article/' + ${sub1.id}}"
+                                onclick="copyArticleLink(this.getAttribute('data-url'), event)"
+                                title="Sao chép liên kết bài viết">
+                            <svg class="action-svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                            </svg>
+                        </button>
                     </div>
-                    <div class="sub-card-content">
-                        <div class="sub-card-kicker">
-                            <span class="sub-kicker-tag" th:text="${subArt.category}">Chuyên mục</span>
-                            <span class="sub-kicker-source" th:text="${subArt.source}">Nguồn</span>
-                            <span class="sub-kicker-time" th:text="${subArt.estimatedReadingTime}">2 phút đọc</span>
+                </div>
+            </article>
+
+            <!-- CỘT 3: Cột "Góc Nhìn" (VnExpress Editorial Opinion Column) -->
+            <aside class="vne-col-opinion" th:if="${#lists.size(featuredArticles) > 2}" th:with="op=${featuredArticles[2]}">
+                <div class="vne-opinion-box">
+                    <div class="vne-opinion-content-wrap">
+                        <div class="vne-opinion-header">
+                            <span class="vne-opinion-kicker">Góc nhìn</span>
+                            <span class="vne-decorator-pill" title="FeaturedArticle Decorator">[Decorator]</span>
                         </div>
-                        <h4 class="sub-card-title">
-                            <a th:href="@{'/article/' + ${subArt.id}}" th:text="${subArt.title}">Tiêu đề bài viết tiêu điểm phụ</a>
-                        </h4>
-                        <p class="sub-card-desc" th:if="${subArt.description != null and !subArt.description.empty}" th:text="${subArt.description}">Mô tả tóm tắt bài viết...</p>
-                        <div class="sub-card-footer">
-                            <span class="sub-card-date" th:text="${subArt.formattedDate}">15/10/2026</span>
-                            <div class="sub-card-actions">
-                                <a th:href="@{'/article/' + ${subArt.id}}" class="sub-read-link">Chi tiết &rarr;</a>
+                        <h3 class="vne-opinion-title">
+                            <a th:href="@{'/article/' + ${op.id}}" th:text="${op.title}">Tiêu đề bài viết góc nhìn bình luận</a>
+                        </h3>
+                        <p class="vne-opinion-sapo" th:text="${op.description}">Góc phân tích, bình luận thời cuộc từ các chuyên gia hàng đầu...</p>
+                    </div>
+
+                    <div class="vne-opinion-bottom-wrap">
+                        <div class="vne-opinion-author">
+                            <div class="vne-author-info">
+                                <span class="vne-author-name">Minh Trường</span>
+                                <span class="vne-author-role">Chuyên gia phân tích</span>
+                                <span class="vne-opinion-comments">💬 15 bình luận</span>
+                            </div>
+                            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&h=120&q=80"
+                                 alt="Tác giả Minh Trường"
+                                 class="vne-author-avatar">
+                        </div>
+
+                        <div class="vne-opinion-footer">
+                            <span class="vne-meta-src" th:text="${op.source}">VnExpress</span>
+                            <div class="vne-meta-actions">
                                 <form th:action="@{/bookmarks/toggle}" method="post" style="display:inline;">
-                                    <input type="hidden" name="articleId" th:value="${subArt.id}">
+                                    <input type="hidden" name="articleId" th:value="${op.id}">
                                     <input type="hidden" name="returnUrl" th:value="@{/}">
-                                    <button type="submit" class="btn-sub-icon" th:classappend="${subArt.bookmarked} ? 'bookmarked' : ''"
-                                            th:title="${subArt.bookmarked} ? 'Bỏ lưu' : 'Lưu tin'">
-                                        <span th:text="${subArt.bookmarked} ? '★' : '☆'">☆</span>
+                                    <button type="submit" class="vne-icon-btn btn-action-bookmark"
+                                            th:classappend="${op.bookmarked} ? 'saved' : ''"
+                                            th:title="${op.bookmarked} ? 'Đã lưu (Bấm để bỏ lưu)' : 'Lưu bài viết [Bookmarked Decorator]'">
+                                        <svg class="action-svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                                        </svg>
                                     </button>
                                 </form>
+                                <button type="button" class="vne-icon-btn btn-action-share"
+                                        th:data-url="@{'/article/' + ${op.id}}"
+                                        onclick="copyArticleLink(this.getAttribute('data-url'), event)"
+                                        title="Sao chép liên kết bài viết">
+                                    <svg class="action-svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </section>
+
+    <!-- Phân cách ngang mảnh chuẩn báo giấy -->
+    <hr class="vne-divider">
+
+    <!-- ================================================================= -->
+    <!-- 2. BỐ CỤC CHÍNH 2 CỘT CHUẨN VNEXPRESS (Editorial 2-Column Split)  -->
+    <!-- Cột Trái (~64%): Dòng Tin Thời Sự Liên Tục                       -->
+    <!-- Cột Phải (~36%): Các Khối Chuyên Mục Báo Chí & Tiện Ích Thị Trường-->
+    <!-- ================================================================= -->
+    <div class="vne-main-layout">
+
+        <!-- ==================== CỘT TRÁI: DÒNG TIN THỜI SỰ LIÊN TỤC ==================== -->
+        <section class="vne-left-column">
+            <div class="vne-column-heading">
+                <h3 class="vne-stream-title">
+                    <span th:if="${selectedCategory == null or selectedCategory.empty}">Dòng sự kiện mới nhất</span>
+                    <span th:if="${selectedCategory != null and !selectedCategory.empty}"
+                          th:text="${selectedCategory} + (${selectedSource != null and !selectedSource.empty} ? ' (' + ${selectedSource} + ')' : '')">Thời sự</span>
+                </h3>
+                <span class="vne-stream-count" th:text="'(' + ${filteredCount} + ' bài viết)'">(45 bài viết)</span>
+                <span class="vne-pattern-tag-sm">[Strategy Filtered]</span>
+            </div>
+
+            <!-- Danh sách bài viết dạng luồng báo chí (VnExpress Continuous Stream) -->
+            <div class="vne-stream-list" th:if="${not #lists.isEmpty(articles)}">
+                <article class="vne-stream-card article-card" th:each="art : ${articles}">
+                    <div class="vne-stream-body">
+                        <h4 class="vne-stream-headline card-title">
+                            <a th:href="@{'/article/' + ${art.id}}" th:text="${art.title}">Tiêu đề bài viết dòng sự kiện</a>
+                        </h4>
+                        <div class="vne-stream-main-content">
+                            <div class="vne-stream-media card-image-wrap" th:if="${art.imageUrl != null and !art.imageUrl.empty}">
+                                <a th:href="@{'/article/' + ${art.id}}">
+                                    <img th:src="${art.imageUrl}"
+                                         th:alt="${art.title}"
+                                         class="vne-stream-img card-image"
+                                         loading="lazy"
+                                         onerror="this.onerror=null; this.src='https://placehold.co/320x200/cbd5e1/1e293b?text=Tin+Tuc';">
+                                </a>
+                            </div>
+                            <div class="vne-stream-text">
+                                <p class="vne-stream-desc card-desc" th:text="${art.description}">Tóm tắt nội dung bài viết súc tích, phản ánh thông tin cốt lõi...</p>
+                                <div class="vne-stream-meta">
+                                    <span class="vne-meta-date" th:text="${art.formattedDate}">15/10/2026 08:30</span>
+                                    <span class="vne-meta-sep">•</span>
+                                    <span class="vne-meta-src" th:text="${art.source}">VnExpress</span>
+                                    <span class="vne-meta-sep">•</span>
+                                    <span class="vne-meta-time" th:text="${art.estimatedReadingTime}">2 phút đọc</span>
+
+                                    <!-- Decorator Badges -->
+                                    <span th:if="${art.featured}" class="badge-vne-featured" title="FeaturedArticle Decorator">★ Tiêu điểm</span>
+                                    <span th:if="${art.bookmarked}" class="badge-vne-saved" title="BookmarkedArticle Decorator">Đã lưu</span>
+
+                                    <div class="vne-stream-actions">
+                                        <!-- Bookmark Button -->
+                                        <form th:action="@{/bookmarks/toggle}" method="post" style="display:inline;">
+                                            <input type="hidden" name="articleId" th:value="${art.id}">
+                                            <input type="hidden" name="returnUrl" th:value="@{/}">
+                                            <button type="submit" class="vne-icon-btn btn-action-bookmark"
+                                                    th:classappend="${art.bookmarked} ? 'saved' : ''"
+                                                    th:title="${art.bookmarked} ? 'Đã lưu (Bấm để bỏ lưu)' : 'Lưu bài viết [Bookmarked Decorator]'">
+                                                <svg class="action-svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                                                </svg>
+                                            </button>
+                                        </form>
+                                        <!-- Share Link -->
+                                        <button type="button" class="vne-icon-btn btn-action-share"
+                                                th:data-url="@{'/article/' + ${art.id}}"
+                                                onclick="copyArticleLink(this.getAttribute('data-url'), event)"
+                                                title="Sao chép liên kết bài viết">
+                                            <svg class="action-svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                                                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </article>
             </div>
-        </div>
-    </section>
 
-    <!-- Thanh Thống Kê & Trạng Thái Lọc -->
-    <div class="stats-bar">
-        <div class="stats-left">
-            <span class="stats-chip">
-                <span>Tổng cộng:</span>
-                <strong th:text="${totalArticles}">0</strong> bài viết
-            </span>
-            <span class="stats-chip" th:if="${totalArticles != filteredCount}">
-                <span>Kết quả lọc:</span>
-                <strong th:text="${filteredCount}">0</strong> bài
-            </span>
-            <span id="searchResultCount" class="stats-chip search-chip" style="display:none;"></span>
-        </div>
-
-        <div class="stats-right" th:if="${(selectedCategory != null and !selectedCategory.empty) or (selectedSource != null and !selectedSource.empty)}">
-            <span class="filter-tag-label">Đang xem:</span>
-            <span th:if="${selectedCategory != null and !selectedCategory.empty}" class="badge badge-category" th:text="${selectedCategory}"></span>
-            <span th:if="${selectedSource != null and !selectedSource.empty}" class="badge badge-source" th:text="${selectedSource}"></span>
-            <a th:href="@{/}" class="clear-filters-link" title="Xóa tất cả bộ lọc">✕ Xóa lọc</a>
-        </div>
-    </div>
-
-    <!-- Danh Sách Bài Viết (Clean Editorial Grid) -->
-    <div class="article-grid" th:if="${not #lists.isEmpty(articles)}">
-        <article class="article-card" th:each="article : ${articles}">
-            <div class="card-image-wrap">
-                <img th:if="${article.imageUrl != null and !article.imageUrl.empty}"
-                     th:src="${article.imageUrl}"
-                     th:alt="${article.title}"
-                     class="card-image"
-                     loading="lazy"
-                     onerror="this.onerror=null; this.src='https://placehold.co/600x400/e2e8f0/1e293b?text=Tin+Tuc';">
-                <img th:unless="${article.imageUrl != null and !article.imageUrl.empty}"
-                     src="https://placehold.co/600x400/e2e8f0/1e293b?text=Tin+Tuc"
-                     th:alt="${article.title}"
-                     class="card-image">
-
-                <span class="card-reading-time" th:text="${article.estimatedReadingTime}">2 phút đọc</span>
+            <!-- Trường hợp không tìm thấy bài viết -->
+            <div th:if="${#lists.isEmpty(articles)}" class="vne-empty-box">
+                <h4>Không có bài viết nào phù hợp với bộ lọc</h4>
+                <p>Vui lòng thử chọn chuyên mục, nguồn báo khác hoặc đặt lại bộ lọc.</p>
+                <a th:href="@{/}" class="btn-vne-apply">Quay lại tất cả bài viết</a>
             </div>
+        </section>
 
-            <div class="card-content">
-                <div class="card-kicker">
-                    <span class="card-kicker-cat" th:text="${article.category}">Chuyên mục</span>
-                    <span class="card-kicker-dot">•</span>
-                    <span class="card-kicker-src" th:text="${article.source}">VnExpress</span>
-                    <div class="decorator-stack">
-                        <span th:if="${article.featured}" class="badge-decorator badge-featured" title="FeaturedArticle Decorator">Tiêu điểm</span>
-                        <span th:if="${article.bookmarked}" class="badge-decorator badge-bookmarked" title="BookmarkedArticle Decorator">Đã lưu</span>
-                    </div>
+        <!-- ==================== CỘT PHẢI: KHỐI CHUYÊN MỤC & TIỆN ÍCH THỊ TRƯỜNG ==================== -->
+        <aside class="vne-right-column">
+
+            <!-- 1. HỘP TIỆN ÍCH THỊ TRƯỜNG & TỶ GIÁ (Market Rates Widget - Như Ảnh 2 của VnExpress) -->
+            <div class="vne-market-widget">
+                <div class="vne-market-header">
+                    <span class="vne-widget-title">Thị trường &amp; Tiện ích</span>
+                    <span class="vne-widget-live">● Cập nhật</span>
                 </div>
-
-                <h2 class="card-title">
-                    <a th:href="@{'/article/' + ${article.id}}" th:text="${article.title}">Tiêu đề bài viết</a>
-                </h2>
-
-                <p class="card-desc" th:text="${article.description}">Tóm tắt nội dung bài viết...</p>
-
-                <div class="card-footer">
-                    <span class="card-date" th:text="${article.formattedDate}">15/10/2026 08:30</span>
-
-                    <div class="card-actions-group">
-                        <a th:href="@{'/article/' + ${article.id}}" class="btn-read-link">
-                            Đọc tiếp &rarr;
-                        </a>
-
-                        <!-- Nút Bookmark (BookmarkedArticle Decorator) -->
-                        <form th:action="@{/bookmarks/toggle}" method="post" style="display:inline;">
-                            <input type="hidden" name="articleId" th:value="${article.id}">
-                            <input type="hidden" name="returnUrl" th:value="@{/}">
-                            <button type="submit" class="btn-card-action"
-                                    th:classappend="${article.bookmarked} ? 'active-bookmark' : ''"
-                                    th:title="${article.bookmarked} ? 'Bỏ lưu bài viết' : 'Lưu bài viết'">
-                                <span th:text="${article.bookmarked} ? '★ Đã lưu' : '☆ Lưu'">☆ Lưu</span>
-                            </button>
-                        </form>
-
-                        <!-- Nút Chia sẻ link -->
-                        <button type="button" class="btn-card-action btn-share"
-                                th:data-url="@{'/article/' + ${article.id}}"
-                                onclick="copyArticleLink(this.getAttribute('data-url'), event)"
-                                title="Sao chép liên kết">
-                            <span>🔗</span>
-                        </button>
+                <div class="vne-market-body">
+                    <div class="vne-rate-row">
+                        <span class="vne-rate-name">Xăng E10 RON 95-III</span>
+                        <span class="vne-rate-val val-down">25.210 đ <small>(-1.810)</small></span>
+                    </div>
+                    <div class="vne-rate-row">
+                        <span class="vne-rate-name">Dầu Diesel 0.05S</span>
+                        <span class="vne-rate-val val-up">29.550 đ <small>(+450)</small></span>
+                    </div>
+                    <div class="vne-rate-row">
+                        <span class="vne-rate-name">Vàng SJC (Bán ra)</span>
+                        <span class="vne-rate-val">138,7 tr/lượng</span>
+                    </div>
+                    <div class="vne-rate-row">
+                        <span class="vne-rate-name">Vàng Thế Giới (Spot)</span>
+                        <span class="vne-rate-val">3.994,9 USD/oz</span>
+                    </div>
+                    <div class="vne-rate-row">
+                        <span class="vne-rate-name">Lãi suất gửi 12 tháng</span>
+                        <span class="vne-rate-val">7.0% / năm</span>
                     </div>
                 </div>
             </div>
-        </article>
-    </div>
 
-    <!-- Khi không có bài viết nào phù hợp -->
-    <div th:if="${#lists.isEmpty(articles)}" class="empty-state">
-        <h3>Không tìm thấy bài viết nào phù hợp</h3>
-        <p>Vui lòng thử chọn chuyên mục, nguồn báo khác hoặc đặt lại bộ lọc.</p>
-        <a th:href="@{/}" class="btn btn-primary">Xem tất cả bài viết</a>
+            <!-- 2. CÁC KHỐI CHUYÊN MỤC BÁO CHÍ (VnExpress Category Blocks) -->
+            <div class="vne-category-blocks" th:if="${categoryBlocks != null}">
+
+                <!-- Khối từng chuyên mục (Kinh doanh, Thể thao, Công nghệ, Giải trí...) -->
+                <div class="vne-cat-block" th:each="entry : ${categoryBlocks}">
+                    <div class="vne-block-header">
+                        <h4 class="vne-block-title">
+                            <a th:href="@{/(category=${entry.key})}" th:text="${entry.key}">Kinh doanh</a>
+                        </h4>
+                        <div class="vne-subcat-links">
+                            <a th:href="@{/(category=${entry.key})}">Xem tất cả &rarr;</a>
+                        </div>
+                    </div>
+
+                    <div class="vne-block-content" th:with="blockArticles=${entry.value}">
+                        <!-- Bài viết lớn đầu tiên của khối -->
+                        <article class="vne-block-featured" th:if="${not #lists.isEmpty(blockArticles)}" th:with="mainArt=${blockArticles[0]}">
+                            <div class="vne-bf-media" th:if="${mainArt.imageUrl != null and !mainArt.imageUrl.empty}">
+                                <a th:href="@{'/article/' + ${mainArt.id}}">
+                                    <img th:src="${mainArt.imageUrl}"
+                                         th:alt="${mainArt.title}"
+                                         class="vne-bf-img"
+                                         loading="lazy"
+                                         onerror="this.onerror=null; this.src='https://placehold.co/350x200/e2e8f0/1e293b?text=Tin+Chuyen+Muc';">
+                                </a>
+                            </div>
+                            <h5 class="vne-bf-title">
+                                <a th:href="@{'/article/' + ${mainArt.id}}" th:text="${mainArt.title}">Tiêu đề bài viết đầu của chuyên mục</a>
+                            </h5>
+                            <p class="vne-bf-desc" th:if="${mainArt.description != null and !mainArt.description.empty}" th:text="${mainArt.description}">Tóm tắt nhanh...</p>
+                        </article>
+
+                        <!-- Danh sách các tin vắn dạng dấu chấm tròn (Bulleted Headlines - Như Ảnh 1 & 2 của VnExpress) -->
+                        <ul class="vne-bullet-list" th:if="${#lists.size(blockArticles) > 1}">
+                            <li class="vne-bullet-item" th:each="bArt, iterStat : ${blockArticles}" th:if="${iterStat.index > 0}">
+                                <a th:href="@{'/article/' + ${bArt.id}}" th:text="${bArt.title}">Tiêu đề tin vắn dạng bullet point...</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- 3. HỘP LỊCH THI ĐẤU & KẾT QUẢ THỂ THAO (Sports Mini Widget - Như Ảnh 3 của VnExpress) -->
+            <div class="vne-sports-widget">
+                <div class="vne-widget-header">
+                    <span class="vne-widget-title">⚽ Lịch thi đấu &amp; Kết quả</span>
+                </div>
+                <div class="vne-sports-body">
+                    <div class="vne-match-item">
+                        <span class="vne-match-teams">Inter vs Fiorentina</span>
+                        <span class="vne-match-score">2 - 1</span>
+                    </div>
+                    <div class="vne-match-item">
+                        <span class="vne-match-teams">Man Utd vs Bournemouth</span>
+                        <span class="vne-match-score">3 - 0</span>
+                    </div>
+                    <div class="vne-match-item">
+                        <span class="vne-match-teams">Liverpool vs Brighton</span>
+                        <span class="vne-match-score">Hôm nay 21:00</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. HỘP TOP ĐỌC NHIỀU NHẤT (Trending News Ranking) -->
+            <div class="vne-trending-widget">
+                <div class="vne-widget-header">
+                    <span class="vne-widget-title">🔥 Đọc nhiều nhất</span>
+                </div>
+                <ol class="vne-trending-list">
+                    <li class="vne-trending-item" th:each="trend, iterStat : ${articles}" th:if="${iterStat.index < 5}">
+                        <span class="vne-trend-rank" th:text="${iterStat.count}">1</span>
+                        <a th:href="@{'/article/' + ${trend.id}}" class="vne-trend-title" th:text="${trend.title}">Tiêu đề bài viết được đọc nhiều nhất...</a>
+                    </li>
+                </ol>
+            </div>
+
+        </aside>
+
     </div>
 </main>
 
-<!-- Footer chung -->
+<!-- Footer chung chuẩn tòa soạn -->
 <div th:replace="~{fragments/footer :: footer}"></div>
 
 </body>

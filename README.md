@@ -11,7 +11,7 @@
 | :---: | :--- | :--- | :--- | :--- |
 | **1** | **Factory Method** | Creational | `NewsParserFactory`, `RssParserFactory`, `JsonParserFactory`, `NewsParser`, `RssNewsParser`, `JsonNewsParser` | Khởi tạo đúng bộ phân tích cú pháp theo loại nguồn (RSS trực tuyến hoặc JSON mẫu) mà không phụ thuộc vào lớp cụ thể. |
 | **2** | **Adapter** | Structural | `ArticleAdapter<T>`, `RssEntryAdapter`, `JsonArticleAdapter` | Chuyển đổi dữ liệu thô `SyndEntry` (Rome) và `JsonNode` (Jackson) về thực thể `Article` thống nhất; lọc sạch HTML và bóc tách ảnh. |
-| **3** | **Strategy** | Behavioral | `SortStrategy` (`Newest`, `Oldest`, `Title`), `FilterStrategy` (`Category`, `Source`, `Composite`, `AllPass`), `ArticleProcessorContext` | Cho phép người dùng hoán đổi thuật toán sắp xếp (Mới nhất, Cũ nhất, Tiêu đề A-Z) và lọc tin (Chuyên mục, Nguồn báo) động lúc runtime trên web. |
+| **3** | **Strategy** | Behavioral | `SortStrategy` (`Newest`, `FeaturedFirst`, `ReadingTime`, `Title`), `FilterStrategy` (`Category`, `Source`, `Composite`, `AllPass`), `ArticleProcessorContext` | Cho phép người dùng hoán đổi thuật toán sắp xếp (Mới nhất, Ưu tiên nổi bật, Đọc nhanh nhất, Tiêu đề A-Z) và lọc tin (Chuyên mục, Nguồn báo) động lúc runtime trên web. |
 | **4** | **Observer** | Behavioral | `NewsSubject`, `NewsFeed`, `NewsObserver`, `UnreadCounter`, `NewsLogger`, `NewsUpdateEvent` | Khi nhấn nút "Làm mới", `NewsFeed` (Subject) tự động phát tín hiệu cho `UnreadCounter` (đếm tin mới) và `NewsLogger` (ghi nhật ký hệ thống). |
 | **5** | **Decorator** | Structural | `ArticleDecorator`, `FeaturedArticle`, `BookmarkedArticle`, `SummarizedArticle` | Bọc đối tượng `Article` để bổ sung tính năng động: gắn nhãn `NỔI BẬT` (tiêu đề sao `★`), trạng thái `ĐÃ LƯU`, và tạo đoạn tóm tắt kèm ước lượng thời gian đọc. |
 | **6** | **Singleton** | Creational | `CacheManager`, `CacheEntry` | Quản lý bộ nhớ đệm tin tức duy nhất trong JVM, thread-safe (Double-Checked Locking), lưu trữ tin đã tải và hỗ trợ thời gian hết hạn (TTL). |
@@ -22,7 +22,8 @@
 
 1. **Trang chủ đa nguồn:** Tổng hợp tin tức từ các báo điện tử uy tín (VnExpress, Tuổi Trẻ) qua chuẩn RSS Feed.
 2. **Lọc tin tức linh hoạt:** Lọc theo Chuyên mục (Thời sự, Kinh doanh, Công nghệ, Thể thao, Giải trí) và theo Nguồn báo (VnExpress, Tuổi Trẻ) hoặc kết hợp cả hai.
-3. **Sắp xếp đa tiêu chí:** Sắp xếp tin mới nhất, cũ nhất, hoặc theo thứ tự chữ cái tiêu đề (A-Z).
+3. **Sắp xếp đa tiêu chí:** Sắp xếp tin mới nhất, ưu tiên tin tiêu điểm nổi bật, đọc nhanh nhất (1-2 phút), hoặc theo thứ tự chữ cái tiêu đề (A-Z).
+4. **Tìm kiếm thời gian thực (Live Search & Highlight):** Tích hợp ô tìm kiếm ngay trên thanh bộ lọc; tự động lọc và làm nổi bật (highlight) từ khóa trực tiếp trên tiêu đề bài viết.
 4. **Xem chi tiết bài viết:** Hiển thị bài viết đầy đủ với ảnh lớn, chuyên mục, ngày giờ xuất bản và liên kết xem bài gốc trên trang báo.
 5. **Đánh dấu bài viết (Bookmark):** Đánh dấu bài viết yêu thích bằng 1 cú nhấp chuột; quản lý danh sách tại trang `/bookmarks`. Dữ liệu được lưu trữ bền vững ra file JSON (`data/bookmarks.json`), không bị mất khi khởi động lại ứng dụng.
 6. **Làm mới dữ liệu & Thông báo (Refresh & Observer):** Nút "Làm mới" kéo dữ liệu mới nhất từ mạng; tự động cập nhật số lượng tin mới và ghi log chi tiết.

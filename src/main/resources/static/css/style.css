@@ -198,47 +198,61 @@ img {
 }
 
 .nav-link {
-    color: var(--text-muted);
+    color: #475569;
     font-weight: 600;
     font-size: 0.88rem;
-    padding: 7px 14px;
-    border-radius: var(--radius-sm);
+    padding: 6px 14px;
+    border-radius: 6px;
     display: flex;
     align-items: center;
     gap: 6px;
-    transition: var(--transition);
+    transition: all 0.2s ease;
 }
 
 .nav-link:hover {
-    background-color: var(--primary-light);
-    color: var(--primary);
+    background-color: #fdf2f4;
+    color: var(--vne-red);
 }
 
 .nav-link.active {
-    background-color: var(--primary-light);
-    color: var(--primary);
+    background-color: #fdf2f4;
+    color: var(--vne-red);
     font-weight: 700;
 }
 
 .nav-counter {
-    background: var(--primary);
+    background: var(--vne-red);
     color: #ffffff;
     font-size: 0.72rem;
     font-weight: 700;
     padding: 1px 7px;
-    border-radius: var(--radius-pill);
+    border-radius: 9999px;
 }
 
 .btn-refresh {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
-    background: var(--primary);
+    gap: 6px;
+    background: var(--vne-red);
     color: #ffffff;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(159, 34, 78, 0.2);
+    transition: all 0.2s ease;
 }
 
 .btn-refresh:hover {
-    background: var(--primary-hover);
+    background: var(--vne-red-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 6px rgba(159, 34, 78, 0.3);
+}
+
+.btn-refresh:active {
+    transform: translateY(0);
 }
 
 /* ==========================================================================
@@ -334,6 +348,41 @@ img {
     display: flex;
     align-items: center;
     gap: 8px;
+}
+
+.filter-search-group {
+    flex: 1;
+    min-width: 220px;
+    max-width: 320px;
+}
+
+.toolbar-search-wrap {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.toolbar-search-input {
+    width: 100%;
+    padding: 6px 30px 6px 32px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-main);
+    font-size: 0.85rem;
+    font-family: inherit;
+    outline: none;
+    transition: var(--transition);
+}
+
+.toolbar-search-input::placeholder {
+    color: var(--text-light);
+}
+
+.toolbar-search-input:focus {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.12);
 }
 
 .filter-label {
@@ -1694,3 +1743,1196 @@ mark.search-highlight {
         grid-template-columns: 1fr;
     }
 }
+
+/* ==========================================================================
+   VNEXPRESS EDITORIAL DESIGN SYSTEM (Chuẩn Mực Báo Chí Điện Tử VnExpress)
+   Đặc điểm:
+   - Màu sắc nhận diện: Đỏ mận (#9f224e), đen than (#222), xám mỏng (#e5e5e5)
+   - Bố cục: Tiêu điểm 3 cột (Tin chính + Tin phụ + Góc nhìn)
+   - Thân trang 2 cột (Cột trái Dòng thời sự + Cột phải Khối chuyên mục & Tiện ích)
+   ========================================================================== */
+
+:root {
+    --vne-red: #9f224e;
+    --vne-red-dark: #821a3e;
+    --vne-red-light: #fdf2f4;
+    --vne-title: #222222;
+    --vne-desc: #4f4f4f;
+    --vne-meta: #757575;
+    --vne-border: #e5e5e5;
+    --vne-bg-subtle: #f8fafc;
+}
+
+body.vne-editorial-theme {
+    background-color: #ffffff;
+    color: var(--vne-title);
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+/* 1. Header VnExpress Branding */
+.logo-vne-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background-color: var(--vne-red);
+    color: #ffffff;
+    font-weight: 800;
+    font-size: 1.2rem;
+    border-radius: 4px;
+    letter-spacing: -0.5px;
+    box-shadow: 0 2px 4px rgba(159, 34, 78, 0.25);
+    flex-shrink: 0;
+}
+
+.header-datetime-widget {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.82rem;
+    color: var(--vne-meta);
+}
+
+
+
+/* 2. Thanh Danh Mục Chuyên Mục (VnExpress Horizontal Navbar) */
+.vne-nav-bar {
+    background-color: #ffffff;
+    border-bottom: 1px solid var(--vne-border);
+    position: sticky;
+    top: 57px;
+    z-index: 990;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+.vne-nav-bar::-webkit-scrollbar {
+    display: none;
+}
+
+.vne-nav-container {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+}
+
+.vne-nav-item {
+    padding: 10px 14px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: #333333;
+    text-decoration: none;
+    transition: color 0.15s ease;
+    border-bottom: 2px solid transparent;
+}
+
+.vne-nav-item:hover {
+    color: var(--vne-red);
+}
+
+.vne-nav-item.active {
+    color: var(--vne-red);
+    border-bottom-color: var(--vne-red);
+    font-weight: 700;
+}
+
+/* 3. Thanh Bộ Lọc Tinh Tế (Strategy Pattern Toolbar) */
+.vne-toolbar-section {
+    background-color: #ffffff;
+    border-bottom: 1px solid var(--vne-border);
+    padding: 10px 0;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+}
+
+.vne-toolbar-container {
+    display: flex;
+    align-items: center;
+}
+
+.vne-filter-form {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    flex-wrap: wrap;
+}
+
+.vne-search-wrap {
+    position: relative;
+    flex: 1;
+    min-width: 240px;
+    max-width: 340px;
+    display: flex;
+    align-items: center;
+}
+
+.vne-search-icon {
+    position: absolute;
+    left: 12px;
+    color: #94a3b8;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.vne-search-input {
+    width: 100%;
+    height: 38px;
+    padding: 0 32px 0 36px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    outline: none;
+    font-family: inherit;
+    color: var(--vne-title);
+    transition: all 0.2s ease;
+}
+
+.vne-search-input:focus {
+    background: #ffffff;
+    border-color: var(--vne-red);
+    box-shadow: 0 0 0 3px rgba(159, 34, 78, 0.1);
+}
+
+.vne-search-clear {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    font-size: 0.85rem;
+    display: none;
+    padding: 2px;
+}
+
+.vne-search-clear:hover {
+    color: var(--vne-title);
+}
+
+.vne-filter-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.vne-filter-label {
+    font-size: 0.8rem;
+    color: #64748b;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.vne-filter-select {
+    height: 38px;
+    padding: 0 32px 0 12px;
+    font-size: 0.85rem;
+    background-color: #ffffff;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    appearance: none;
+    -webkit-appearance: none;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    outline: none;
+    font-family: inherit;
+    cursor: pointer;
+    color: #1e293b;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.vne-filter-select:hover {
+    border-color: #cbd5e1;
+    background-color: #f8fafc;
+}
+
+.vne-filter-select:focus {
+    border-color: var(--vne-red);
+    box-shadow: 0 0 0 3px rgba(159, 34, 78, 0.1);
+}
+
+.vne-filter-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto;
+}
+
+.btn-vne-apply {
+    height: 38px;
+    background-color: var(--vne-red);
+    color: #ffffff;
+    border: none;
+    padding: 0 18px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(159, 34, 78, 0.2);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-vne-apply:hover {
+    background-color: var(--vne-red-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 6px rgba(159, 34, 78, 0.25);
+}
+
+.btn-vne-apply:active {
+    transform: translateY(0);
+}
+
+.btn-vne-reset {
+    height: 38px;
+    background-color: #ffffff;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+    padding: 0 14px;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-vne-reset:hover {
+    background-color: #f1f5f9;
+    color: #0f172a;
+    border-color: #cbd5e1;
+}
+
+.vne-pattern-tag {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #0369a1;
+    background: #e0f2fe;
+    border: 1px solid #bae6fd;
+    padding: 4px 10px;
+    border-radius: 6px;
+    letter-spacing: 0.3px;
+    display: inline-flex;
+    align-items: center;
+}
+
+/* 4. Top 3-Column Spotlight (Tiêu Điểm & Góc Nhìn Chuẩn VnExpress) */
+.vne-top-spotlight {
+    padding: 24px 0 20px 0;
+}
+
+.vne-spotlight-row {
+    display: grid;
+    grid-template-columns: 1.35fr 1fr 1fr;
+    gap: 24px;
+    align-items: stretch;
+}
+
+/* Col 1: Hero Lead Story */
+.vne-col-hero {
+    display: flex;
+    flex-direction: column;
+    padding-right: 24px;
+    border-right: 1px solid var(--vne-border);
+}
+
+.vne-hero-headline {
+    font-size: 1.32rem;
+    font-weight: 800;
+    line-height: 1.35;
+    margin-bottom: 12px;
+}
+
+.vne-hero-headline a {
+    color: var(--vne-title);
+    text-decoration: none;
+    transition: color 0.15s ease;
+}
+
+.vne-hero-headline a:hover {
+    color: var(--vne-red);
+}
+
+.vne-hero-media {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 12px;
+    background-color: #f1f5f9;
+}
+
+.vne-hero-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.vne-hero-media:hover .vne-hero-img {
+    transform: scale(1.02);
+}
+
+.vne-hero-sapo {
+    font-size: 0.92rem;
+    color: var(--vne-desc);
+    line-height: 1.55;
+    margin-bottom: 14px;
+}
+
+.vne-hero-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.78rem;
+    color: var(--vne-meta);
+    margin-top: auto;
+    padding-top: 10px;
+    border-top: 1px solid #f8fafc;
+}
+
+.vne-meta-cat {
+    color: var(--vne-red);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+}
+
+/* Col 2: Secondary Spotlight */
+.vne-col-sub {
+    display: flex;
+    flex-direction: column;
+    padding-right: 24px;
+    border-right: 1px solid var(--vne-border);
+}
+
+.vne-sub-headline {
+    font-size: 1.08rem;
+    font-weight: 700;
+    line-height: 1.35;
+    margin-bottom: 12px;
+}
+
+.vne-sub-headline a {
+    color: var(--vne-title);
+    text-decoration: none;
+    transition: color 0.15s ease;
+}
+
+.vne-sub-headline a:hover {
+    color: var(--vne-red);
+}
+
+.vne-sub-media {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 12px;
+    background-color: #f1f5f9;
+}
+
+.vne-sub-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.vne-sub-media:hover .vne-sub-img {
+    transform: scale(1.02);
+}
+
+.vne-sub-sapo {
+    font-size: 0.86rem;
+    color: var(--vne-desc);
+    line-height: 1.5;
+    margin-bottom: 14px;
+}
+
+.vne-sub-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    color: var(--vne-meta);
+    margin-top: auto;
+    padding-top: 10px;
+    border-top: 1px solid #f8fafc;
+}
+
+/* Col 3: VnExpress Editorial Opinion ("Góc Nhìn") */
+.vne-col-opinion {
+    display: flex;
+    flex-direction: column;
+}
+
+.vne-opinion-box {
+    background-color: #faf7f5;
+    border: 1px solid #ebdcd0;
+    border-radius: 8px;
+    padding: 18px 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.vne-opinion-content-wrap {
+    display: flex;
+    flex-direction: column;
+}
+
+.vne-opinion-bottom-wrap {
+    display: flex;
+    flex-direction: column;
+    margin-top: auto;
+}
+
+.vne-opinion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.vne-opinion-kicker {
+    color: var(--vne-red);
+    font-size: 0.85rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.vne-decorator-pill {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #9333ea;
+    background: #f3e8ff;
+    padding: 2px 7px;
+    border-radius: 4px;
+}
+
+.vne-opinion-title {
+    font-size: 1.12rem;
+    font-weight: 700;
+    line-height: 1.35;
+    margin-bottom: 10px;
+}
+
+.vne-opinion-title a {
+    color: var(--vne-title);
+    text-decoration: none;
+    transition: color 0.15s ease;
+}
+
+.vne-opinion-title a:hover {
+    color: var(--vne-red);
+}
+
+.vne-opinion-sapo {
+    font-size: 0.88rem;
+    color: var(--vne-desc);
+    line-height: 1.55;
+    margin-bottom: 16px;
+}
+
+.vne-opinion-author {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px dashed #e2e8f0;
+    padding-top: 12px;
+}
+
+.vne-author-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.vne-author-name {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: var(--vne-title);
+}
+
+.vne-author-role {
+    font-size: 0.78rem;
+    color: var(--vne-meta);
+}
+
+.vne-opinion-comments {
+    font-size: 0.76rem;
+    color: #64748b;
+    margin-top: 2px;
+}
+
+.vne-author-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ffffff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.vne-opinion-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid #ebdcd0;
+    font-size: 0.78rem;
+    color: var(--vne-meta);
+}
+
+.vne-divider {
+    border: none;
+    border-top: 1px solid var(--vne-border);
+    margin: 16px 0 24px 0;
+}
+
+/* 5. Thân Trang 2 Cột (VnExpress 2-Column Split) */
+.vne-main-layout {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 32px;
+    align-items: start;
+    padding-bottom: 40px;
+}
+
+/* CỘT TRÁI: Dòng Thời Sự Liên Tục (Continuous Stream) */
+.vne-left-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.vne-column-heading {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    border-bottom: 2px solid var(--vne-title);
+    padding-bottom: 8px;
+    margin-bottom: 20px;
+}
+
+.vne-stream-title {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--vne-title);
+    text-transform: capitalize;
+}
+
+.vne-stream-count {
+    font-size: 0.85rem;
+    color: var(--vne-meta);
+}
+
+.vne-pattern-tag-sm {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #0369a1;
+    background: #e0f2fe;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: auto;
+}
+
+.vne-stream-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.vne-stream-card {
+    border-bottom: 1px solid var(--vne-border);
+    padding-bottom: 18px;
+    margin-bottom: 18px;
+    transition: background-color 0.15s ease;
+}
+
+.vne-stream-headline {
+    font-size: 1.08rem;
+    font-weight: 700;
+    line-height: 1.35;
+    margin-bottom: 10px;
+}
+
+.vne-stream-headline a {
+    color: var(--vne-title);
+    text-decoration: none;
+}
+
+.vne-stream-headline a:hover {
+    color: var(--vne-red);
+}
+
+.vne-stream-main-content {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+}
+
+.vne-stream-media {
+    width: 160px;
+    min-width: 160px;
+    height: 105px;
+    border-radius: 4px;
+    overflow: hidden;
+    background-color: #f1f5f9;
+}
+
+.vne-stream-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.vne-stream-media:hover .vne-stream-img {
+    transform: scale(1.04);
+}
+
+.vne-stream-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.vne-stream-desc {
+    font-size: 0.88rem;
+    color: var(--vne-desc);
+    line-height: 1.5;
+    margin-bottom: 8px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.vne-stream-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.78rem;
+    color: var(--vne-meta);
+    flex-wrap: wrap;
+}
+
+.badge-vne-featured {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #b45309;
+    background: #fef3c7;
+    padding: 2px 6px;
+    border-radius: 3px;
+}
+
+.badge-vne-saved {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #047857;
+    background: #d1fae5;
+    padding: 2px 6px;
+    border-radius: 3px;
+}
+
+/* ==========================================================================
+   Editorial Action Buttons (Lưu bài viết [Bookmark Decorator] & Sao chép liên kết)
+   Chuẩn mực báo chí hiện đại: Nút bấm viền tinh tế, SVG vector sắc nét,
+   micro-interactions mượt mà, trạng thái đã lưu ấm áp nổi bật.
+   ========================================================================== */
+.vne-meta-actions,
+.vne-stream-actions,
+.card-actions-group,
+.detail-action-buttons {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.vne-stream-actions {
+    margin-left: auto;
+}
+
+.vne-meta-actions {
+    margin-left: auto;
+}
+
+/* Nút vuông bo góc gọn gàng chứa biểu tượng SVG (cho card danh sách, tin phụ) */
+.vne-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    color: #64748b;
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.vne-icon-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+}
+
+.vne-icon-btn:active {
+    transform: translateY(0);
+}
+
+/* Nút dài có kèm nhãn chữ (cho Hero spotlight, trang chi tiết và trang đã lưu) */
+.vne-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    height: 30px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    font-family: inherit;
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    color: #475569;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.vne-action-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+}
+
+.vne-action-btn:active {
+    transform: translateY(0);
+}
+
+/* Biểu tượng SVG và hiệu ứng micro-zoom */
+.action-svg {
+    display: inline-block;
+    flex-shrink: 0;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), stroke 0.2s ease, fill 0.2s ease;
+}
+
+.vne-icon-btn:hover .action-svg,
+.vne-action-btn:hover .action-svg {
+    transform: scale(1.15);
+}
+
+/* Phối màu nút Bookmark (Lưu bài viết) */
+.btn-action-bookmark:hover {
+    background-color: #fffbeb;
+    border-color: #fcd34d;
+    color: #d97706;
+}
+
+.btn-action-bookmark:hover .action-svg {
+    stroke: #d97706;
+}
+
+/* Trạng thái ĐÃ LƯU (Bookmarked Active State) */
+.btn-action-bookmark.saved {
+    background-color: #fef3c7;
+    border-color: #f59e0b;
+    color: #b45309;
+    font-weight: 700;
+    box-shadow: 0 1px 3px rgba(245, 158, 11, 0.2);
+}
+
+.btn-action-bookmark.saved .action-svg {
+    fill: #f59e0b;
+    stroke: #d97706;
+}
+
+.btn-action-bookmark.saved:hover {
+    background-color: #fde68a;
+    border-color: #d97706;
+    color: #92400e;
+}
+
+/* Phối màu nút Share (Sao chép liên kết) */
+.btn-action-share:hover {
+    background-color: #eff6ff;
+    border-color: #93c5fd;
+    color: #2563eb;
+}
+
+.btn-action-share:hover .action-svg {
+    stroke: #2563eb;
+}
+
+.btn-stream-bookmark,
+.btn-stream-share {
+    display: none;
+}
+
+.vne-empty-box {
+    text-align: center;
+    padding: 48px 24px;
+    background-color: #fafafa;
+    border: 1px dashed var(--vne-border);
+    border-radius: 6px;
+}
+
+/* CỘT PHẢI: Khối Chuyên Mục & Tiện Ích */
+.vne-right-column {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    border-left: 1px solid var(--vne-border);
+    padding-left: 24px;
+}
+
+/* 1. Hộp Tiện Ích Thị Trường (Market Rates Widget) */
+.vne-market-widget {
+    background-color: #fbfbfb;
+    border: 1px solid var(--vne-border);
+    border-radius: 6px;
+    padding: 14px 16px;
+}
+
+.vne-market-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ebebeb;
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+}
+
+.vne-widget-title {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: var(--vne-title);
+}
+
+.vne-widget-live {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #16a34a;
+}
+
+.vne-market-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.vne-rate-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 0.82rem;
+    color: #475569;
+}
+
+.vne-rate-val {
+    font-weight: 700;
+    color: var(--vne-title);
+}
+
+.vne-rate-val.val-down {
+    color: #dc2626;
+}
+
+.vne-rate-val.val-up {
+    color: #16a34a;
+}
+
+/* 2. Khối Chuyên Mục Báo Chí (Category Blocks) */
+.vne-category-blocks {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.vne-cat-block {
+    display: flex;
+    flex-direction: column;
+}
+
+.vne-block-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-bottom: 2px solid var(--vne-red);
+    padding-bottom: 6px;
+    margin-bottom: 12px;
+}
+
+.vne-block-title {
+    font-size: 1.12rem;
+    font-weight: 800;
+    text-transform: capitalize;
+}
+
+.vne-block-title a {
+    color: var(--vne-red);
+    text-decoration: none;
+}
+
+.vne-subcat-links a {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #64748b;
+    text-decoration: none;
+}
+
+.vne-subcat-links a:hover {
+    color: var(--vne-red);
+}
+
+.vne-block-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.vne-block-featured {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+}
+
+.vne-bf-media {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 8px;
+    background-color: #f1f5f9;
+}
+
+.vne-bf-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.vne-bf-media:hover .vne-bf-img {
+    transform: scale(1.03);
+}
+
+.vne-bf-title {
+    font-size: 0.98rem;
+    font-weight: 700;
+    line-height: 1.35;
+    margin-bottom: 6px;
+}
+
+.vne-bf-title a {
+    color: var(--vne-title);
+    text-decoration: none;
+}
+
+.vne-bf-title a:hover {
+    color: var(--vne-red);
+}
+
+.vne-bf-desc {
+    font-size: 0.84rem;
+    color: var(--vne-desc);
+    line-height: 1.45;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Bulleted Headlines (Như Ảnh 1 & 2 của VnExpress) */
+.vne-bullet-list {
+    list-style: none;
+    padding: 0;
+    margin: 8px 0 0 0;
+    border-top: 1px solid #f1f5f9;
+    padding-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.vne-bullet-item {
+    position: relative;
+    padding-left: 14px;
+    font-size: 0.86rem;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.vne-bullet-item::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    top: -2px;
+    color: #94a3b8;
+    font-size: 1.1rem;
+}
+
+.vne-bullet-item a {
+    color: #333333;
+    text-decoration: none;
+    transition: color 0.15s ease;
+}
+
+.vne-bullet-item a:hover {
+    color: var(--vne-red);
+    text-decoration: underline;
+}
+
+/* 3. Hộp Lịch Thi Đấu & Kết Quả Thể Thao (Sports Widget) */
+.vne-sports-widget {
+    background-color: #fbfbfb;
+    border: 1px solid var(--vne-border);
+    border-radius: 6px;
+    padding: 14px 16px;
+}
+
+.vne-sports-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.vne-match-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.82rem;
+    padding-bottom: 6px;
+    border-bottom: 1px dashed #e2e8f0;
+}
+
+.vne-match-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.vne-match-teams {
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.vne-match-score {
+    font-weight: 700;
+    color: var(--vne-red);
+}
+
+/* 4. Hộp Top Đọc Nhiều Nhất (Trending Ranking) */
+.vne-trending-widget {
+    background-color: #ffffff;
+    border: 1px solid var(--vne-border);
+    border-radius: 6px;
+    padding: 14px 16px;
+}
+
+.vne-trending-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.vne-trending-item {
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+    font-size: 0.86rem;
+    line-height: 1.35;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #f8fafc;
+}
+
+.vne-trend-rank {
+    font-size: 1.15rem;
+    font-weight: 900;
+    color: #cbd5e1;
+    font-family: inherit;
+    min-width: 18px;
+}
+
+.vne-trending-item:nth-child(1) .vne-trend-rank {
+    color: var(--vne-red);
+}
+.vne-trending-item:nth-child(2) .vne-trend-rank {
+    color: #e11d48;
+}
+.vne-trending-item:nth-child(3) .vne-trend-rank {
+    color: #f59e0b;
+}
+
+.vne-trend-title {
+    color: #334155;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.vne-trend-title:hover {
+    color: var(--vne-red);
+    text-decoration: underline;
+}
+
+/* Responsive Cho Thiết Bị Di Động & Tablet */
+@media (max-width: 992px) {
+    .vne-spotlight-row {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    .vne-main-layout {
+        grid-template-columns: 1fr;
+    }
+    .vne-right-column {
+        border-left: none;
+        padding-left: 0;
+        border-top: 2px solid var(--vne-title);
+        padding-top: 24px;
+    }
+    .header-datetime-widget {
+        display: none;
+    }
+}
+
+@media (max-width: 640px) {
+    .vne-stream-main-content {
+        flex-direction: column;
+    }
+    .vne-stream-media {
+        width: 100%;
+        height: 180px;
+    }
+    .vne-toolbar-container form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .vne-search-wrap {
+        max-width: 100%;
+    }
+    .vne-filter-actions {
+        margin-left: 0;
+        justify-content: flex-end;
+    }
+}
+

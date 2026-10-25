@@ -37,6 +37,17 @@
         (function() {
             localStorage.removeItem('theme');
             document.documentElement.removeAttribute('data-theme');
+
+            const dateElem = document.getElementById('liveDateText');
+            if (dateElem) {
+                const now = new Date();
+                const days = ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy'];
+                const dayName = days[now.getDay()];
+                const d = String(now.getDate()).padStart(2, '0');
+                const m = String(now.getMonth() + 1).padStart(2, '0');
+                const y = now.getFullYear();
+                dateElem.textContent = dayName + ', ' + d + '/' + m + '/' + y;
+            }
         })();
 
         // 2. Tìm kiếm nhanh thời gian thực với Highlight từ khóa (Live Search & Keyword Highlight)
@@ -48,6 +59,12 @@
             function escapeRegExp(string) {
                 return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             }
+
+            searchInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                }
+            });
 
             searchInput.addEventListener('input', function() {
                 const query = this.value.trim();

@@ -2,23 +2,27 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <header th:fragment="header(activePage)" class="site-header">
     <div class="container header-content">
+        <!-- Logo thương hiệu phong cách tòa soạn VnExpress -->
         <a th:href="@{/}" class="logo-area" title="Về trang chủ">
-            <span class="logo-badge">NEWS</span>
+            <span class="logo-vne-badge">E</span>
             <div class="site-title">
                 <span class="site-title-main">Tin Tức Đa Nguồn</span>
-                <span class="site-subtitle">Đồ án Mẫu Thiết Kế (Design Patterns)</span>
+                <span class="site-subtitle">Báo Điện Tử • Chuẩn Mực 6 Mẫu Thiết Kế GoF</span>
             </div>
         </a>
 
-        <!-- Thanh tìm kiếm nhanh trên Header -->
-        <div class="header-search-wrap">
-            <span class="search-icon">🔍</span>
-            <input type="text" id="liveSearchInput" class="header-search-input"
-                   placeholder="Tìm kiếm bài viết, từ khóa..."
-                   aria-label="Tìm kiếm bài viết">
-            <button type="button" id="clearSearchBtn" class="search-clear-btn" style="display:none;" title="Xóa tìm kiếm">✕</button>
+        <!-- Thông tin ngày tháng thời gian thực chuẩn VnExpress -->
+        <div class="header-datetime-widget">
+            <svg class="vne-header-svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#94a3b8;">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            <span class="vne-date-text" id="liveDateText">Chủ nhật, 25/10/2026</span>
         </div>
 
+        <!-- Điều hướng tiện ích & Nút Observer Pattern -->
         <nav class="header-actions">
             <a th:href="@{/}" class="nav-link" th:classappend="${activePage == 'home'} ? 'active' : ''">
                 <span>Trang chủ</span>
@@ -31,8 +35,12 @@
             </a>
             <!-- Nút làm mới dữ liệu (Observer Pattern) -->
             <form th:action="@{/refresh}" method="post" style="display: inline;">
-                <button type="submit" class="btn btn-primary btn-sm btn-refresh" title="Làm mới tin tức từ các nguồn RSS [Observer Pattern]">
-                    <span class="refresh-icon">🔄</span>
+                <button type="submit" class="btn-refresh" title="Làm mới tin tức từ các nguồn RSS [Observer Pattern]">
+                    <svg class="btn-refresh-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="23 4 23 10 17 10"></polyline>
+                        <polyline points="1 20 1 14 7 14"></polyline>
+                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                    </svg>
                     <span class="refresh-text">Làm mới</span>
                 </button>
             </form>

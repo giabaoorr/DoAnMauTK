@@ -167,14 +167,17 @@ public class Article {
         return null;
     }
 
-    public String getEstimatedReadingTime() {
+    public int getReadingTimeMinutes() {
         String text = (content != null && !content.isEmpty()) ? content : description;
         if (text == null || text.isEmpty()) {
-            return "1 phút đọc";
+            return 1;
         }
         int words = text.trim().split("\\s+").length;
-        int minutes = Math.max(1, (int) Math.ceil(words / 180.0));
-        return minutes + " phút đọc";
+        return Math.max(1, (int) Math.ceil(words / 180.0));
+    }
+
+    public String getEstimatedReadingTime() {
+        return getReadingTimeMinutes() + " phút đọc";
     }
 
     public String getHighlightReason() {

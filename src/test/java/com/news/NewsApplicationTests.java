@@ -109,4 +109,35 @@ class NewsApplicationTests {
                 .andExpect(redirectedUrl("/"))
                 .andExpect(flash().attributeExists("message"));
     }
+
+    @Test
+    @DisplayName("GĐ2 - Lọc kết hợp Chuyên mục Thời sự và Nguồn Tuổi Trẻ: Cả Tiêu điểm và Grid đều phải thuộc Tuổi Trẻ")
+    @SuppressWarnings("unchecked")
+    void testFilterCategoryAndSource() throws Exception {
+        var result = mockMvc.perform(get("/")
+                        .param("category", "Thời sự")
+                        .param("source", "Tuổi Trẻ"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("index"))
+                .andExpect(model().attribute("selectedCategory", "Thời sự"))
+                .andExpect(model().attribute("selectedSource", "Tuổi Trẻ"))
+                .andReturn();
+
+        List<Article> featured = (List<Article>) result.getModelAndView().getModel().get("featuredArticles");
+        System.out.println("DEBUG: featured size = " + (featured != null ? featured.size() : "null"));
+        assertThat(featured).isNotEmpty();
+        for (Article a : featured) {
+            System.out.println("DEBUG: featured article = " + a.getTitle() + " | source=" + a.getSource() + " | cat=" + a.getCategory());
+            assertThat(a.getSource()).isEqualTo("Tuổi Trẻ");
+            assertThat(a.getCategory()).isEqualTo("Thời sự");
+        }
+
+        List<Article> grid = (List<Article>) result.getModelAndView().getModel().get("articles");
+        System.out.println("DEBUG: grid size = " + (grid != null ? grid.size() : "null"));
+        assertThat(grid).isNotEmpty();
+        for (Article a : grid) {
+            assertThat(a.getSource()).isEqualTo("Tuổi Trẻ");
+            assertThat(a.getCategory()).isEqualTo("Thời sự");
+        }
+    }
 }

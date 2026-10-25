@@ -44,15 +44,31 @@ class StrategyPatternTest {
     }
 
     @Test
-    @DisplayName("[Strategy] OldestSortStrategy sắp xếp thời gian tăng dần (cũ nhất trước)")
-    void testOldestSortStrategy() {
-        SortStrategy strategy = new OldestSortStrategy();
+    @DisplayName("[Strategy] FeaturedFirstSortStrategy ưu tiên bài tiêu điểm nổi bật lên đầu")
+    void testFeaturedFirstSortStrategy() {
+        a3.setFeatured(true);
+        SortStrategy strategy = new FeaturedFirstSortStrategy();
         List<Article> sorted = strategy.sort(testArticles);
 
         assertThat(sorted).hasSize(3);
-        assertThat(sorted.get(0).getId()).isEqualTo("1"); // 10/10
-        assertThat(sorted.get(1).getId()).isEqualTo("3"); // 12/10
-        assertThat(sorted.get(2).getId()).isEqualTo("2"); // 15/10
+        assertThat(sorted.get(0).getId()).isEqualTo("3"); // Featured
+        assertThat(sorted.get(1).getId()).isEqualTo("2"); // 15/10
+        assertThat(sorted.get(2).getId()).isEqualTo("1"); // 10/10
+    }
+
+    @Test
+    @DisplayName("[Strategy] ReadingTimeSortStrategy sắp xếp theo thời gian đọc ngắn nhất lên trước")
+    void testReadingTimeSortStrategy() {
+        // Tạo bài a2 có nội dung rất dài để thời gian đọc > 1 phút
+        a2.setContent("Từ khóa công nghệ rất dài ".repeat(150));
+        SortStrategy strategy = new ReadingTimeSortStrategy();
+        List<Article> sorted = strategy.sort(testArticles);
+
+        assertThat(sorted).hasSize(3);
+        // a3 (12/10, 1 phút) và a1 (10/10, 1 phút) đọc nhanh hơn a2
+        assertThat(sorted.get(0).getId()).isEqualTo("3");
+        assertThat(sorted.get(1).getId()).isEqualTo("1");
+        assertThat(sorted.get(2).getId()).isEqualTo("2");
     }
 
     @Test
@@ -113,10 +129,11 @@ class StrategyPatternTest {
         List<Article> res1 = context.process(testArticles);
         assertThat(res1.get(0).getId()).isEqualTo("2"); // mới nhất
 
-        // 2. [Strategy] Hoán đổi chiến lược sắp xếp sang OldestSortStrategy lúc runtime
-        context.setSortStrategy(new OldestSortStrategy());
+        // 2. [Strategy] Hoán đổi chiến lược sắp xếp sang FeaturedFirstSortStrategy lúc runtime
+        a1.setFeatured(true);
+        context.setSortStrategy(new FeaturedFirstSortStrategy());
         List<Article> res2 = context.process(testArticles);
-        assertThat(res2.get(0).getId()).isEqualTo("1"); // cũ nhất
+        assertThat(res2.get(0).getId()).isEqualTo("1"); // bài a1 nổi bật được lên đầu
 
         // 3. [Strategy] Hoán đổi chiến lược lọc sang CategoryFilterStrategy("Thể thao") lúc runtime
         context.setFilterStrategy(new CategoryFilterStrategy("Thể thao"));
@@ -124,9 +141,15 @@ class StrategyPatternTest {
         assertThat(res3).hasSize(1);
         assertThat(res3.get(0).getId()).isEqualTo("1");
 
-        // 4. Kiểm tra helper fromUserPreferences
-        ArticleProcessorContext prefContext = ArticleProcessorContext.fromUserPreferences("Thời sự", "VnExpress", "title");
-        List<Article> res4 = prefContext.process(testArticles);
+        // 4. Kiểm tra helper fromUserPreferences với "featured" và "reading_time"
+        ArticleProcessorContext featuredContext = ArticleProcessorContext.fromUserPreferences("Thời sự", "VnExpress", "featured");
+        assertThat(featuredContext.getSortStrategy()).isInstanceOf(FeaturedFirstSortStrategy.class);
+
+        ArticleProcessorContext readingContext = ArticleProcessorContext.fromUserPreferences(null, null, "reading_time");
+        assertThat(readingContext.getSortStrategy()).isInstanceOf(ReadingTimeSortStrategy.class);
+
+        ArticleProcessorContext titleContext = ArticleProcessorContext.fromUserPreferences("Thời sự", "VnExpress", "title");
+        List<Article> res4 = titleContext.process(testArticles);
         assertThat(res4).hasSize(1);
         assertThat(res4.get(0).getId()).isEqualTo("3");
     }

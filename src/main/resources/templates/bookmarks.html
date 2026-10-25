@@ -87,17 +87,23 @@
                         <form th:action="@{/bookmarks/toggle}" method="post" style="display:inline;">
                             <input type="hidden" name="articleId" th:value="${article.id}">
                             <input type="hidden" name="returnUrl" th:value="@{/bookmarks}">
-                            <button type="submit" class="btn-card-action active-bookmark" title="Gỡ bài viết khỏi danh sách đã lưu">
-                                <span>✕ Bỏ lưu</span>
+                            <button type="submit" class="vne-action-btn btn-action-bookmark saved" title="Gỡ bài viết khỏi danh sách đã lưu">
+                                <svg class="action-svg" viewBox="0 0 24 24" width="14" height="14" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                                </svg>
+                                <span>Bỏ lưu</span>
                             </button>
                         </form>
 
                         <!-- Nút Chia sẻ link -->
-                        <button type="button" class="btn-card-action btn-share"
+                        <button type="button" class="vne-icon-btn btn-action-share"
                                 th:data-url="@{'/article/' + ${article.id}}"
                                 onclick="copyArticleLink(this.getAttribute('data-url'), event)"
                                 title="Sao chép liên kết">
-                            <span>🔗</span>
+                            <svg class="action-svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                            </svg>
                         </button>
                     </div>
                 </div>

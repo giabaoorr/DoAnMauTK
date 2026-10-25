@@ -8,7 +8,10 @@ import java.util.List;
 
 /**
  * [Strategy] Concrete Strategy: Sắp xếp bài viết theo thời gian xuất bản cũ nhất lên đầu.
+ * @deprecated Đã loại bỏ khỏi giao diện người dùng theo chuẩn trải nghiệm đọc báo hiện đại.
+ *             Thay thế bằng {@link ReadingTimeSortStrategy} hoặc {@link FeaturedFirstSortStrategy}.
  */
+@Deprecated
 public class OldestSortStrategy implements SortStrategy {
 
     @Override
