@@ -141,5 +141,49 @@
     "publishedDate": "2026-10-15T16:20:00",
     "source": "VnExpress",
     "category": "Pháp luật"
+  },
+  {
+    "id": "tn-thoi-su-14",
+    "title": "Chính phủ đẩy nhanh tiến độ các công trình hạ tầng giao thông trọng điểm quốc gia",
+    "description": "Nhiều dự án cao tốc Bắc - Nam và vành đai đô thị được tháo gỡ vướng mắc mặt bằng, thi công vượt tiến độ đề ra.",
+    "content": "Thủ tướng Chính phủ vừa có công điện chỉ đạo các bộ ngành và địa phương tập trung cao độ, phối hợp nhịp nhàng để hoàn thành các gói thầu giao thông chiến lược theo đúng cam kết phục vụ phát triển kinh tế xã hội.",
+    "url": "https://thanhnien.vn/thoi-su/ha-tang-giao-thong-trong-diem-185261015.htm",
+    "imageUrl": "https://images.unsplash.com/photo-1545558014-8692077e9b5c?w=600&auto=format&fit=crop&q=80",
+    "publishedDate": "2026-10-15T17:00:00",
+    "source": "Thanh Niên",
+    "category": "Thời sự"
+  },
+  {
+    "id": "tn-cong-nghe-15",
+    "title": "Doanh nghiệp công nghệ Việt ra mắt nền tảng bảo mật điện toán đám mây thế hệ mới",
+    "description": "Giải pháp an toàn thông tin áp dụng mô hình Zero-Trust đạt tiêu chuẩn an ninh mạng quốc tế cao nhất.",
+    "content": "Nền tảng bảo mật mới cho phép doanh nghiệp giám sát lưu lượng dữ liệu thời gian thực và phát hiện tấn công mạng bằng trí tuệ nhân tạo chỉ trong vài mili-giây, góp phần củng cố chủ quyền số quốc gia.",
+    "url": "https://thanhnien.vn/cong-nghe/nen-tang-bao-mat-dam-may-185261016.htm",
+    "imageUrl": "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=600&auto=format&fit=crop&q=80",
+    "publishedDate": "2026-10-15T17:30:00",
+    "source": "Thanh Niên",
+    "category": "Công nghệ"
+  },
+  {
+    "id": "dt-thoi-su-16",
+    "title": "Đẩy mạnh chuyển đổi số toàn diện trong cung cấp dịch vụ công trực tuyến",
+    "description": "Các thủ tục hành chính liên quan mật thiết đến người dân và doanh nghiệp được tinh gọn, xử lý nhanh chóng qua cổng dịch vụ công quốc gia.",
+    "content": "Báo cáo sơ kết công tác cải cách hành chính ghi nhận tỷ lệ hài lòng của người dân đạt trên 92%. Việc tích hợp dữ liệu dân cư và thanh toán không dùng tiền mặt đã giảm đáng kể thời gian và chi phí xã hội.",
+    "url": "https://dantri.com.vn/xa-hoi/day-manh-chuyen-doi-so-dich-vu-cong-20261015180000.htm",
+    "imageUrl": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&auto=format&fit=crop&q=80",
+    "publishedDate": "2026-10-15T18:00:00",
+    "source": "Dân Trí",
+    "category": "Thời sự"
+  },
+  {
+    "id": "dt-giao-duc-17",
+    "title": "Học sinh Việt Nam giành giải cao tại Olympic Tin học quốc tế",
+    "description": "Đoàn học sinh Việt Nam xuất sắc đạt thành tích ấn tượng với nhiều huy chương vàng và bạc tại kỳ thi Olympic Tin học quốc tế năm nay.",
+    "content": "Kỳ thi năm nay quy tụ hơn 350 thí sinh xuất sắc đến từ 90 quốc gia và vùng lãnh thổ. Đội tuyển Việt Nam thể hiện tư duy thuật toán xuất sắc, giải quyết trọn vẹn các bài toán lập trình phức tạp.",
+    "url": "https://dantri.com.vn/giao-duc/hoc-sinh-viet-nam-gianh-huy-chuong-olympic-tin-hoc-20261015183000.htm",
+    "imageUrl": "https://images.unsplash.com/photo-1509062522246-3755977927d7?w=600&auto=format&fit=crop&q=80",
+    "publishedDate": "2026-10-15T18:30:00",
+    "source": "Dân Trí",
+    "category": "Giáo dục"
   }
 ]

@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css(v='10.0')}">
 </head>
 <body>
 
@@ -20,8 +20,11 @@
     <div class="page-heading">
         <div class="page-heading-left">
             <h1 class="page-title">Danh sách bài viết đã lưu</h1>
-            <p class="page-desc">
-                Dữ liệu được lưu trữ bền vững tại file <code>data/bookmarks.json</code>. Các bài viết được bọc bởi <strong>[Decorator] BookmarkedArticle</strong>.
+            <p class="page-desc" th:if="${currentUser != null}">
+                Tài khoản: <strong th:text="${currentUser.fullName} + ' (@' + ${currentUser.username} + ')'">Người dùng</strong> • Lưu trữ trong <strong>H2 In-Memory Database</strong>. Các bài viết được bọc bởi <strong>[Decorator] BookmarkedArticle</strong>.
+            </p>
+            <p class="page-desc" th:unless="${currentUser != null}">
+                Khách vãng lai: Lưu tạm tại <code>data/bookmarks.json</code>. Bạn có thể <a th:href="@{/login(returnUrl='/bookmarks')}" style="color:var(--primary); font-weight:700;">Đăng nhập</a> để lưu trữ vĩnh viễn theo tài khoản vào cơ sở dữ liệu H2.
             </p>
         </div>
         <div class="page-heading-right">

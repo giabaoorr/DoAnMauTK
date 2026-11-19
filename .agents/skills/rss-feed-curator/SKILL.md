@@ -33,6 +33,30 @@ Skill này hướng dẫn quy trình kiểm tra, bóc tách an toàn và mở r�
 - Du lịch: `https://tuoitre.vn/rss/du-lich.rss`
 - Pháp luật: `https://tuoitre.vn/rss/phap-luat.rss`
 
+### Nguồn Thanh Niên:
+- Thời sự: `https://thanhnien.vn/rss/thoi-su.rss`
+- Thế giới: `https://thanhnien.vn/rss/the-gioi.rss`
+- Kinh doanh: `https://thanhnien.vn/rss/kinh-te.rss`
+- Công nghệ: `https://thanhnien.vn/rss/cong-nghe.rss`
+- Thể thao: `https://thanhnien.vn/rss/the-thao.rss`
+- Giải trí: `https://thanhnien.vn/rss/giai-tri.rss`
+- Sức khỏe: `https://thanhnien.vn/rss/suc-khoe.rss`
+- Giáo dục: `https://thanhnien.vn/rss/giao-duc.rss`
+- Du lịch: `https://thanhnien.vn/rss/du-lich.rss`
+- Pháp luật: `https://thanhnien.vn/rss/thoi-su/phap-luat.rss`
+
+### Nguồn Dân Trí:
+- Thời sự: `https://dantri.com.vn/rss/su-kien.rss`
+- Thế giới: `https://dantri.com.vn/rss/the-gioi.rss`
+- Kinh doanh: `https://dantri.com.vn/rss/kinh-doanh.rss`
+- Công nghệ: `https://dantri.com.vn/rss/cong-nghe.rss`
+- Thể thao: `https://dantri.com.vn/rss/the-thao.rss`
+- Giải trí: `https://dantri.com.vn/rss/giai-tri.rss`
+- Sức khỏe: `https://dantri.com.vn/rss/suc-khoe.rss`
+- Giáo dục: `https://dantri.com.vn/rss/giao-duc.rss`
+- Du lịch: `https://dantri.com.vn/rss/du-lich.rss`
+- Pháp luật: `https://dantri.com.vn/rss/phap-luat.rss`
+
 ## 2. Kỹ Thuật Bóc Tách Hình Ảnh và Mô Tả
 
 RSS của các báo Việt Nam thường đặt ảnh đại diện trong:

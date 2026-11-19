@@ -6,16 +6,18 @@
 ## I. TỔNG QUAN DỰ ÁN
 
 ### 1. Giới thiệu
-Ứng dụng **News Reader** là hệ thống web đọc báo tin tức tổng hợp từ nhiều nguồn báo chí trực tuyến hàng đầu Việt Nam (VnExpress, Tuổi Trẻ) thông qua chuẩn RSS Feed, tích hợp chế độ đọc dữ liệu mẫu cục bộ (offline fallback). Hệ thống được xây dựng với mục tiêu chính là minh họa **đúng, rõ ràng và gắn liền với tính năng thực tế** của 6 mẫu thiết kế hướng đối tượng (GoF Design Patterns) bằng ngôn ngữ **Java thuần**, không dùng các cơ chế phụ thuộc vào Spring DI/Bean để thay thế mẫu.
+Ứng dụng **News Reader** là hệ thống web đọc báo tin tức tổng hợp từ 4 nguồn báo chí trực tuyến hàng đầu Việt Nam (**VnExpress, Tuổi Trẻ, Thanh Niên, Dân Trí**) thông qua chuẩn RSS Feed, tích hợp chế độ đọc dữ liệu mẫu cục bộ (offline fallback). Hệ thống được xây dựng với mục tiêu chính là minh họa **đúng, rõ ràng và gắn liền với tính năng thực tế** của 6 mẫu thiết kế hướng đối tượng (GoF Design Patterns) bằng ngôn ngữ **Java thuần**, không dùng các cơ chế phụ thuộc vào Spring DI/Bean để thay thế mẫu.
 
 ### 2. Ngăn xếp công nghệ (Technology Stack)
-- **Ngôn ngữ:** Java 17 (LTS).
+- **Ngôn ngữ:** Java 17 (LTS) / Java 21.
 - **Quản lý dự án & Build:** Apache Maven 3.9+.
 - **Framework Web:** Spring Boot 3.3.4 (Spring MVC, Thymeleaf render phía server).
 - **Thư viện RSS:** ROME 2.1.0 (phân tích RSS 2.0 XML).
 - **Thư viện JSON:** Jackson Databind & JSR310 (xử lý dữ liệu fallback và lưu bookmarks).
-- **Kiểm thử tự động:** JUnit 5 (Jupiter), AssertJ, MockMvc.
-- **Lưu trữ:** Lưu trữ trong bộ nhớ kết hợp tệp tin phẳng JSON (`data/bookmarks.json`), không dùng cơ sở dữ liệu nặng.
+- **Kiểm thử tự động:** JUnit 5 (Jupiter), AssertJ, MockMvc (38/38 bài test tự động đạt 100%).
+- **Lưu trữ & Bảo mật:** 
+  - Cơ sở dữ liệu **H2 In-Memory Database** quản lý người dùng đăng ký, đăng nhập (bảo mật mật khẩu SHA-256 + Salt) và đồng bộ dấu trang yêu thích theo tài khoản.
+  - Tệp tin phẳng JSON (`data/bookmarks.json`) lưu tạm thời dấu trang cho khách vãng lai.
 
 ### 3. Cấu trúc Package theo phân lớp chuẩn
 ```text
@@ -25,10 +27,12 @@ com.news
 ├── controller  : Tiếp nhận HTTP Request và render view Thymeleaf (Controller chỉ gọi Service)
 ├── decorator   : Bọc Article mở rộng tính năng động (Mẫu Decorator)
 ├── factory     : Tạo bộ phân tích tin tức theo loại nguồn (Mẫu Factory Method)
-├── model       : Mô hình dữ liệu thực thể (Article, FeedSource)
+├── model       : Mô hình dữ liệu thực thể (Article, FeedSource, User, UserBookmark)
 ├── observer    : Cơ chế thông báo sự kiện tin mới (Mẫu Observer)
-├── service     : Nơi tích hợp và điều phối hoạt động giữa các mẫu thiết kế
-└── strategy    : Thuật toán sắp xếp và lọc tin đổi được lúc runtime (Mẫu Strategy)
+├── repository  : Truy xuất dữ liệu H2 Database qua Spring Data JPA (UserRepository, UserBookmarkRepository)
+├── service     : Nơi tích hợp và điều phối hoạt động giữa các mẫu thiết kế và nghiệp vụ người dùng
+├── strategy    : Thuật toán sắp xếp và lọc tin đổi được lúc runtime (Mẫu Strategy)
+└── util        : Tiện ích mã hóa bảo mật mật khẩu SHA-256 + Salt (PasswordUtil)
 ```
 
 ---

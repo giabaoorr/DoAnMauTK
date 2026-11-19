@@ -3,6 +3,7 @@ package com.news.adapter;
 import com.news.model.Article;
 import com.rometools.rome.feed.synd.SyndEnclosure;
 import com.rometools.rome.feed.synd.SyndEntry;
+import org.springframework.web.util.HtmlUtils;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -108,6 +109,7 @@ public class RssEntryAdapter implements ArticleAdapter<SyndEntry> {
     private String cleanHtml(String html) {
         if (html == null) return "";
         String text = HTML_TAG_PATTERN.matcher(html).replaceAll("");
+        text = HtmlUtils.htmlUnescape(text);
         return text.replace("&nbsp;", " ")
                 .replace("&amp;", "&")
                 .replace("&quot;", "\"")

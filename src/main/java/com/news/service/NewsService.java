@@ -58,11 +58,21 @@ public class NewsService {
      * - SummarizedArticle: tạo đoạn trích dẫn súc tích và tính toán thời gian đọc
      */
     public Article applyDecorators(Article article) {
+        return applyDecorators(article, null);
+    }
+
+    /**
+     * [Decorator] Bọc Article bằng các Concrete Decorator tùy theo ngữ cảnh và người dùng đăng nhập:
+     * - BookmarkedArticle: nếu bài viết đã được lưu bởi người dùng (hoặc khách)
+     * - FeaturedArticle: nếu bài viết thuộc nhóm tin tiêu điểm / từ khóa nổi bật
+     * - SummarizedArticle: tạo đoạn trích dẫn súc tích và tính toán thời gian đọc
+     */
+    public Article applyDecorators(Article article, Long userId) {
         if (article == null) return null;
         Article decorated = article;
 
         // 1. [Decorator] Bọc BookmarkedArticle nếu người dùng đã lưu
-        if (bookmarkService != null && bookmarkService.isBookmarked(article.getId())) {
+        if (bookmarkService != null && bookmarkService.isBookmarked(article.getId(), userId)) {
             decorated = new com.news.decorator.BookmarkedArticle(decorated);
         }
 
@@ -125,6 +135,30 @@ public class NewsService {
         feedSources.add(new FeedSource("Tuổi Trẻ", "Giáo dục", "https://tuoitre.vn/rss/giao-duc.rss", SourceType.RSS));
         feedSources.add(new FeedSource("Tuổi Trẻ", "Du lịch", "https://tuoitre.vn/rss/du-lich.rss", SourceType.RSS));
         feedSources.add(new FeedSource("Tuổi Trẻ", "Pháp luật", "https://tuoitre.vn/rss/phap-luat.rss", SourceType.RSS));
+
+        // Nguồn Thanh Niên
+        feedSources.add(new FeedSource("Thanh Niên", "Thời sự", "https://thanhnien.vn/rss/thoi-su.rss", SourceType.RSS));
+        feedSources.add(new FeedSource("Thanh Niên", "Thế giới", "https://thanhnien.vn/rss/the-gioi.rss", SourceType.RSS));
+        feedSources.add(new FeedSource("Thanh Niên", "Kinh doanh", "https://thanhnien.vn/rss/kinh-te.rss", SourceType.RSS));
+        feedSources.add(new FeedSource("Thanh Niên", "Công nghệ", "https://thanhnien.vn/rss/cong-nghe.rss", SourceType.RSS));
+        feedSources.add(new FeedSource("Thanh Niên", "Thể thao", "https://thanhnien.vn/rss/the-thao.rss", SourceType.RSS));
+        feedSources.add(new FeedSource("Thanh Niên", "Giải trí", "https://thanhnien.vn/rss/giai-tri.rss", SourceType.RSS));
+        feedSources.add(new FeedSource("Thanh Niên", "Sức khỏe", "https://thanhnien.vn/rss/suc-khoe.rss", SourceType.RSS));
+        feedSources.add(new FeedSource("Thanh Niên", "Giáo dục", "https://thanhnien.vn/rss/giao-duc.rss", SourceType.RSS));
+        feedSources.add(new FeedSource("Thanh Niên", "Du lịch", "https://thanhnien.vn/rss/du-lich.rss", SourceType.RSS));
+        feedSources.add(new FeedSource("Thanh Niên", "Pháp luật", "https://thanhnien.vn/rss/thoi-su/phap-luat.rss", SourceType.RSS));
+
+        // Nguồn Dân Trí
+        feedSources.add(new FeedSource("Dân Trí", "Thời sự", "https://dantri.com.vn/rss/su-kien.rss", SourceType.RSS));
+        feedSources.add(new FeedSource("Dân Trí", "Thế giới", "https://dantri.com.vn/rss/the-gioi.rss", SourceType.RSS));
+        feedSources.add(new FeedSource("Dân Trí", "Kinh doanh", "https://dantri.com.vn/rss/kinh-doanh.rss", SourceType.RSS));
+        feedSources.add(new FeedSource("Dân Trí", "Công nghệ", "https://dantri.com.vn/rss/cong-nghe.rss", SourceType.RSS));
+        feedSources.add(new FeedSource("Dân Trí", "Thể thao", "https://dantri.com.vn/rss/the-thao.rss", SourceType.RSS));
+        feedSources.add(new FeedSource("Dân Trí", "Giải trí", "https://dantri.com.vn/rss/giai-tri.rss", SourceType.RSS));
+        feedSources.add(new FeedSource("Dân Trí", "Sức khỏe", "https://dantri.com.vn/rss/suc-khoe.rss", SourceType.RSS));
+        feedSources.add(new FeedSource("Dân Trí", "Giáo dục", "https://dantri.com.vn/rss/giao-duc.rss", SourceType.RSS));
+        feedSources.add(new FeedSource("Dân Trí", "Du lịch", "https://dantri.com.vn/rss/du-lich.rss", SourceType.RSS));
+        feedSources.add(new FeedSource("Dân Trí", "Pháp luật", "https://dantri.com.vn/rss/phap-luat.rss", SourceType.RSS));
     }
 
     @PostConstruct
@@ -273,18 +307,26 @@ public class NewsService {
      * đồng thời áp dụng Decorator pattern cho từng bài viết.
      */
     public List<Article> getProcessedArticles(String category, String source, String sort) {
-        return getProcessedArticles(category, source, sort, false);
+        return getProcessedArticles(category, source, sort, false, null);
+    }
+
+    public List<Article> getProcessedArticles(String category, String source, String sort, Long userId) {
+        return getProcessedArticles(category, source, sort, false, userId);
     }
 
     public List<Article> getProcessedArticles(String category, String source, String sort, Boolean onlyFeatured) {
+        return getProcessedArticles(category, source, sort, onlyFeatured, null);
+    }
+
+    public List<Article> getProcessedArticles(String category, String source, String sort, Boolean onlyFeatured, Long userId) {
         // [Strategy] Khởi tạo Context và nạp các chiến lược theo lựa chọn
         com.news.strategy.ArticleProcessorContext context =
                 com.news.strategy.ArticleProcessorContext.fromUserPreferences(category, source, sort);
         List<Article> processed = context.process(new ArrayList<>(this.articles));
 
-        // [Decorator] Áp dụng các decorator cho bài viết kết quả
+        // [Decorator] Áp dụng các decorator cho bài viết kết quả kèm thông tin bookmark của User
         List<Article> decorated = processed.stream()
-                .map(this::applyDecorators)
+                .map(a -> this.applyDecorators(a, userId))
                 .collect(Collectors.toList());
 
         if (Boolean.TRUE.equals(onlyFeatured)) {
@@ -307,6 +349,10 @@ public class NewsService {
      * @return Danh sách bài viết được bọc bởi FeaturedArticle Decorator
      */
     public List<Article> getFeaturedArticles(String category, String source, int limit) {
+        return getFeaturedArticles(category, source, limit, null);
+    }
+
+    public List<Article> getFeaturedArticles(String category, String source, int limit, Long userId) {
         if (limit <= 0) limit = 3;
 
         boolean hasCategory = (category != null && !category.trim().isEmpty());
@@ -327,28 +373,22 @@ public class NewsService {
         Set<String> pickedIds = new HashSet<>();
 
         if (!hasCategory) {
-            // Khi xem "Mới nhất" (Toàn trang):
-            // Ưu tiên chọn 3 bài tiêu điểm từ 3 chuyên mục KHÁC NHAU để khu vực tiêu điểm trang chủ
-            // phong phú đa diện (ví dụ: 1 Thời sự, 1 Thế giới/Kinh doanh, 1 Sức khỏe/Công nghệ/Thể thao),
-            // tạo sự khác biệt hoàn toàn với khi người dùng bấm vào xem riêng từng chuyên mục Thời sự.
             for (Article a : pool) {
                 if (a == null || a.getId() == null) continue;
                 if (featured.size() >= limit) break;
                 String cat = a.getCategory() != null ? a.getCategory().trim() : "Khác";
                 if (isHighlightArticle(a) && !pickedCategories.contains(cat) && !pickedIds.contains(a.getId())) {
-                    featured.add(applyDecorators(a));
+                    featured.add(applyDecorators(a, userId));
                     pickedCategories.add(cat);
                     pickedIds.add(a.getId());
                 }
             }
         } else {
-            // Khi xem một chuyên mục cụ thể (ví dụ: Thời sự, Kinh doanh, Công nghệ...):
-            // Chọn các bài viết tiêu điểm nổi bật nhất trong chính chuyên mục đó.
             for (Article a : pool) {
                 if (a == null || a.getId() == null) continue;
                 if (featured.size() >= limit) break;
                 if (isHighlightArticle(a) && !pickedIds.contains(a.getId())) {
-                    featured.add(applyDecorators(a));
+                    featured.add(applyDecorators(a, userId));
                     pickedIds.add(a.getId());
                 }
             }
@@ -360,7 +400,7 @@ public class NewsService {
                 if (a == null || a.getId() == null) continue;
                 if (featured.size() >= limit) break;
                 if (!pickedIds.contains(a.getId())) {
-                    Article baseDecorated = applyDecorators(a);
+                    Article baseDecorated = applyDecorators(a, userId);
                     Article manuallyFeatured = (baseDecorated instanceof com.news.decorator.FeaturedArticle)
                             ? baseDecorated
                             : new com.news.decorator.FeaturedArticle(baseDecorated);
@@ -407,11 +447,15 @@ public class NewsService {
     }
 
     public Optional<Article> getArticleById(String id) {
+        return getArticleById(id, null);
+    }
+
+    public Optional<Article> getArticleById(String id, Long userId) {
         if (id == null) return Optional.empty();
         return articles.stream()
                 .filter(a -> id.equals(a.getId()))
                 .findFirst()
-                .map(this::applyDecorators);
+                .map(a -> this.applyDecorators(a, userId));
     }
 
     private static final List<String> EDITORIAL_CATEGORY_ORDER = List.of(

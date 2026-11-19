@@ -22,8 +22,8 @@
             <span class="vne-date-text" id="liveDateText">Chủ nhật, 25/10/2026</span>
         </div>
 
-        <!-- Điều hướng tiện ích & Nút Observer Pattern -->
-        <nav class="header-actions">
+        <!-- Điều hướng tiện ích, Tài khoản & Nút Observer Pattern -->
+        <nav class="header-actions" th:with="user=${currentUser != null ? currentUser : (session != null ? session.currentUser : null)}">
             <a th:href="@{/}" class="nav-link" th:classappend="${activePage == 'home'} ? 'active' : ''">
                 <span>Trang chủ</span>
             </a>
@@ -33,6 +33,7 @@
                       class="nav-counter"
                       th:text="${bookmarkCount}">0</span>
             </a>
+
             <!-- Nút làm mới dữ liệu (Observer Pattern) -->
             <form th:action="@{/refresh}" method="post" style="display: inline;">
                 <button type="submit" class="btn-refresh" title="Làm mới tin tức từ các nguồn RSS">
@@ -44,6 +45,39 @@
                     <span class="refresh-text">Làm mới</span>
                 </button>
             </form>
+
+            <!-- Khu vực Người dùng (User Account): Nếu đã đăng nhập -->
+            <div class="user-auth-widget" th:if="${user != null}">
+                <div class="user-profile-badge" th:title="'Tài khoản: ' + ${user.username} + ' (' + ${user.email} + ')'">
+                    <span class="user-avatar" th:text="${#strings.substring(user.fullName, 0, 1).toUpperCase()}">U</span>
+                    <span class="user-name" th:text="${user.fullName}">Người dùng</span>
+                    <span th:if="${user.role == 'ADMIN'}" class="badge-role-admin">ADMIN</span>
+                </div>
+                <a th:href="@{/h2-console}" target="_blank" class="btn-h2-console" title="Mở bảng dữ liệu SQL H2">H2 DB</a>
+                <a th:href="@{/logout}" class="btn-logout" title="Đăng xuất khỏi hệ thống">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    <span>Thoát</span>
+                </a>
+            </div>
+
+            <!-- Nếu chưa đăng nhập: Nút Đăng nhập & Đăng ký -->
+            <div class="user-guest-actions" th:unless="${user != null}">
+                <a th:href="@{/login}" class="btn-login" th:classappend="${activePage == 'login'} ? 'active' : ''" title="Đăng nhập tài khoản">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                        <polyline points="10 17 15 12 10 7"></polyline>
+                        <line x1="15" y1="12" x2="3" y2="12"></line>
+                    </svg>
+                    <span>Đăng nhập</span>
+                </a>
+                <a th:href="@{/register}" class="btn-register" th:classappend="${activePage == 'register'} ? 'active' : ''" title="Đăng ký tài khoản mới">
+                    <span>Đăng ký</span>
+                </a>
+            </div>
         </nav>
     </div>
 </header>
