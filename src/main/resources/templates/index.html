@@ -36,7 +36,10 @@
 <section class="vne-toolbar-section">
     <div class="container vne-toolbar-container">
         <form th:action="@{/}" method="get" class="vne-filter-form" id="filterForm">
-            <!-- Tìm kiếm từ khóa thời gian thực (Live Search) -->
+            <!-- Giữ nguyên chuyên mục đang chọn khi tìm kiếm -->
+            <input type="hidden" name="category" th:value="${selectedCategory}" th:if="${selectedCategory != null and !selectedCategory.empty}">
+
+            <!-- Tìm kiếm từ khóa thời gian thực (Live Search & Strategy Search) -->
             <div class="vne-search-wrap">
                 <span class="vne-search-icon">
                     <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -44,10 +47,13 @@
                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                     </svg>
                 </span>
-                <input type="text" id="liveSearchInput" class="vne-search-input"
+                <input type="text" id="liveSearchInput" name="keyword" class="vne-search-input"
+                       th:value="${keyword}"
                        placeholder="Tìm kiếm bài viết, từ khóa..."
-                       aria-label="Tìm kiếm bài viết">
-                <button type="button" id="clearSearchBtn" class="vne-search-clear" title="Xóa tìm kiếm">✕</button>
+                       aria-label="Tìm kiếm bài viết"
+                       autocomplete="off">
+                <button type="button" id="clearSearchBtn" class="vne-search-clear" title="Xóa tìm kiếm"
+                        th:style="${keyword != null and !keyword.empty} ? 'display:block;' : ''">✕</button>
             </div>
 
             <!-- Lọc theo Nguồn báo -->
@@ -82,6 +88,18 @@
 
 <!-- Nội Dung Báo Chí Chính (Editorial Content) -->
 <main class="container vne-main-container">
+
+    <!-- Thông báo kết quả thao tác (Lưu bài viết, Đăng nhập,...) -->
+    <div th:if="${message != null}" class="alert-banner alert-success">
+        <div class="alert-content">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px; vertical-align:text-bottom;">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            <span th:text="${message}">Thao tác thành công!</span>
+        </div>
+        <button type="button" class="alert-close" onclick="this.parentElement.remove()">✕</button>
+    </div>
 
     <!-- Thông báo làm mới từ Observer Pattern -->
     <div th:if="${refreshMessage != null}" class="alert-banner alert-success">
@@ -274,11 +292,14 @@
         <section class="vne-left-column">
             <div class="vne-column-heading">
                 <h3 class="vne-stream-title">
-                    <span th:if="${selectedCategory == null or selectedCategory.empty}">Dòng sự kiện mới nhất</span>
-                    <span th:if="${selectedCategory != null and !selectedCategory.empty}"
-                          th:text="${selectedCategory} + (${selectedSource != null and !selectedSource.empty} ? ' (' + ${selectedSource} + ')' : '')">Thời sự</span>
+                    <span th:if="${keyword != null and !keyword.empty}">Kết quả tìm kiếm: "<span th:text="${keyword}"></span>"</span>
+                    <span th:unless="${keyword != null and !keyword.empty}">
+                        <span th:if="${selectedCategory == null or selectedCategory.empty}">Dòng sự kiện mới nhất</span>
+                        <span th:if="${selectedCategory != null and !selectedCategory.empty}"
+                              th:text="${selectedCategory} + (${selectedSource != null and !selectedSource.empty} ? ' (' + ${selectedSource} + ')' : '')">Thời sự</span>
+                    </span>
                 </h3>
-                <span class="vne-stream-count" th:text="'(' + ${filteredCount} + ' bài viết)'">(45 bài viết)</span>
+                <span class="vne-stream-count" id="searchResultCount" th:text="'(' + ${filteredCount} + ' bài viết)'">(45 bài viết)</span>
             </div>
 
             <!-- Danh sách bài viết dạng luồng báo chí (VnExpress Continuous Stream) -->

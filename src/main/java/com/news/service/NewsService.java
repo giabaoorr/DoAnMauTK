@@ -307,21 +307,29 @@ public class NewsService {
      * đồng thời áp dụng Decorator pattern cho từng bài viết.
      */
     public List<Article> getProcessedArticles(String category, String source, String sort) {
-        return getProcessedArticles(category, source, sort, false, null);
+        return getProcessedArticles(category, source, null, sort, false, null);
     }
 
     public List<Article> getProcessedArticles(String category, String source, String sort, Long userId) {
-        return getProcessedArticles(category, source, sort, false, userId);
+        return getProcessedArticles(category, source, null, sort, false, userId);
+    }
+
+    public List<Article> getProcessedArticles(String category, String source, String keyword, String sort, Long userId) {
+        return getProcessedArticles(category, source, keyword, sort, false, userId);
     }
 
     public List<Article> getProcessedArticles(String category, String source, String sort, Boolean onlyFeatured) {
-        return getProcessedArticles(category, source, sort, onlyFeatured, null);
+        return getProcessedArticles(category, source, null, sort, onlyFeatured, null);
     }
 
     public List<Article> getProcessedArticles(String category, String source, String sort, Boolean onlyFeatured, Long userId) {
-        // [Strategy] Khởi tạo Context và nạp các chiến lược theo lựa chọn
+        return getProcessedArticles(category, source, null, sort, onlyFeatured, userId);
+    }
+
+    public List<Article> getProcessedArticles(String category, String source, String keyword, String sort, Boolean onlyFeatured, Long userId) {
+        // [Strategy] Khởi tạo Context và nạp các chiến lược theo lựa chọn (bao gồm KeywordFilterStrategy nếu có)
         com.news.strategy.ArticleProcessorContext context =
-                com.news.strategy.ArticleProcessorContext.fromUserPreferences(category, source, sort);
+                com.news.strategy.ArticleProcessorContext.fromUserPreferences(category, source, keyword, sort);
         List<Article> processed = context.process(new ArrayList<>(this.articles));
 
         // [Decorator] Áp dụng các decorator cho bài viết kết quả kèm thông tin bookmark của User
@@ -339,8 +347,7 @@ public class NewsService {
     }
 
     /**
-    /**
-     * [Decorator: FeaturedArticle] Lấy danh sách các bài viết tiêu điểm nổi bật theo Chuyên mục và Nguồn báo.
+     * [Decorator: FeaturedArticle] Lấy danh sách các bài viết tiêu điểm nổi bật theo Chuyên mục, Nguồn báo và Từ khóa.
      * Áp dụng tính năng Tin Tiêu Điểm & Nổi Bật đồng bộ với bộ lọc Strategy của người dùng.
      *
      * @param category Tên chuyên mục (hoặc null/rỗng nếu xem tất cả)
@@ -349,19 +356,26 @@ public class NewsService {
      * @return Danh sách bài viết được bọc bởi FeaturedArticle Decorator
      */
     public List<Article> getFeaturedArticles(String category, String source, int limit) {
-        return getFeaturedArticles(category, source, limit, null);
+        return getFeaturedArticles(category, source, null, limit, null);
     }
 
     public List<Article> getFeaturedArticles(String category, String source, int limit, Long userId) {
+        return getFeaturedArticles(category, source, null, limit, userId);
+    }
+
+    public List<Article> getFeaturedArticles(String category, String source, String keyword, int limit, Long userId) {
         if (limit <= 0) limit = 3;
 
         boolean hasCategory = (category != null && !category.trim().isEmpty());
         boolean hasSource = (source != null && !source.trim().isEmpty());
+        boolean hasKeyword = (keyword != null && !keyword.trim().isEmpty());
+        com.news.strategy.KeywordFilterStrategy keywordFilter = hasKeyword ? new com.news.strategy.KeywordFilterStrategy(keyword) : null;
 
         List<Article> pool = articles.stream()
                 .filter(a -> a != null
                         && (!hasCategory || (category != null && category.equalsIgnoreCase(a.getCategory())))
-                        && (!hasSource || (source != null && source.equalsIgnoreCase(a.getSource()))))
+                        && (!hasSource || (source != null && source.equalsIgnoreCase(a.getSource())))
+                        && (!hasKeyword || keywordFilter.matches(a)))
                 .sorted(Comparator.comparing(
                         a -> a != null ? a.getPublishedDate() : null,
                         Comparator.nullsLast(Comparator.reverseOrder())

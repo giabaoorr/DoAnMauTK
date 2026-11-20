@@ -34,3 +34,9 @@ build/
 ### Bookmarks runtime storage ###
 data/
 bookmarks.json
+
+### Build & Temporary Outputs ###
+out/
+__pycache__/
+*.pyc
+

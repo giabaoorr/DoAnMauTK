@@ -70,21 +70,42 @@ public class ArticleProcessorContext {
      * @return Đối tượng ArticleProcessorContext với các chiến lược đã được lắp ghép
      */
     public static ArticleProcessorContext fromUserPreferences(String category, String source, String sortCode) {
-        // [Strategy] Lựa chọn chiến lược lọc động
+        return fromUserPreferences(category, source, null, sortCode);
+    }
+
+    /**
+     * [Strategy] Xây dựng Context động bao gồm cả tiêu chí lọc theo từ khóa tìm kiếm (KeywordFilterStrategy).
+     *
+     * @param category Tên chuyên mục cần lọc
+     * @param source Tên nguồn báo cần lọc
+     * @param keyword Từ khóa tìm kiếm bài viết
+     * @param sortCode Mã sắp xếp bài viết
+     * @return Đối tượng ArticleProcessorContext được cấu hình hoàn chỉnh
+     */
+    public static ArticleProcessorContext fromUserPreferences(String category, String source, String keyword, String sortCode) {
+        // [Strategy] Lựa chọn chiến lược lọc động kết hợp (CompositeFilterStrategy)
         String trimmedCategory = (category != null && !category.trim().isEmpty()) ? category.trim() : null;
         String trimmedSource = (source != null && !source.trim().isEmpty()) ? source.trim() : null;
+        String trimmedKeyword = (keyword != null && !keyword.trim().isEmpty()) ? keyword.trim() : null;
+
+        CompositeFilterStrategy composite = new CompositeFilterStrategy();
+        if (trimmedCategory != null) {
+            composite.addStrategy(new CategoryFilterStrategy(trimmedCategory));
+        }
+        if (trimmedSource != null) {
+            composite.addStrategy(new SourceFilterStrategy(trimmedSource));
+        }
+        if (trimmedKeyword != null) {
+            composite.addStrategy(new KeywordFilterStrategy(trimmedKeyword));
+        }
 
         FilterStrategy filter;
-        if (trimmedCategory != null && trimmedSource != null) {
-            filter = new CompositeFilterStrategy()
-                    .addStrategy(new CategoryFilterStrategy(trimmedCategory))
-                    .addStrategy(new SourceFilterStrategy(trimmedSource));
-        } else if (trimmedCategory != null) {
-            filter = new CategoryFilterStrategy(trimmedCategory);
-        } else if (trimmedSource != null) {
-            filter = new SourceFilterStrategy(trimmedSource);
-        } else {
+        if (composite.getStrategies().isEmpty()) {
             filter = new AllPassFilterStrategy();
+        } else if (composite.getStrategies().size() == 1) {
+            filter = composite.getStrategies().get(0);
+        } else {
+            filter = composite;
         }
 
         // [Strategy] Lựa chọn chiến lược sắp xếp động

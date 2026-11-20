@@ -35,6 +35,88 @@ com.news
 └── util        : Tiện ích mã hóa bảo mật mật khẩu SHA-256 + Salt (PasswordUtil)
 ```
 
+### 4. Sơ đồ Use Case tổng quát (Use Case Diagram)
+
+#### a. Sơ đồ Use Case chuẩn UML
+```mermaid
+flowchart LR
+    subgraph ACTORS["Tác nhân (Actors)"]
+        direction TB
+        Guest(["Khách vãng lai<br/>(Guest / Anonymous)"])
+        Member(["Độc giả thành viên<br/>(Registered Member)"])
+        RSS["4 Tòa Báo RSS<br/>(VnExpress, Tuổi Trẻ, Thanh Niên, Dân Trí)"]
+    end
+
+    Member -.->|Kế thừa quyền| Guest
+
+    subgraph SYSTEM["RANH GIỚI HỆ THỐNG: ỨNG DỤNG ĐỌC BÁO NEWS READER"]
+        direction TB
+        
+        subgraph SUB1["1. Phân hệ Duyệt & Đọc Tin Tức"]
+            UC01(["UC01: Xem dòng tin trang chủ (News Feed)"])
+            UC02(["UC02: Lọc tin tức đa chiều theo Nguồn & Chuyên mục"])
+            UC03(["UC03: Sắp xếp tin tức đa tiêu chí (Mới/Cũ/A-Z)"])
+            UC04(["UC04: Tìm kiếm tức thì & Tô sáng từ khóa"])
+            UC05(["UC05: Xem chi tiết toàn văn bài báo & Tùy biến cỡ chữ"])
+        end
+
+        subgraph SUB2["2. Phân hệ Đánh Dấu & Lưu Trữ"]
+            UC06(["UC06: Đánh dấu bài viết yêu thích (Bookmark)"])
+            UC07(["UC07: Quản lý & Xem danh sách tin đã lưu"])
+        end
+
+        subgraph SUB3["3. Phân hệ Quản Lý Tài Khoản"]
+            UC08(["UC08: Đăng ký tài khoản (Mã hóa SHA-256 + Salt)"])
+            UC09(["UC09: Đăng nhập hệ thống (Quản lý HttpSession)"])
+            UC10(["UC10: Đăng xuất phiên làm việc"])
+        end
+
+        subgraph SUB4["4. Phân hệ Thu Thập & Đồng Bộ RSS"]
+            UC11(["UC11: Thu thập & Làm mới tin tức (Observer Pattern)"])
+        end
+    end
+
+    Guest --- UC01
+    Guest --- UC02
+    Guest --- UC03
+    Guest --- UC04
+    Guest --- UC05
+    Guest ---|Lưu JSON tạm thời| UC06
+    Guest --- UC07
+    Guest --- UC08
+    Guest --- UC09
+    Guest ---|Nút Làm mới| UC11
+
+    Member ---|Lưu CSDL H2 vĩnh viễn| UC06
+    Member --- UC07
+    Member --- UC10
+
+    RSS ==>|Cung cấp 40 luồng XML| UC11
+    UC05 -.->|&lt;&lt;extend&gt;&gt;| UC06
+```
+
+#### b. Bảng đặc tả Tác nhân (Actors)
+| Tác nhân | Vai trò | Quyền hạn trong hệ thống |
+| :--- | :--- | :--- |
+| **Khách vãng lai (Guest)** | Độc giả truy cập tự do chưa đăng nhập | Đọc tin tức, lọc, tìm kiếm, xem chi tiết, đăng ký, đăng nhập và lưu tạm thời bài viết vào tệp `bookmarks.json`. |
+| **Độc giả thành viên (Member)** | Độc giả đã có tài khoản và đăng nhập | **Kế thừa toàn bộ quyền của Khách vãng lai**, đồng thời được lưu trữ dấu trang bài viết vĩnh viễn trong CSDL H2 và đăng xuất phiên. |
+| **Hệ thống RSS (External Feeds)** | Tác nhân hệ thống ngoài (VnExpress, Tuổi Trẻ, Thanh Niên, Dân Trí) | Cung cấp các kênh cấp tin tức XML định dạng chuẩn RSS 2.0 cho hệ thống định kỳ đồng bộ và phân tích cú pháp. |
+
+#### c. Bảng danh mục 11 Use Case chính
+| Mã UC | Tên Use Case | Phân hệ | Mẫu thiết kế liên quan |
+| :---: | :--- | :--- | :--- |
+| **UC01** | Xem dòng tin trang chủ | Duyệt & Đọc tin | **Decorator**: Bọc `FeaturedArticle`, `ReadingTimeArticle` |
+| **UC02** | Lọc tin tức theo Nguồn & Chuyên mục | Duyệt & Đọc tin | **Strategy**: `SourceFilterStrategy`, `CategoryFilterStrategy`, `CompositeFilterStrategy` |
+| **UC03** | Sắp xếp tin tức đa tiêu chí | Duyệt & Đọc tin | **Strategy**: `NewestSortStrategy`, `OldestSortStrategy`, `TitleSortStrategy` |
+| **UC04** | Tìm kiếm tức thì & Highlight từ khóa | Duyệt & Đọc tin | Lọc Client-side tức thì kết hợp Regular Expression Highlight |
+| **UC05** | Xem chi tiết bài báo toàn văn | Duyệt & Đọc tin | Đọc bài viết gốc, tùy chỉnh cỡ chữ (A-/A+), thanh tiến trình đọc |
+| **UC06** | Đánh dấu bài viết yêu thích (Bookmark) | Đánh dấu & Lưu trữ | **Decorator**: `BookmarkedArticle` • Khách: JSON / Thành viên: H2 DB |
+| **UC07** | Quản lý danh sách tin đã lưu | Đánh dấu & Lưu trữ | Xem danh sách lưu trữ, xóa từng tin hoặc xóa tất cả |
+| **UC08** | Đăng ký tài khoản | Quản lý Tài khoản | Kiểm tra trùng lặp, mã hóa bảo mật SHA-256 + Salt |
+| **UC09** | Đăng nhập hệ thống | Quản lý Tài khoản | Xác thực thông tin, cấp phát `HttpSession` |
+| **UC10** | Đăng xuất phiên làm việc | Quản lý Tài khoản | Hủy `HttpSession`, chuyển quyền về Khách vãng lai |
+| **UC11** | Thu thập & Làm mới tin tức | Đồng bộ RSS | **Factory Method** (Tạo Parser) • **Adapter** (Chuyển SyndEntry) • **Singleton** (CacheManager) • **Observer** (NewsLogger, UnreadCounter) |
+
 ---
 
 ## II. CHI TIẾT 6 MẪU THIẾT KẾ ÁP DỤNG TRONG ĐỒ ÁN

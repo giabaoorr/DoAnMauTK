@@ -153,4 +153,32 @@ class StrategyPatternTest {
         assertThat(res4).hasSize(1);
         assertThat(res4.get(0).getId()).isEqualTo("3");
     }
+
+    @Test
+    @DisplayName("[Strategy] KeywordFilterStrategy lọc chính xác theo từ khóa có dấu và không dấu")
+    void testKeywordFilterStrategy() {
+        // 1. Tìm có dấu: "bóng đá"
+        FilterStrategy s1 = new KeywordFilterStrategy("bóng đá");
+        List<Article> res1 = s1.filter(testArticles);
+        assertThat(res1).hasSize(1);
+        assertThat(res1.get(0).getId()).isEqualTo("1");
+
+        // 2. Tìm không dấu: "bong da" vẫn khớp "Bóng đá Việt Nam thăng tiến"
+        FilterStrategy s2 = new KeywordFilterStrategy("bong da");
+        List<Article> res2 = s2.filter(testArticles);
+        assertThat(res2).hasSize(1);
+        assertThat(res2.get(0).getId()).isEqualTo("1");
+
+        // 3. Tìm không dấu: "bien dong" khớp "Áp thấp nhiệt đới trên biển Đông"
+        FilterStrategy s3 = new KeywordFilterStrategy("bien dong");
+        List<Article> res3 = s3.filter(testArticles);
+        assertThat(res3).hasSize(1);
+        assertThat(res3.get(0).getId()).isEqualTo("3");
+
+        // 4. Tìm kiếm kết hợp qua ArticleProcessorContext: Category + Source + Keyword
+        ArticleProcessorContext comboContext = ArticleProcessorContext.fromUserPreferences("Thể thao", "Tuổi Trẻ", "Việt Nam", "newest");
+        List<Article> comboRes = comboContext.process(testArticles);
+        assertThat(comboRes).hasSize(1);
+        assertThat(comboRes.get(0).getId()).isEqualTo("1");
+    }
 }

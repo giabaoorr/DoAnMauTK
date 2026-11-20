@@ -11,9 +11,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -42,6 +45,7 @@ public class NewsController {
     public String index(
             @RequestParam(name = "category", required = false) String category,
             @RequestParam(name = "source", required = false) String source,
+            @RequestParam(name = "keyword", required = false) String keyword,
             @RequestParam(name = "sort", required = false, defaultValue = "newest") String sort,
             HttpSession session,
             Model model) {
@@ -49,11 +53,11 @@ public class NewsController {
         User currentUser = (User) session.getAttribute("currentUser");
         Long currentUserId = (currentUser != null) ? currentUser.getId() : null;
 
-        // [Strategy] Lấy danh sách bài viết đã qua lọc và sắp xếp kèm trạng thái bookmark của User
-        List<Article> processedArticles = newsService.getProcessedArticles(category, source, sort, currentUserId);
+        // [Strategy] Lấy danh sách bài viết đã qua lọc và sắp xếp (kết hợp Chuyên mục, Nguồn báo, Từ khóa tìm kiếm)
+        List<Article> processedArticles = newsService.getProcessedArticles(category, source, keyword, sort, currentUserId);
 
-        // [Decorator: FeaturedArticle] Lấy 3 bài tiêu điểm nổi bật phù hợp cho cả chủ đề VÀ nguồn báo đang lọc
-        List<Article> featuredArticles = newsService.getFeaturedArticles(category, source, 3, currentUserId);
+        // [Decorator: FeaturedArticle] Lấy 3 bài tiêu điểm nổi bật phù hợp cho cả chủ đề, nguồn báo và từ khóa
+        List<Article> featuredArticles = newsService.getFeaturedArticles(category, source, keyword, 3, currentUserId);
         Set<String> featuredIds = featuredArticles.stream()
                 .filter(Objects::nonNull)
                 .map(Article::getId)
@@ -73,6 +77,7 @@ public class NewsController {
         model.addAttribute("filteredCount", processedArticles.size());
         model.addAttribute("selectedCategory", category != null ? category : "");
         model.addAttribute("selectedSource", source != null ? source : "");
+        model.addAttribute("keyword", keyword != null ? keyword : "");
         model.addAttribute("selectedSort", sort != null ? sort : "newest");
         model.addAttribute("categoryBlocks", newsService.getCategoryBlocks(4));
         model.addAttribute("fallbackMode", newsService.isFallbackMode());
@@ -166,6 +171,47 @@ public class NewsController {
         }
 
         return "redirect:" + (returnUrl.startsWith("/") ? returnUrl : "/");
+    }
+
+    /**
+     * [AJAX API] Đánh dấu / Bỏ đánh dấu bài viết không cần tải lại toàn bộ trang web.
+     * Trả về JSON để hiển thị Toast popup và cập nhật trạng thái nút bấm, số lượng tức thì.
+     */
+    @PostMapping("/api/bookmarks/toggle")
+    @ResponseBody
+    public Map<String, Object> toggleBookmarkAjax(
+            @RequestParam("articleId") String articleId,
+            HttpSession session) {
+
+        User currentUser = (User) session.getAttribute("currentUser");
+        Long currentUserId = (currentUser != null) ? currentUser.getId() : null;
+
+        Optional<Article> articleOpt = newsService.getArticleById(articleId, currentUserId);
+        if (articleOpt.isEmpty()) {
+            articleOpt = bookmarkService.getBookmarkedArticles(currentUserId).stream()
+                    .filter(a -> articleId.equals(a.getId()))
+                    .findFirst();
+        }
+
+        Map<String, Object> response = new HashMap<>();
+        if (articleOpt.isPresent()) {
+            boolean isBookmarked = bookmarkService.toggleBookmark(articleOpt.get(), currentUserId);
+            int count = bookmarkService.getBookmarkCount(currentUserId);
+            String targetInfo = (currentUser != null) ? " (tài khoản @" + currentUser.getUsername() + ")" : "";
+            String message = isBookmarked
+                    ? "Đã lưu bài viết vào danh sách đánh dấu" + targetInfo + "!"
+                    : "Đã gỡ bài viết khỏi danh sách đánh dấu!";
+
+            response.put("success", true);
+            response.put("bookmarked", isBookmarked);
+            response.put("count", count);
+            response.put("message", message);
+            return response;
+        }
+
+        response.put("success", false);
+        response.put("message", "Không tìm thấy bài viết!");
+        return response;
     }
 
     /**

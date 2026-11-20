@@ -50,83 +50,182 @@
             }
         })();
 
-        // 2. Tìm kiếm nhanh thời gian thực với Highlight từ khóa (Live Search & Keyword Highlight)
+        // 2. Tìm kiếm thông minh thời gian thực với Highlight từ khóa (Live Search & Keyword Highlight)
         (function() {
             const searchInput = document.getElementById('liveSearchInput');
             const clearBtn = document.getElementById('clearSearchBtn');
+            const filterForm = document.getElementById('filterForm');
             if (!searchInput) return;
 
             function escapeRegExp(string) {
                 return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             }
 
-            searchInput.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                }
-            });
+            // Tiện ích loại bỏ dấu tiếng Việt để tìm kiếm không dấu ("dan tri" -> "dân trí")
+            function removeVietnameseTones(str) {
+                if (!str) return '';
+                return str.normalize('NFD')
+                    .replace(/[\u0300-\u036f]/g, '')
+                    .replace(/đ/g, 'd').replace(/Đ/g, 'D')
+                    .toLowerCase();
+            }
 
-            searchInput.addEventListener('input', function() {
-                const query = this.value.trim();
-                const lowerQuery = query.toLowerCase();
+            function getArticleElements(card) {
+                const titleLink = card.querySelector('.vne-hero-headline a, .vne-sub-headline a, .vne-stream-headline a, .card-title a, .vne-block-title a, .vne-bullet-link');
+                const descElem = card.querySelector('.vne-hero-sapo, .vne-sub-sapo, .vne-stream-desc, .card-desc, .vne-block-desc');
+                return { titleLink, descElem };
+            }
+
+            function performSearch(query) {
+                const trimmed = query.trim();
+                const lowerQuery = trimmed.toLowerCase();
+                const normQuery = removeVietnameseTones(trimmed);
+
                 if (clearBtn) {
-                    clearBtn.style.display = query ? 'block' : 'none';
+                    clearBtn.style.display = trimmed ? 'block' : 'none';
                 }
 
-                const cards = document.querySelectorAll('.article-card, .featured-hero-card, .featured-sub-card');
+                // Tất cả các thẻ bài viết trên trang (Tiêu điểm, Luồng tin chính, Khối chuyên mục)
+                const streamCards = document.querySelectorAll('.vne-stream-card, .article-card');
+                const spotlightCards = document.querySelectorAll('.vne-col-hero, .vne-col-sub');
+                const blockCards = document.querySelectorAll('.vne-block-featured, .vne-bullet-item');
+                const spotlightSection = document.querySelector('.vne-top-spotlight');
+
                 let matchCount = 0;
+                let spotlightMatchCount = 0;
 
-                cards.forEach(card => {
-                    const titleLink = card.querySelector('.card-title a, .featured-hero-title a, .sub-card-title a');
-                    const descElem = card.querySelector('.card-desc, .featured-hero-desc, .sub-card-desc');
+                function processCard(card, isSpotlight) {
+                    const { titleLink, descElem } = getArticleElements(card);
+                    if (!titleLink) return;
 
-                    if (titleLink && !titleLink.dataset.originalTitle) {
+                    if (!titleLink.dataset.originalTitle) {
                         titleLink.dataset.originalTitle = titleLink.textContent;
                     }
+                    const rawTitle = titleLink.dataset.originalTitle || titleLink.textContent;
+                    const rawDesc = descElem ? descElem.textContent : '';
 
-                    const rawTitle = titleLink ? (titleLink.dataset.originalTitle || titleLink.textContent) : '';
                     const titleLower = rawTitle.toLowerCase();
-                    const descText = descElem ? descElem.textContent.toLowerCase() : '';
+                    const descLower = rawDesc.toLowerCase();
+                    const titleNorm = removeVietnameseTones(rawTitle);
+                    const descNorm = removeVietnameseTones(rawDesc);
 
-                    if (!query || titleLower.includes(lowerQuery) || descText.includes(lowerQuery)) {
+                    const isMatch = !trimmed
+                        || titleLower.includes(lowerQuery)
+                        || descLower.includes(lowerQuery)
+                        || (normQuery && (titleNorm.includes(normQuery) || descNorm.includes(normQuery)));
+
+                    if (isMatch) {
                         card.style.display = '';
                         matchCount++;
+                        if (isSpotlight) spotlightMatchCount++;
 
-                        // Highlight từ khóa khớp trong tiêu đề bài viết
-                        if (titleLink) {
-                            if (query && titleLower.includes(lowerQuery)) {
-                                const regex = new RegExp('(' + escapeRegExp(query) + ')', 'gi');
+                        // Tô sáng (Highlight) từ khóa khớp trong tiêu đề bài viết
+                        if (trimmed) {
+                            try {
+                                const regex = new RegExp('(' + escapeRegExp(trimmed) + ')', 'gi');
                                 titleLink.innerHTML = rawTitle.replace(regex, '<mark class="search-highlight">$1</mark>');
-                            } else {
+                            } catch (err) {
                                 titleLink.textContent = rawTitle;
                             }
+                        } else {
+                            titleLink.textContent = rawTitle;
                         }
                     } else {
                         card.style.display = 'none';
-                        if (titleLink) {
-                            titleLink.textContent = rawTitle;
-                        }
+                        titleLink.textContent = rawTitle;
                     }
-                });
+                }
 
-                // Cập nhật thông báo số lượng tìm thấy
+                // 1. Lọc luồng bài viết chính
+                streamCards.forEach(card => processCard(card, false));
+
+                // 2. Lọc 3 bài viết tiêu điểm hàng đầu
+                spotlightCards.forEach(card => processCard(card, true));
+                if (spotlightSection) {
+                    if (trimmed && spotlightMatchCount === 0) {
+                        spotlightSection.style.display = 'none';
+                    } else {
+                        spotlightSection.style.display = '';
+                    }
+                }
+
+                // 3. Lọc các bài viết trong khối chuyên mục (nếu có)
+                blockCards.forEach(card => processCard(card, false));
+
+                // 4. Cập nhật thông báo số lượng bài viết tìm thấy
                 const searchCounter = document.getElementById('searchResultCount');
                 if (searchCounter) {
-                    if (query) {
-                        searchCounter.style.display = 'inline-block';
-                        searchCounter.textContent = 'Tìm thấy ' + matchCount + ' bài viết';
+                    if (trimmed) {
+                        searchCounter.textContent = '(' + matchCount + ' bài viết khớp)';
+                        searchCounter.style.color = '#9f224e';
+                        searchCounter.style.fontWeight = 'bold';
                     } else {
-                        searchCounter.style.display = 'none';
+                        searchCounter.style.color = '';
+                        searchCounter.style.fontWeight = '';
+                    }
+                }
+
+                // 5. Hiển thị hộp thông báo trống nếu không tìm thấy bài nào
+                let emptyNotice = document.getElementById('liveSearchEmptyNotice');
+                const streamList = document.querySelector('.vne-stream-list');
+                if (trimmed && matchCount === 0) {
+                    if (!emptyNotice && streamList && streamList.parentNode) {
+                        emptyNotice = document.createElement('div');
+                        emptyNotice.id = 'liveSearchEmptyNotice';
+                        emptyNotice.className = 'vne-empty-box';
+                        emptyNotice.innerHTML = `
+                            <h4 style="color:#9f224e;">Không tìm thấy bài viết nào</h4>
+                            <p>Không có bài viết nào khớp với từ khóa "<strong>${trimmed}</strong>". Vui lòng thử từ khóa khác hoặc xóa tìm kiếm.</p>
+                            <button type="button" id="btnResetLiveSearch" class="btn-vne-apply" style="cursor:pointer; margin-top:8px;">Xóa tìm kiếm</button>
+                        `;
+                        streamList.parentNode.insertBefore(emptyNotice, streamList.nextSibling);
+                        const resetBtn = document.getElementById('btnResetLiveSearch');
+                        if (resetBtn) {
+                            resetBtn.addEventListener('click', function() {
+                                if (clearBtn) clearBtn.click();
+                            });
+                        }
+                    }
+                    if (emptyNotice) emptyNotice.style.display = 'block';
+                } else if (emptyNotice) {
+                    emptyNotice.style.display = 'none';
+                }
+            }
+
+            // Lắng nghe sự kiện gõ phím thời gian thực (Live Search)
+            searchInput.addEventListener('input', function() {
+                performSearch(this.value);
+            });
+
+            // Khi người dùng bấm Enter: cho phép submit form để Strategy Pattern phía Server xử lý
+            searchInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    if (filterForm) {
+                        filterForm.submit();
                     }
                 }
             });
 
+            // Nút Xóa từ khóa (Clear Search)
             if (clearBtn) {
                 clearBtn.addEventListener('click', function() {
                     searchInput.value = '';
-                    searchInput.dispatchEvent(new Event('input'));
-                    searchInput.focus();
+                    // Nếu đang có tham số ?keyword= trên URL thì chuyển về trang không có keyword
+                    const urlParams = new URLSearchParams(window.location.search);
+                    if (urlParams.has('keyword')) {
+                        urlParams.delete('keyword');
+                        const newQuery = urlParams.toString();
+                        window.location.href = window.location.pathname + (newQuery ? '?' + newQuery : '');
+                    } else {
+                        performSearch('');
+                        searchInput.focus();
+                    }
                 });
+            }
+
+            // Khi trang vừa tải: nếu đã có từ khóa (từ URL/Server), thực hiện highlight ngay
+            if (searchInput.value && searchInput.value.trim() !== '') {
+                performSearch(searchInput.value);
             }
         })();
 
@@ -162,8 +261,98 @@
             clearTimeout(window._toastTimer);
             window._toastTimer = setTimeout(() => {
                 toast.classList.remove('show');
-            }, 3000);
+            }, 3500);
         }
+
+        // 5. Tự động hiển thị Toast nếu có thông báo từ Spring Boot Flash Attributes
+        (function() {
+            /*[# th:if="${message != null}"]*/
+            const serverMsg = /*[[${message}]]*/ '';
+            if (serverMsg) {
+                const icon = serverMsg.includes('Đã lưu') ? '🔖' : (serverMsg.includes('Đã gỡ') ? '🗑️' : '✨');
+                setTimeout(() => showToast(serverMsg, icon), 150);
+            }
+            /*[/]*/
+        })();
+
+        // 6. Xử lý Đánh dấu / Bỏ đánh dấu bài viết tức thì (AJAX Bookmark & Toast Notification)
+        (function() {
+            document.addEventListener('submit', function(e) {
+                const form = e.target;
+                if (!form || !form.action || !form.action.includes('/bookmarks/toggle')) return;
+
+                e.preventDefault();
+
+                const formData = new FormData(form);
+                const articleId = formData.get('articleId');
+                if (!articleId) {
+                    form.submit();
+                    return;
+                }
+
+                const submitBtn = form.querySelector('button[type="submit"]');
+                if (submitBtn) submitBtn.disabled = true;
+
+                fetch('/api/bookmarks/toggle?articleId=' + encodeURIComponent(articleId), {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.success) {
+                        // Cập nhật trạng thái tất cả các nút của bài viết này trên trang
+                        const sameArticleForms = document.querySelectorAll('form[action*="/bookmarks/toggle"]');
+                        sameArticleForms.forEach(f => {
+                            const fId = f.querySelector('input[name="articleId"]');
+                            if (fId && fId.value === articleId) {
+                                const btn = f.querySelector('button[type="submit"]');
+                                if (btn) {
+                                    if (data.bookmarked) {
+                                        btn.classList.add('saved');
+                                        btn.title = 'Đã lưu (Bấm để bỏ lưu)';
+                                    } else {
+                                        btn.classList.remove('saved');
+                                        btn.title = 'Lưu bài viết';
+                                    }
+                                }
+                            }
+                        });
+
+                        // Cập nhật con số hiển thị trên Header (badge số lượng tin đã lưu)
+                        const counters = document.querySelectorAll('.nav-counter');
+                        counters.forEach(c => {
+                            c.textContent = data.count;
+                        });
+
+                        // Nếu đang ở trang danh sách bài viết đã lưu (/bookmarks) và vừa gỡ bỏ tin:
+                        if (window.location.pathname.includes('/bookmarks') && !data.bookmarked) {
+                            const card = form.closest('.article-card, .vne-stream-card, .bookmark-item, .vne-bookmark-card');
+                            if (card) {
+                                card.style.transition = 'all 0.3s ease';
+                                card.style.opacity = '0';
+                                card.style.transform = 'scale(0.96)';
+                                setTimeout(() => card.remove(), 300);
+                            }
+                        }
+
+                        // Hiển thị Toast thông báo nổi bật
+                        const icon = data.bookmarked ? '🔖' : '🗑️';
+                        showToast(data.message, icon);
+                    } else {
+                        form.submit();
+                    }
+                })
+                .catch(err => {
+                    console.error('AJAX bookmark error, fallback to form submit', err);
+                    form.submit();
+                })
+                .finally(() => {
+                    if (submitBtn) submitBtn.disabled = false;
+                });
+            });
+        })();
 
         // 5. Nút sao chép liên kết bài viết
         function copyArticleLink(url, event) {
